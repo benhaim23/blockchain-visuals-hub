@@ -234,12 +234,12 @@ const Contact: React.FC = () => {
                   </div>
                 </div>
                 
-                <div className="mt-8 pt-6 border-t border-primary/10">
-                  <h3 className="text-lg font-semibold mb-4 flex items-center gap-2">
+                <div className="mt-6 pt-5 border-t border-primary/10 pb-2">
+                  <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
                     <Download className="h-4 w-4 text-primary" />
                     Resume
                   </h3>
-                  <p className="text-sm text-muted-foreground mb-4">
+                  <p className="text-sm text-muted-foreground mb-3">
                     View my full resume to learn more about my experience, projects, and qualifications.
                   </p>
                   <Button
