@@ -13,7 +13,7 @@ export const projects: Project[] = [
   {
     id: 1,
     title: '0n1Force',
-    description: 'Supported the 0n1Force project launch, overseeing marketing strategy, community development, and partnerships that positioned it as a leading project in the NFT space.',
+    description: 'Supported the 0n1Force project launch, marketing strategy, community development, and partnerships that positioned it as a leading project in the NFT space.',
     tags: ['Marketing Strategy', 'Community Building', 'Partnership Development'],
     link: 'https://www.0n1force.com/',
     image: '/images/projects/0n1force.jpeg',
