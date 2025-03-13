@@ -75,8 +75,8 @@ export const projects: Project[] = [
   },
   {
     id: 8,
-    title: 'On1Force NFT',
-    description: 'Managed the On1Force NFT project launch, overseeing marketing strategy, community development, and partnerships that positioned it as a leading project in the NFT space.',
+    title: '0n1Force NFT',
+    description: 'Managed the 0n1Force NFT project launch, overseeing marketing strategy, community development, and partnerships that positioned it as a leading project in the NFT space.',
     tags: ['NFT Project', 'Marketing Strategy', 'Community Building'],
     link: 'https://www.0n1force.com/',
     image: '/lovable-uploads/8522e42a-57db-43a7-988b-f0088d154f2f.png',

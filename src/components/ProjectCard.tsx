@@ -20,7 +20,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, index }) => {
 
   // Handle image loading errors
   const handleImageError = () => {
-    console.error(`Failed to load image for project: ${project.title}`);
+    console.error(`Failed to load image for project: ${project.title}`, project.image);
     setImageError(true);
     setImageLoaded(true); // We mark it as loaded to remove the skeleton
   };
@@ -41,7 +41,8 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, index }) => {
             ) : (
               <img 
                 src={project.image} 
-                alt={project.title} 
+                alt={project.title}
+                crossOrigin="anonymous" 
                 className={cn(
                   "w-full h-full object-cover transition-transform duration-500 hover:scale-110",
                   !imageLoaded && "opacity-0"
