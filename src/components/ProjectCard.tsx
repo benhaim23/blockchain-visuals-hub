@@ -25,6 +25,11 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, index }) => {
     setImageLoaded(true); // We mark it as loaded to remove the skeleton
   };
 
+  // Determine if the image is an external URL or a local path
+  const imageSrc = project.image.startsWith('http') 
+    ? project.image 
+    : project.image;
+
   return (
     <div
       className="animate-fade-in-up"
@@ -40,7 +45,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, index }) => {
               </div>
             ) : (
               <img 
-                src={project.image} 
+                src={imageSrc} 
                 alt={project.title}
                 crossOrigin="anonymous" 
                 className={cn(

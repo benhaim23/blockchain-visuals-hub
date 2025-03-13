@@ -16,7 +16,7 @@ export const projects: Project[] = [
     description: 'Led operations at Toshiverse L4bs, managing end-to-end project launches for Wooshi World, On1Force, and Multiversal Walkers across community development, marketing, engineering, and creative direction.',
     tags: ['Operations Management', 'NFT Development', 'Team Leadership'],
     link: 'https://toshiverse.io/',
-    image: '/images/toshiverse.png',
+    image: 'https://images.unsplash.com/photo-1531297484001-80022131f5a1',
     category: 'development',
   },
   {
@@ -25,7 +25,7 @@ export const projects: Project[] = [
     description: 'Orchestrated collaborations with major NFT projects including Bored Ape Yacht Club and Doodles, building strategic partnerships that expanded community reach across Instagram, Twitter, and Discord.',
     tags: ['Partnership Development', 'Influencer Marketing', 'Community Building'],
     link: 'https://www.wooshi.world/',
-    image: '/lovable-uploads/5b2709de-fbb4-4346-8075-3174c5497f06.png',
+    image: 'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b',
     category: 'development',
   },
   {
@@ -34,7 +34,7 @@ export const projects: Project[] = [
     description: 'Crafted robust evaluation frameworks using Dune Analytics, Python, and SQL to convert complex on-chain data into critical insights that informed lending strategies.',
     tags: ['Dune Analytics', 'Data Visualization', 'On-Chain Data'],
     link: 'https://github.com/benhaim23',
-    image: 'https://dune.com/assets/poster.png',
+    image: 'https://images.unsplash.com/photo-1531297484001-80022131f5a1',
     category: 'analytics',
   },
   {
@@ -43,7 +43,7 @@ export const projects: Project[] = [
     description: 'Executed arbitrage and hedging strategies using 15 exchanges, spot trading pairs, and perpetual futures to identify market inefficiencies and optimize returns with 675% YoY growth.',
     tags: ['Arbitrage', 'Hedging', 'Trading Algorithms'],
     link: 'https://github.com/benhaim23',
-    image: 'https://images.unsplash.com/photo-1518770660439-4636190af475',
+    image: '/lovable-uploads/85726000-8e73-4eb5-923d-753655ddee88.png',
     category: 'trading',
   },
   {
@@ -61,7 +61,7 @@ export const projects: Project[] = [
     description: 'Led the successful launch of the Multiversal Walkers NFT project, coordinating creative development, marketing strategy, community building, and technical implementation.',
     tags: ['NFT Launch', 'Community Growth', 'Project Management'],
     link: 'https://multiversalwalkers.com/multipaper',
-    image: '/lovable-uploads/dc155fa2-6796-40df-92fc-adf5750527d6.png',
+    image: 'https://images.unsplash.com/photo-1531297484001-80022131f5a1',
     category: 'development',
   },
   {
@@ -70,7 +70,7 @@ export const projects: Project[] = [
     description: 'Directed the launch of Wooshi World, a successful NFT collection with robust community engagement strategies that drove significant growth across social media platforms.',
     tags: ['NFT Launch', 'Community Management', 'Creative Direction'],
     link: 'https://www.wooshi.world/',
-    image: '/lovable-uploads/0fbdf9e7-b439-4b8f-922c-5d642479bb9e.png',
+    image: 'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b',
     category: 'development',
   },
   {
@@ -79,7 +79,7 @@ export const projects: Project[] = [
     description: 'Managed the 0n1Force NFT project launch, overseeing marketing strategy, community development, and partnerships that positioned it as a leading project in the NFT space.',
     tags: ['NFT Project', 'Marketing Strategy', 'Community Building'],
     link: 'https://www.0n1force.com/',
-    image: '/lovable-uploads/8522e42a-57db-43a7-988b-f0088d154f2f.png',
+    image: 'https://images.unsplash.com/photo-1488590528505-98d2b5aba04b',
     category: 'development',
   },
 ];
