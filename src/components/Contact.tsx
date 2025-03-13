@@ -83,7 +83,7 @@ const Contact: React.FC = () => {
       <div className="max-w-5xl mx-auto">
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
           <div className="lg:col-span-2">
-            <Card className="glass-card shadow-lg animate-fade-in-up overflow-hidden">
+            <Card className="glass-card shadow-lg animate-fade-in-up h-full">
               <CardHeader className="bg-primary/5 border-b border-primary/10">
                 <CardTitle className="flex items-center gap-2">
                   <MessageSquare className="h-5 w-5 text-primary" />
@@ -191,7 +191,7 @@ const Contact: React.FC = () => {
           </div>
           
           <div className="animate-fade-in-up">
-            <Card className="glass-card shadow-lg h-full overflow-hidden">
+            <Card className="glass-card shadow-lg h-full">
               <CardHeader className="bg-primary/5 border-b border-primary/10">
                 <CardTitle className="flex items-center gap-2">
                   <Mail className="h-5 w-5 text-primary" />
@@ -201,7 +201,7 @@ const Contact: React.FC = () => {
                   Ways to reach me directly
                 </CardDescription>
               </CardHeader>
-              <CardContent className="p-6 flex flex-col justify-between h-[calc(100%-5rem)]">
+              <CardContent className="p-6 flex flex-col justify-between h-[calc(100%-76px)]">
                 <div className="space-y-6">
                   <div className="flex items-start space-x-3">
                     <div className="p-2 rounded-full bg-primary/10 text-primary">
