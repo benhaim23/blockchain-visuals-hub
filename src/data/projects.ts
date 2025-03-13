@@ -34,7 +34,7 @@ export const projects: Project[] = [
     description: 'Executed arbitrage and hedging strategies at GMB Capital using 15 exchanges, spot trading pairs, and perpetual futures to identify market inefficiencies and optimize returns with 675% YoY growth.',
     tags: ['Arbitrage', 'Hedging', 'Trading Algorithms', 'Fund Management'],
     link: 'https://github.com/benhaim23',
-    image: '/images/projects/gmb_capital.jpeg',
+    image: '/images/projects/GMB_Capital.jpeg',
     category: 'trading',
   },
   {
@@ -43,7 +43,7 @@ export const projects: Project[] = [
     description: 'Architected a sophisticated analytical model merging social media sentiment evaluation with financial metrics on Bitcoin performance to identify primary market volatility factors.',
     tags: ['Sentiment Analysis', 'Financial Metrics', 'Market Volatility'],
     link: 'https://github.com/benhaim23',
-    image: '/placeholder.svg',
+    image: '/images/projects/bitcoin_price_forecast_and_sentiment_tool.jpeg',
     category: 'analytics',
   },
   {
@@ -79,7 +79,8 @@ export const projects: Project[] = [
     description: 'Worked within the Research and Development department at 3iQ, building project initiatives in Real World Asset Tokenization and DeFi treasury management. Conducted in-depth analysis of DeFi protocols and blockchain financial mechanisms to identify investment opportunities and risks.',
     tags: ['RWA Tokenization', 'DeFi Treasury', 'Blockchain Research', 'Investment Analysis'],
     link: 'https://3iq.io/',
-    image: '/images/projects/3iq.jpeg',
+    image: '/images/projects/3iQ.jpeg',
     category: 'analytics',
   },
 ];
+
