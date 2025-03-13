@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { BarChart, PieChart, AreaChart, Users, Megaphone, Briefcase, Code, Database, Network, Shield, Search, FlaskConical } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -114,10 +115,10 @@ const Skills: React.FC = () => {
     },
     {
       title: "Technical Skills",
-      description: "Basic programming and data tools",
+      description: "Programming and data tools",
       icon: <Code className="h-6 w-6 text-primary" />,
       skills: [
-        { name: "Python", keywords: ["Data Analysis", "Jupyter", "Basic Scripting"] },
+        { name: "Python", keywords: ["Data Analysis", "Jupyter", "Machine Learning"] },
         { name: "Version Control", keywords: ["Git", "GitHub"] },
         { name: "SQL", keywords: ["Queries", "Data Extraction", "MySQL"] },
         { name: "Data Tools", keywords: ["Excel", "Google Sheets", "Tableau"] },
@@ -125,11 +126,11 @@ const Skills: React.FC = () => {
     },
     {
       title: "Data Fundamentals",
-      description: "Working with data and basic infrastructure",
+      description: "Working with data and infrastructure",
       icon: <Database className="h-6 w-6 text-primary" />,
       skills: [
         { name: "Database Basics", keywords: ["MySQL", "SQL Queries", "Data Models"] },
-        { name: "Data Extraction", keywords: ["APIs", "Basic ETL", "CSV/JSON"] },
+        { name: "Data Extraction", keywords: ["APIs", "ETL", "CSV/JSON"] },
         { name: "Analytics", keywords: ["Dashboards", "Reporting", "KPIs"] },
         { name: "Visualization", keywords: ["Charts", "Graphs", "Presentation"] },
       ],
