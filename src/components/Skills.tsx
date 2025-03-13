@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { BarChart, PieChart, AreaChart, Users, Megaphone, Briefcase, Code, Database, Network, Shield, Search, FlaskConical } from 'lucide-react';
+import { BarChart, PieChart, AreaChart, Users, Megaphone, Briefcase, Code, Database, Network, Shield, Search, FlaskConical, Award, GraduationCap } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
@@ -176,38 +176,70 @@ const Skills: React.FC = () => {
         ))}
       </div>
 
-      <div className="mt-12 glass-card p-8 animate-fade-in-up">
-        <h3 className="text-xl font-semibold mb-6 text-center">Certifications & Education</h3>
+      <div className="mt-12 animate-fade-in-up" style={{ animationDelay: '0.9s' }}>
+        <h3 className="text-xl font-semibold mb-6 text-center inline-flex items-center gap-2">
+          <Award className="h-5 w-5 text-primary" />
+          Certifications & Education
+        </h3>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <div>
-            <h4 className="font-medium text-lg mb-4">Certifications</h4>
-            <ul className="space-y-2 list-disc pl-5">
-              <li>Tableau Desktop Specialist</li>
-              <li>Python for Trading - Quantinsti</li>
-              <li>IBM Professional Certificate for Data Science</li>
-              <li>Brainstation Data Science Bootcamp</li>
-            </ul>
-          </div>
+          <Card className="glass-card hover:shadow-md transition-all duration-300">
+            <CardHeader className="flex flex-row items-start space-x-4 pb-2">
+              <div className="p-2 rounded-md bg-primary/10">
+                <Award className="h-6 w-6 text-primary" />
+              </div>
+              <div>
+                <CardTitle className="text-xl">Certifications</CardTitle>
+                <CardDescription>Professional qualifications</CardDescription>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <ul className="space-y-3">
+                {[
+                  "Tableau Desktop Specialist",
+                  "Python for Trading - Quantinsti",
+                  "IBM Professional Certificate for Data Science",
+                  "Brainstation Data Science Bootcamp"
+                ].map((cert, index) => (
+                  <li key={index} className="flex items-start gap-2 group">
+                    <Badge variant="outline" className="mt-0.5 group-hover:bg-primary/20 transition-colors">
+                      {index + 1}
+                    </Badge>
+                    <span className="font-medium">{cert}</span>
+                  </li>
+                ))}
+              </ul>
+            </CardContent>
+          </Card>
           
-          <div>
-            <h4 className="font-medium text-lg mb-4">Education</h4>
-            <ul className="space-y-4">
-              <li>
-                <div className="font-medium">Master's in Applied Data Science</div>
-                <div className="text-sm text-muted-foreground">University of Michigan, 2023 - Present</div>
-              </li>
-              <li>
-                <div className="font-medium">Master's in Blockchain & Digital Currency</div>
-                <div className="text-sm text-muted-foreground">University of Nicosia, 2018 - 2019</div>
-              </li>
-              <li>
-                <div className="font-medium">Bachelor of Commerce (Accounting)</div>
-                <div className="text-sm text-muted-foreground">Concordia University, John Molson School of Business, 2015 - 2018</div>
-                <div className="text-xs text-muted-foreground">Honors: Ernst & Young Scholarship, Beta Gamma Sigma, Dean's Honor List</div>
-              </li>
-            </ul>
-          </div>
+          <Card className="glass-card hover:shadow-md transition-all duration-300">
+            <CardHeader className="flex flex-row items-start space-x-4 pb-2">
+              <div className="p-2 rounded-md bg-primary/10">
+                <GraduationCap className="h-6 w-6 text-primary" />
+              </div>
+              <div>
+                <CardTitle className="text-xl">Education</CardTitle>
+                <CardDescription>Academic background</CardDescription>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <ul className="space-y-4">
+                <li className="border-l-2 border-primary/30 pl-4 py-1 hover:border-primary transition-colors">
+                  <div className="font-medium text-base">Master's in Applied Data Science</div>
+                  <div className="text-sm text-muted-foreground">University of Michigan, 2023 - Present</div>
+                </li>
+                <li className="border-l-2 border-primary/30 pl-4 py-1 hover:border-primary transition-colors">
+                  <div className="font-medium text-base">Master's in Blockchain & Digital Currency</div>
+                  <div className="text-sm text-muted-foreground">University of Nicosia, 2018 - 2019</div>
+                </li>
+                <li className="border-l-2 border-primary/30 pl-4 py-1 hover:border-primary transition-colors">
+                  <div className="font-medium text-base">Bachelor of Commerce (Accounting)</div>
+                  <div className="text-sm text-muted-foreground">Concordia University, John Molson School of Business, 2015 - 2018</div>
+                  <div className="text-xs text-muted-foreground">Honors: Ernst & Young Scholarship, Beta Gamma Sigma, Dean's Honor List</div>
+                </li>
+              </ul>
+            </CardContent>
+          </Card>
         </div>
       </div>
     </section>
