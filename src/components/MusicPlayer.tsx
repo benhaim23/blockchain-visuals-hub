@@ -1,6 +1,6 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Play, Pause, Volume2, VolumeX } from 'lucide-react';
+import { Play, Pause, Volume2, VolumeX, Music, MinusCircle } from 'lucide-react';
 import { Slider } from '@/components/ui/slider';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/context/ThemeContext';
@@ -8,15 +8,11 @@ import { useTheme } from '@/context/ThemeContext';
 const MUSIC_TRACKS = [
   {
     title: "Ambient Innovation",
-    path: "/music/ambient-innovation.mp3",
+    path: "/music/Ambient_innovation.mp3",
   },
   {
     title: "Digital Serenity",
-    path: "/music/digital-serenity.mp3",
-  },
-  {
-    title: "Blockchain Harmony",
-    path: "/music/blockchain-harmony.mp3",
+    path: "/music/Digital_serenity.mp3",
   }
 ];
 
@@ -106,36 +102,38 @@ const MusicPlayer: React.FC = () => {
   return (
     <div 
       className={cn(
-        "fixed bottom-4 left-4 z-50 flex flex-col rounded-lg shadow-lg transition-all duration-300 glass",
-        isExpanded ? "w-64 p-4" : "w-12 h-12"
+        "fixed bottom-5 left-5 z-50 flex flex-col rounded-xl shadow-xl transition-all duration-300",
+        isExpanded ? "w-72 p-5 bg-background/80 backdrop-blur-lg border border-border/50" : "w-14 h-14",
+        theme === 'dark' ? 'shadow-primary/20' : 'shadow-primary/10'
       )}
     >
       {isExpanded ? (
         <>
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="text-sm font-medium truncate">
-              {currentTrack.title}
-            </h3>
+          <div className="flex items-center justify-between mb-4">
+            <div className="flex items-center gap-2">
+              <Music size={16} className="text-primary" />
+              <h3 className="text-sm font-medium truncate">
+                {currentTrack.title}
+              </h3>
+            </div>
             <button 
               onClick={() => setIsExpanded(false)}
-              className="text-muted-foreground hover:text-foreground"
+              className="text-muted-foreground hover:text-foreground rounded-full p-1 hover:bg-secondary/80 transition-colors"
+              aria-label="Minimize music player"
             >
-              <span className="sr-only">Collapse</span>
-              <svg width="15" height="15" viewBox="0 0 15 15" fill="none" xmlns="http://www.w3.org/2000/svg">
-                <path d="M11.7816 4.03157C12.0062 3.80702 12.0062 3.44295 11.7816 3.2184C11.5571 2.99385 11.193 2.99385 10.9685 3.2184L7.50005 6.68682L4.03164 3.2184C3.80708 2.99385 3.44301 2.99385 3.21846 3.2184C2.99391 3.44295 2.99391 3.80702 3.21846 4.03157L6.68688 7.49999L3.21846 10.9684C2.99391 11.193 2.99391 11.557 3.21846 11.7816C3.44301 12.0061 3.80708 12.0061 4.03164 11.7816L7.50005 8.31316L10.9685 11.7816C11.193 12.0061 11.5571 12.0061 11.7816 11.7816C12.0062 11.557 12.0062 11.193 11.7816 10.9684L8.31322 7.49999L11.7816 4.03157Z" fill="currentColor"></path>
-              </svg>
+              <MinusCircle size={16} />
             </button>
           </div>
           
-          <div className="flex gap-2 mb-3 flex-wrap">
+          <div className="flex gap-2 mb-4">
             {MUSIC_TRACKS.map((track, index) => (
               <button
                 key={index}
                 onClick={() => changeTrack(index)}
                 className={cn(
-                  "text-xs px-2 py-1 rounded-full",
+                  "text-xs px-3 py-1.5 rounded-full transition-all duration-200",
                   currentTrackIndex === index 
-                    ? "bg-primary text-primary-foreground" 
+                    ? "bg-primary text-primary-foreground shadow-sm" 
                     : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
                 )}
               >
@@ -144,19 +142,29 @@ const MusicPlayer: React.FC = () => {
             ))}
           </div>
           
-          <div className="flex items-center gap-3 mb-2">
+          <div className="flex items-center gap-3 mb-1">
             <button
               onClick={togglePlay}
-              className="h-8 w-8 rounded-full bg-primary text-primary-foreground flex items-center justify-center hover:bg-primary/90 transition-colors"
+              className={cn(
+                "h-10 w-10 rounded-full flex items-center justify-center transition-all duration-200",
+                isPlaying 
+                  ? "bg-primary text-primary-foreground shadow-sm" 
+                  : "bg-secondary text-secondary-foreground hover:bg-secondary/80"
+              )}
+              aria-label={isPlaying ? "Pause" : "Play"}
             >
-              {isPlaying ? <Pause size={16} /> : <Play size={16} />}
+              {isPlaying ? <Pause size={18} /> : <Play size={18} className="ml-1" />}
             </button>
             
             <button
               onClick={toggleMute}
-              className="text-muted-foreground hover:text-foreground transition-colors"
+              className={cn(
+                "text-muted-foreground hover:text-foreground rounded-full p-1.5 hover:bg-secondary/80 transition-colors",
+                isMuted && "text-destructive hover:text-destructive/80"
+              )}
+              aria-label={isMuted ? "Unmute" : "Mute"}
             >
-              {isMuted ? <VolumeX size={16} /> : <Volume2 size={16} />}
+              {isMuted ? <VolumeX size={18} /> : <Volume2 size={18} />}
             </button>
             
             <div className="flex-1">
@@ -166,22 +174,40 @@ const MusicPlayer: React.FC = () => {
                 max={100}
                 step={1}
                 onValueChange={handleVolumeChange}
-                className="h-1.5"
+                className="h-2"
               />
             </div>
           </div>
+          
+          {isPlaying && (
+            <div className="flex justify-center gap-0.5 h-4 mt-2">
+              {Array(4).fill(0).map((_, i) => (
+                <div 
+                  key={i} 
+                  className="equalizer-bar" 
+                  style={{ 
+                    animationDelay: `${i * 0.2}s`,
+                    height: '8px'
+                  }} 
+                />
+              ))}
+            </div>
+          )}
         </>
       ) : (
         <button
           onClick={() => setIsExpanded(true)}
-          className="w-full h-full flex items-center justify-center rounded-lg hover:bg-primary/10 transition-colors"
+          className={cn(
+            "w-full h-full flex items-center justify-center rounded-xl hover:bg-primary/10 transition-colors",
+            "bg-background/80 backdrop-blur-lg border border-border/50"
+          )}
           aria-label="Open music player"
         >
           <div className={cn(
             "relative",
             isPlaying ? "animate-pulse" : ""
           )}>
-            <Volume2 size={20} className={cn(
+            <Music size={20} className={cn(
               "text-foreground transition-opacity",
               isPlaying ? "opacity-100" : "opacity-70"
             )} />
