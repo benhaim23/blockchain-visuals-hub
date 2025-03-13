@@ -1,20 +1,22 @@
 
 import React, { useEffect, useState } from 'react';
-import { Menu, X } from 'lucide-react';
+import { Menu, X, Home, User, Code, Layers, Mail } from 'lucide-react';
 import ThemeToggle from './ThemeToggle';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const navigation = [
-  { name: 'About', href: '#about' },
-  { name: 'Projects', href: '#projects' },
-  { name: 'Skills', href: '#skills' },
-  { name: 'Contact', href: '#contact' },
+  { name: 'About', href: '#about', icon: <User className="h-4 w-4 mr-2" /> },
+  { name: 'Projects', href: '#projects', icon: <Code className="h-4 w-4 mr-2" /> },
+  { name: 'Skills', href: '#skills', icon: <Layers className="h-4 w-4 mr-2" /> },
+  { name: 'Contact', href: '#contact', icon: <Mail className="h-4 w-4 mr-2" /> },
 ];
 
 const Header: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
+  const isMobile = useIsMobile();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -76,14 +78,21 @@ const Header: React.FC = () => {
         </div>
       </div>
 
-      {/* Mobile menu */}
+      {/* Mobile menu - updated for better UX */}
       <div
         className={cn(
           'fixed inset-0 z-50 md:hidden glass',
           mobileMenuOpen ? 'block' : 'hidden'
         )}
       >
-        <div className="flex items-center justify-end p-4">
+        <div className="flex items-center justify-between p-4">
+          <a 
+            href="#" 
+            className="text-xl font-bold crypto-gradient"
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            Crypto<span className="font-mono">Portfolio</span>
+          </a>
           <Button
             variant="ghost"
             size="icon"
@@ -94,17 +103,39 @@ const Header: React.FC = () => {
             <span className="sr-only">Close menu</span>
           </Button>
         </div>
-        <div className="flex flex-col items-center justify-center h-full space-y-8 p-4">
+        <div className="flex flex-col px-4 py-6 space-y-2">
+          <a
+            href="#"
+            className="flex items-center px-4 py-3 rounded-lg bg-primary/10 text-primary"
+            onClick={() => setMobileMenuOpen(false)}
+          >
+            <Home className="h-5 w-5 mr-3" />
+            <span className="font-medium">Home</span>
+          </a>
+          
           {navigation.map((item) => (
             <a
               key={item.name}
               href={item.href}
-              className="text-foreground text-xl font-medium"
+              className="flex items-center px-4 py-3 rounded-lg hover:bg-foreground/5 transition-colors"
               onClick={() => setMobileMenuOpen(false)}
             >
-              {item.name}
+              {item.icon}
+              <span>{item.name}</span>
             </a>
           ))}
+
+          {isMobile && (
+            <div className="mt-8 pt-6 border-t border-border/30">
+              <a
+                href="mailto:markbenhaim0@gmail.com"
+                className="flex items-center justify-center w-full px-4 py-3 rounded-lg bg-primary text-primary-foreground"
+              >
+                <Mail className="h-5 w-5 mr-2" />
+                <span className="font-medium">Contact Me</span>
+              </a>
+            </div>
+          )}
         </div>
       </div>
     </header>

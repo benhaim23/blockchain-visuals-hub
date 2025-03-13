@@ -9,8 +9,11 @@ import Contact from '@/components/Contact';
 import Footer from '@/components/Footer';
 import ParticleBackground from '@/components/ParticleBackground';
 import { ThemeProvider } from '@/context/ThemeContext';
+import { useIsMobile } from '@/hooks/use-mobile';
 
 const Index: React.FC = () => {
+  const isMobile = useIsMobile();
+  
   // Smooth scroll function for anchor links
   useEffect(() => {
     const handleAnchorClick = (e: MouseEvent) => {
@@ -22,8 +25,9 @@ const Index: React.FC = () => {
         
         const element = document.querySelector(anchor.hash);
         if (element) {
+          const offset = isMobile ? 60 : 80; // Smaller offset on mobile
           window.scrollTo({
-            top: element.getBoundingClientRect().top + window.scrollY - 80,
+            top: element.getBoundingClientRect().top + window.scrollY - offset,
             behavior: 'smooth'
           });
           
@@ -38,7 +42,7 @@ const Index: React.FC = () => {
     return () => {
       document.removeEventListener('click', handleAnchorClick);
     };
-  }, []);
+  }, [isMobile]);
 
   return (
     <ThemeProvider>
@@ -47,7 +51,7 @@ const Index: React.FC = () => {
         <Header />
         <main className="flex flex-col items-center justify-center">
           <Hero />
-          <div className="w-full max-w-7xl mx-auto">
+          <div className="w-full max-w-7xl mx-auto px-4 sm:px-6">
             <About />
             <Projects />
             <Skills />
