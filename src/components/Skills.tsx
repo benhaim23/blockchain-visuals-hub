@@ -152,6 +152,7 @@ const Skills: React.FC = () => {
               <li>Tableau Desktop Specialist</li>
               <li>Python for Trading - Quantinsti</li>
               <li>IBM Professional Certificate for Data Science</li>
+              <li>Brainstation Data Science Bootcamp</li>
             </ul>
           </div>
           
