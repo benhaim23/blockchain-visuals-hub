@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { ExternalLink, Code, Database, ArrowRight } from 'lucide-react';
+import { ExternalLink, Code, Database, ArrowRight, Users } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
@@ -13,21 +13,30 @@ interface Project {
   tags: string[];
   link?: string;
   image: string;
-  category: 'development' | 'trading' | 'analytics';
+  category: 'development' | 'trading' | 'analytics' | 'community';
 }
 
 const projects: Project[] = [
   {
     id: 1,
-    title: 'NFT Studio & Marketplace',
-    description: 'Co-founded and scaled an NFT studio that generated over $4M USD in first-year revenue, leading a 20-person team across engineering, marketing, and creative domains.',
-    tags: ['NFT Development', 'Team Leadership', 'Revenue Generation'],
-    link: 'https://github.com/benhaim23',
+    title: 'Toshiverse NFT Studio',
+    description: 'Led operations at Toshiverse L4bs, managing end-to-end project launches for Wooshi World, On1Force, and Multiversal Walkers across community development, marketing, engineering, and creative direction.',
+    tags: ['Operations Management', 'NFT Development', 'Team Leadership'],
+    link: 'https://toshiverse.io/',
     image: 'data:image/svg+xml;charset=UTF-8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="560" height="320" viewBox="0 0 560 320" fill="none"%3E%3Crect width="560" height="320" fill="%230066CC" fill-opacity="0.05"/%3E%3Cpath d="M280 160m-50 0a50 50 0 1 0 100 0a50 50 0 1 0 -100 0" stroke="%230066CC" stroke-width="2" stroke-dasharray="4 4"/%3E%3Cpath d="M280 120L330 190H230L280 120Z" stroke="%230066CC" stroke-width="2"/%3E%3C/svg%3E',
     category: 'development',
   },
   {
     id: 2,
+    title: 'Strategic NFT Collaborations',
+    description: 'Orchestrated collaborations with major NFT projects including Bored Ape Yacht Club and Doodles, building strategic partnerships that expanded community reach across Instagram, Twitter, and Discord.',
+    tags: ['Partnership Development', 'Influencer Marketing', 'Community Building'],
+    link: 'https://www.wooshi.world/',
+    image: 'data:image/svg+xml;charset=UTF-8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="560" height="320" viewBox="0 0 560 320" fill="none"%3E%3Crect width="560" height="320" fill="%23AA00AA" fill-opacity="0.05"/%3E%3Cpath d="M140 140H420" stroke="%23AA00AA" stroke-width="2" stroke-dasharray="6 6"/%3E%3Cpath d="M140 180H420" stroke="%23AA00AA" stroke-width="2" stroke-dasharray="6 6"/%3E%3Cpath d="M140 100v120" stroke="%23AA00AA" stroke-width="2" stroke-dasharray="6 6"/%3E%3Cpath d="M420 100v120" stroke="%23AA00AA" stroke-width="2" stroke-dasharray="6 6"/%3E%3Cpath d="M280 120L330 180H230L280 120Z" fill="%23AA00AA" fill-opacity="0.2" stroke="%23AA00AA" stroke-width="2"/%3E%3C/svg%3E',
+    category: 'community',
+  },
+  {
+    id: 3,
     title: 'Dune Analytics Dashboard',
     description: 'Crafted robust evaluation frameworks using Dune Analytics, Python, and SQL to convert complex on-chain data into critical insights that informed lending strategies.',
     tags: ['Dune Analytics', 'Data Visualization', 'On-Chain Data'],
@@ -36,7 +45,7 @@ const projects: Project[] = [
     category: 'analytics',
   },
   {
-    id: 3,
+    id: 4,
     title: 'Arbitrage Trading System',
     description: 'Executed arbitrage and hedging strategies using 15 exchanges, spot trading pairs, and perpetual futures to identify market inefficiencies and optimize returns with 675% YoY growth.',
     tags: ['Arbitrage', 'Hedging', 'Trading Algorithms'],
@@ -45,7 +54,7 @@ const projects: Project[] = [
     category: 'trading',
   },
   {
-    id: 4,
+    id: 5,
     title: 'Bitcoin Sentiment Analysis',
     description: 'Architected a sophisticated analytical model merging social media sentiment evaluation with financial metrics on Bitcoin performance to identify primary market volatility factors.',
     tags: ['Sentiment Analysis', 'Financial Metrics', 'Market Volatility'],
@@ -54,22 +63,13 @@ const projects: Project[] = [
     category: 'analytics',
   },
   {
-    id: 5,
-    title: 'BTC LSTM Prediction Model',
-    description: 'Innovated an end-to-end pipeline featuring cutting-edge long short-term memory algorithms focused on refining crypto price predictions to inform trading decisions.',
-    tags: ['Machine Learning', 'Time Series', 'Price Prediction'],
-    link: 'https://github.com/benhaim23',
-    image: 'data:image/svg+xml;charset=UTF-8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="560" height="320" viewBox="0 0 560 320" fill="none"%3E%3Crect width="560" height="320" fill="%23AAAA00" fill-opacity="0.05"/%3E%3Crect x="200" y="120" width="160" height="100" rx="10" stroke="%23AAAA00" stroke-width="2"/%3E%3Cpath d="M230 140l20 20m0-20l-20 20" stroke="%23AAAA00" stroke-width="2"/%3E%3Cpath d="M310 140l20 20m0-20l-20 20" stroke="%23AAAA00" stroke-width="2"/%3E%3Cpath d="M250 180h60" stroke="%23AAAA00" stroke-width="2"/%3E%3C/svg%3E',
-    category: 'analytics',
-  },
-  {
     id: 6,
-    title: 'Crypto Market Research Reports',
-    description: 'Developed comprehensive analytical reports on blockchain financial mechanisms, including detailed analyses of token economics, protocol incentives, and market trends.',
-    tags: ['Market Research', 'Token Economics', 'Financial Analysis'],
-    link: 'https://github.com/benhaim23',
+    title: 'Multiversal Walkers NFT',
+    description: 'Led the successful launch of the Multiversal Walkers NFT project, coordinating creative development, marketing strategy, community building, and technical implementation.',
+    tags: ['NFT Launch', 'Community Growth', 'Project Management'],
+    link: 'https://multiversalwalkers.com/multipaper',
     image: 'data:image/svg+xml;charset=UTF-8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="560" height="320" viewBox="0 0 560 320" fill="none"%3E%3Crect width="560" height="320" fill="%230088AA" fill-opacity="0.05"/%3E%3Cpath d="M200 120h160m-160 40h160m-160 40h160m-160 40h80" stroke="%230088AA" stroke-width="2" stroke-dasharray="4 4"/%3E%3Crect x="180" y="100" width="200" height="140" rx="5" stroke="%230088AA" stroke-width="2"/%3E%3C/svg%3E',
-    category: 'analytics',
+    category: 'community',
   },
 ];
 
@@ -87,7 +87,7 @@ const Projects: React.FC = () => {
         <h2 className="section-title">Featured Projects</h2>
         <p className="section-subtitle">
           A showcase of my contributions to the blockchain and cryptocurrency ecosystem,
-          spanning development, trading systems, and data analytics.
+          spanning development, trading systems, data analytics, and community building.
         </p>
         
         <div className="flex flex-wrap justify-center gap-2 mt-8">
@@ -118,6 +118,13 @@ const Projects: React.FC = () => {
             onClick={() => setFilter("analytics")}
           >
             Analytics
+          </Button>
+          <Button
+            variant={filter === "community" ? "default" : "outline"}
+            className="rounded-full text-sm"
+            onClick={() => setFilter("community")}
+          >
+            Community
           </Button>
         </div>
       </div>

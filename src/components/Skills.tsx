@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { BarChart, PieChart, AreaChart } from 'lucide-react';
+import { BarChart, PieChart, AreaChart, Users, Megaphone, Briefcase } from 'lucide-react';
 import { Progress } from '@/components/ui/progress';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
@@ -58,6 +58,28 @@ const Skills: React.FC = () => {
       ],
     },
     {
+      title: "Product & Business Development",
+      description: "Building and scaling products and businesses",
+      icon: <Briefcase className="h-6 w-6 text-primary" />,
+      skills: [
+        { name: "NFT Project Management", level: 95 },
+        { name: "Cross-functional Leadership", level: 90 },
+        { name: "Strategic Partnerships", level: 92 },
+        { name: "Revenue Generation", level: 88 },
+      ],
+    },
+    {
+      title: "Marketing & Community",
+      description: "Building engaged communities and brand presence",
+      icon: <Megaphone className="h-6 w-6 text-primary" />,
+      skills: [
+        { name: "Community Development", level: 94 },
+        { name: "Influencer Campaigns", level: 90 },
+        { name: "Social Media Strategy", level: 92 },
+        { name: "Cross-Project Collaborations", level: 93 },
+      ],
+    },
+    {
       title: "Blockchain & Crypto",
       description: "Expertise in blockchain technologies",
       icon: <BarChart className="h-6 w-6 text-primary" />,
@@ -79,6 +101,17 @@ const Skills: React.FC = () => {
         { name: "Crypto Market Forecasting", level: 85 },
       ],
     },
+    {
+      title: "Team & Project Management",
+      description: "Leading teams and executing complex projects",
+      icon: <Users className="h-6 w-6 text-primary" />,
+      skills: [
+        { name: "End-to-End Project Management", level: 95 },
+        { name: "Creative Direction", level: 88 },
+        { name: "Engineering Coordination", level: 87 },
+        { name: "Multi-stakeholder Alignment", level: 93 },
+      ],
+    },
   ];
 
   return (
@@ -88,11 +121,11 @@ const Skills: React.FC = () => {
         <h2 className="section-title">Skills & Proficiencies</h2>
         <p className="section-subtitle">
           With a diverse skill set spanning operations, product development, research, and data analytics,
-          I bring specialized expertise to navigate the complexities of the crypto ecosystem.
+          I bring specialized expertise to navigate the complexities of the crypto ecosystem and NFT space.
         </p>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {skillCategories.map((category, index) => (
           <div
             key={index}
