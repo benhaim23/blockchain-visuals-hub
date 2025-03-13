@@ -48,55 +48,39 @@ const Footer: React.FC = () => {
               <div className="flex flex-wrap justify-center md:justify-end gap-3">
                 <Button 
                   variant="outline" 
-                  size={isMobile ? "default" : "icon"} 
+                  size="icon" 
                   aria-label="Twitter"
-                  className={cn(
-                    "hover:bg-primary/10 hover:text-primary transition-colors",
-                    isMobile && "flex-1 min-w-[70px]"
-                  )}
+                  className="hover:bg-primary/10 hover:text-primary transition-colors"
                   onClick={() => window.open('https://x.com/inflationseries', '_blank')}
                 >
                   <Twitter className="h-4 w-4" />
-                  {isMobile && <span className="ml-2">Twitter</span>}
                 </Button>
                 <Button 
                   variant="outline" 
-                  size={isMobile ? "default" : "icon"} 
+                  size="icon" 
                   aria-label="LinkedIn"
-                  className={cn(
-                    "hover:bg-blue-500/10 hover:text-blue-500 transition-colors",
-                    isMobile && "flex-1 min-w-[70px]"
-                  )}
+                  className="hover:bg-blue-500/10 hover:text-blue-500 transition-colors"
                   onClick={() => window.open('https://www.linkedin.com/in/mark-benhaim/', '_blank')}
                 >
                   <Linkedin className="h-4 w-4" />
-                  {isMobile && <span className="ml-2">LinkedIn</span>}
                 </Button>
                 <Button 
                   variant="outline" 
-                  size={isMobile ? "default" : "icon"} 
+                  size="icon" 
                   aria-label="GitHub"
-                  className={cn(
-                    "hover:bg-gray-800/10 hover:text-gray-800 dark:hover:text-white transition-colors",
-                    isMobile && "flex-1 min-w-[70px]"
-                  )}
+                  className="hover:bg-gray-800/10 hover:text-gray-800 dark:hover:text-white transition-colors"
                   onClick={() => window.open('https://github.com/benhaim23', '_blank')}
                 >
                   <Github className="h-4 w-4" />
-                  {isMobile && <span className="ml-2">GitHub</span>}
                 </Button>
                 <Button 
                   variant="outline" 
-                  size={isMobile ? "default" : "icon"} 
+                  size="icon" 
                   aria-label="Email"
-                  className={cn(
-                    "hover:bg-green-500/10 hover:text-green-500 transition-colors",
-                    isMobile && "flex-1 min-w-[70px]"
-                  )}
+                  className="hover:bg-green-500/10 hover:text-green-500 transition-colors"
                   onClick={() => window.location.href = 'mailto:markbenhaim0@gmail.com'}
                 >
                   <Mail className="h-4 w-4" />
-                  {isMobile && <span className="ml-2">Email</span>}
                 </Button>
               </div>
             </CardContent>
