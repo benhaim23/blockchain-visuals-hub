@@ -196,6 +196,7 @@ const Skills: React.FC = () => {
             <CardContent>
               <ul className="space-y-3">
                 {[
+                  "Blockchain and Digital Currencies at UNIC",
                   "Tableau Desktop Specialist",
                   "Python for Trading - Quantinsti",
                   "IBM Professional Certificate for Data Science",
