@@ -64,12 +64,12 @@ const projects: Project[] = [
   },
   {
     id: 6,
-    title: 'Trading Dashboard Automation',
-    description: 'Engineered a custom dashboard automating trade execution processes, achieving a 30% reduction in manual oversight hours while enhancing precision in real-time monitoring.',
-    tags: ['Dashboard Development', 'Process Automation', 'Real-time Monitoring'],
+    title: 'Crypto Market Research Reports',
+    description: 'Developed comprehensive analytical reports on blockchain financial mechanisms, including detailed analyses of token economics, protocol incentives, and market trends.',
+    tags: ['Market Research', 'Token Economics', 'Financial Analysis'],
     link: 'https://github.com/benhaim23',
-    image: 'data:image/svg+xml;charset=UTF-8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="560" height="320" viewBox="0 0 560 320" fill="none"%3E%3Crect width="560" height="320" fill="%230088AA" fill-opacity="0.05"/%3E%3Cpath d="M280 120l-50 80h100l-50-80z" stroke="%230088AA" stroke-width="2"/%3E%3Ccircle cx="280" cy="150" r="10" fill="%230088AA" fill-opacity="0.2" stroke="%230088AA" stroke-width="2"/%3E%3Cpath d="M260 190h40" stroke="%230088AA" stroke-width="2"/%3E%3C/svg%3E',
-    category: 'development',
+    image: 'data:image/svg+xml;charset=UTF-8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="560" height="320" viewBox="0 0 560 320" fill="none"%3E%3Crect width="560" height="320" fill="%230088AA" fill-opacity="0.05"/%3E%3Cpath d="M200 120h160m-160 40h160m-160 40h160m-160 40h80" stroke="%230088AA" stroke-width="2" stroke-dasharray="4 4"/%3E%3Crect x="180" y="100" width="200" height="140" rx="5" stroke="%230088AA" stroke-width="2"/%3E%3C/svg%3E',
+    category: 'analytics',
   },
 ];
 

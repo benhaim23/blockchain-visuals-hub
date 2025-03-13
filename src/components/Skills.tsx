@@ -87,8 +87,8 @@ const Skills: React.FC = () => {
         <div className="badge badge-primary inline-block mb-2">My Expertise</div>
         <h2 className="section-title">Skills & Proficiencies</h2>
         <p className="section-subtitle">
-          With a diverse skill set spanning data science, blockchain technologies, and trading strategies,
-          I bring comprehensive expertise to navigate the complexities of the crypto ecosystem.
+          With a diverse skill set spanning operations, product development, research, and data analytics,
+          I bring specialized expertise to navigate the complexities of the crypto ecosystem.
         </p>
       </div>
 
@@ -116,9 +116,7 @@ const Skills: React.FC = () => {
           <div>
             <h4 className="font-medium text-lg mb-4">Certifications</h4>
             <ul className="space-y-2 list-disc pl-5">
-              <li>AWS Certified Data Engineer Associate (in progress)</li>
-              <li>Tableau Desktop Specialist (in progress)</li>
-              <li>SnowPro Core Certification (in progress)</li>
+              <li>Tableau Desktop Specialist</li>
               <li>Python for Trading - Quantinsti</li>
               <li>IBM Professional Certificate for Data Science</li>
             </ul>
