@@ -1,3 +1,4 @@
+
 import React, { useState } from 'react';
 import { ExternalLink, Code, Database, ArrowRight, Users } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -5,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
+import { Skeleton } from '@/components/ui/skeleton';
 
 interface Project {
   id: number;
@@ -68,7 +70,7 @@ const projects: Project[] = [
     description: 'Led the successful launch of the Multiversal Walkers NFT project, coordinating creative development, marketing strategy, community building, and technical implementation.',
     tags: ['NFT Launch', 'Community Growth', 'Project Management'],
     link: 'https://multiversalwalkers.com/multipaper',
-    image: 'https://i.seadn.io/gcs/files/de2b7d6fa1c95c94c37cd238a14c2c50.gif',
+    image: 'public/lovable-uploads/53557887-64a6-4193-9e46-f70b4d5397f3.png',
     category: 'development',
   },
   {
@@ -77,7 +79,7 @@ const projects: Project[] = [
     description: 'Directed the launch of Wooshi World, a successful NFT collection with robust community engagement strategies that drove significant growth across social media platforms.',
     tags: ['NFT Launch', 'Community Management', 'Creative Direction'],
     link: 'https://www.wooshi.world/',
-    image: 'https://i.seadn.io/gcs/files/6d83fc15d76ea34fa95e4dd85620e5b8.gif',
+    image: 'public/lovable-uploads/5b2709de-fbb4-4346-8075-3174c5497f06.png',
     category: 'development',
   },
   {
@@ -86,10 +88,63 @@ const projects: Project[] = [
     description: 'Managed the On1Force NFT project launch, overseeing marketing strategy, community development, and partnerships that positioned it as a leading project in the NFT space.',
     tags: ['NFT Project', 'Marketing Strategy', 'Community Building'],
     link: 'https://www.0n1force.com/',
-    image: 'https://pbs.twimg.com/media/E_MoK6TXsAUlNdl?format=jpg&name=large',
+    image: 'public/lovable-uploads/8eef8d55-7210-4a49-9781-a8a3e5dc1bf8.png',
     category: 'development',
   },
 ];
+
+const ProjectCard: React.FC<{ project: Project; index: number }> = ({ project, index }) => {
+  const [imageLoaded, setImageLoaded] = useState(false);
+
+  return (
+    <div
+      className="animate-fade-in-up"
+      style={{ animationDelay: `${index * 0.1}s` }}
+    >
+      <Card className="glass-card h-full overflow-hidden flex flex-col transition-all duration-300 hover:shadow-lg">
+        <div className="overflow-hidden">
+          <AspectRatio ratio={16 / 9} className="bg-muted">
+            {!imageLoaded && <Skeleton className="absolute inset-0 z-10" />}
+            <img 
+              src={project.image} 
+              alt={project.title} 
+              className={cn(
+                "w-full h-full object-cover transition-transform duration-500 hover:scale-110",
+                !imageLoaded && "opacity-0"
+              )}
+              onLoad={() => setImageLoaded(true)}
+            />
+          </AspectRatio>
+        </div>
+        <CardHeader className="flex-grow">
+          <CardTitle>{project.title}</CardTitle>
+          <CardDescription>{project.description}</CardDescription>
+        </CardHeader>
+        <CardContent>
+          <div className="flex flex-wrap gap-2">
+            {project.tags.map((tag) => (
+              <Badge key={tag} variant="secondary" className="text-xs">
+                {tag}
+              </Badge>
+            ))}
+          </div>
+        </CardContent>
+        {project.link && (
+          <CardFooter>
+            <Button 
+              variant="ghost" 
+              className="text-primary px-0 flex items-center gap-1 hover:gap-2 transition-all"
+              onClick={() => window.open(project.link, '_blank')}
+            >
+              <span>View Details</span>
+              <ArrowRight className="h-4 w-4" />
+            </Button>
+          </CardFooter>
+        )}
+      </Card>
+    </div>
+  );
+};
 
 const Projects: React.FC = () => {
   const [filter, setFilter] = useState<string | null>(null);
@@ -149,48 +204,7 @@ const Projects: React.FC = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {filteredProjects.map((project, index) => (
-          <div
-            key={project.id}
-            className="animate-fade-in-up"
-            style={{ animationDelay: `${index * 0.1}s` }}
-          >
-            <Card className="glass-card h-full overflow-hidden flex flex-col">
-              <div className="overflow-hidden">
-                <AspectRatio ratio={16 / 9} className="bg-muted">
-                  <img 
-                    src={project.image} 
-                    alt={project.title} 
-                    className="w-full h-full object-cover transition-transform duration-500 hover:scale-110" 
-                  />
-                </AspectRatio>
-              </div>
-              <CardHeader className="flex-grow">
-                <CardTitle>{project.title}</CardTitle>
-                <CardDescription>{project.description}</CardDescription>
-              </CardHeader>
-              <CardContent>
-                <div className="flex flex-wrap gap-2">
-                  {project.tags.map((tag) => (
-                    <Badge key={tag} variant="secondary" className="text-xs">
-                      {tag}
-                    </Badge>
-                  ))}
-                </div>
-              </CardContent>
-              {project.link && (
-                <CardFooter>
-                  <Button 
-                    variant="ghost" 
-                    className="text-primary px-0 flex items-center gap-1 hover:gap-2 transition-all"
-                    onClick={() => window.open(project.link, '_blank')}
-                  >
-                    <span>View Details</span>
-                    <ArrowRight className="h-4 w-4" />
-                  </Button>
-                </CardFooter>
-              )}
-            </Card>
-          </div>
+          <ProjectCard key={project.id} project={project} index={index} />
         ))}
       </div>
       
