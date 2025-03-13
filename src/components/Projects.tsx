@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { ExternalLink, Code, Database, ArrowRight, Users } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
@@ -24,7 +23,7 @@ const projects: Project[] = [
     description: 'Led operations at Toshiverse L4bs, managing end-to-end project launches for Wooshi World, On1Force, and Multiversal Walkers across community development, marketing, engineering, and creative direction.',
     tags: ['Operations Management', 'NFT Development', 'Team Leadership'],
     link: 'https://toshiverse.io/',
-    image: '/placeholder.svg',
+    image: 'https://i.seadn.io/gcs/files/8e05a7b4b112a3dc8b6c72dc7d305d86.png',
     category: 'development',
   },
   {
