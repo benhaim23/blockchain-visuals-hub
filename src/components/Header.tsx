@@ -44,7 +44,7 @@ const Header: React.FC = () => {
               href="#" 
               className="text-xl md:text-2xl font-bold crypto-gradient"
             >
-              Crypto<span className="font-mono">Portfolio</span>
+              My<span className="font-mono">Portfolio</span>
             </a>
           </div>
           
@@ -91,7 +91,7 @@ const Header: React.FC = () => {
             className="text-xl font-bold crypto-gradient"
             onClick={() => setMobileMenuOpen(false)}
           >
-            Crypto<span className="font-mono">Portfolio</span>
+            My<span className="font-mono">Portfolio</span>
           </a>
           <Button
             variant="ghost"
