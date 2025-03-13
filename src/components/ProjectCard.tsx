@@ -16,6 +16,14 @@ interface ProjectCardProps {
 
 const ProjectCard: React.FC<ProjectCardProps> = ({ project, index }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
+  const [imageError, setImageError] = useState(false);
+
+  // Handle image loading errors
+  const handleImageError = () => {
+    console.error(`Failed to load image for project: ${project.title}`);
+    setImageError(true);
+    setImageLoaded(true); // We mark it as loaded to remove the skeleton
+  };
 
   return (
     <div
@@ -26,15 +34,22 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, index }) => {
         <div className="overflow-hidden">
           <AspectRatio ratio={16 / 9} className="bg-muted">
             {!imageLoaded && <Skeleton className="absolute inset-0 z-10" />}
-            <img 
-              src={project.image} 
-              alt={project.title} 
-              className={cn(
-                "w-full h-full object-cover transition-transform duration-500 hover:scale-110",
-                !imageLoaded && "opacity-0"
-              )}
-              onLoad={() => setImageLoaded(true)}
-            />
+            {imageError ? (
+              <div className="w-full h-full flex items-center justify-center bg-muted">
+                <p className="text-muted-foreground text-sm">Image not available</p>
+              </div>
+            ) : (
+              <img 
+                src={project.image} 
+                alt={project.title} 
+                className={cn(
+                  "w-full h-full object-cover transition-transform duration-500 hover:scale-110",
+                  !imageLoaded && "opacity-0"
+                )}
+                onLoad={() => setImageLoaded(true)}
+                onError={handleImageError}
+              />
+            )}
           </AspectRatio>
         </div>
         <CardHeader className="flex-grow">
