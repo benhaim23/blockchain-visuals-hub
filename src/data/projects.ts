@@ -1,4 +1,3 @@
-
 export interface Project {
   id: number;
   title: string;
@@ -42,7 +41,7 @@ export const projects: Project[] = [
     title: 'Dune Analytics Dashboard',
     description: 'Crafted robust evaluation frameworks using Dune Analytics, Python, and SQL to convert complex on-chain data into critical insights that informed lending strategies.',
     tags: ['Dune Analytics', 'Data Visualization', 'On-Chain Data'],
-    link: 'https://github.com/benhaim23',
+    link: 'http://dune.com/',
     image: '/images/projects/dune_analytics.jpeg',
     category: 'analytics',
   },
@@ -51,7 +50,6 @@ export const projects: Project[] = [
     title: 'GMB Capital - Arbitrage Trading',
     description: 'Executed arbitrage and hedging strategies at GMB Capital using 15 exchanges, spot trading pairs, and perpetual futures to identify market inefficiencies and optimize returns with 675% YoY growth.',
     tags: ['Arbitrage', 'Hedging', 'Trading Algorithms', 'Fund Management'],
-    link: 'https://github.com/benhaim23',
     image: '/images/projects/GMB_Capital.jpeg',
     category: 'trading',
   },
