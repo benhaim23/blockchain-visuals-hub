@@ -20,6 +20,15 @@ export const projects: Project[] = [
     category: 'development',
   },
   {
+    id: 10,
+    title: '0n1Force',
+    description: 'Managed the 0n1Force project launch, overseeing marketing strategy, community development, and partnerships that positioned it as a leading project in the NFT space.',
+    tags: ['Marketing Strategy', 'Community Building', 'Partnership Development'],
+    link: 'https://www.0n1force.com/',
+    image: '/images/projects/0n1force.jpeg',
+    category: 'community',
+  },
+  {
     id: 9,
     title: '3iQ Research & Development',
     description: 'Worked within the Research and Development department at 3iQ, building project initiatives in Real World Asset Tokenization and DeFi treasury management. Conducted in-depth analysis of DeFi protocols and blockchain financial mechanisms to identify investment opportunities and risks.',
@@ -65,6 +74,15 @@ export const projects: Project[] = [
     category: 'development',
   },
   {
+    id: 11,
+    title: 'Multiversal Walkers',
+    description: 'Led the successful launch of the Multiversal Walkers project, coordinating creative development, marketing strategy, community building, and technical implementation. Managed project planning, creative direction, and marketing campaigns from concept to execution.',
+    tags: ['Project Management', 'Creative Direction', 'Marketing Strategy', 'Community Growth'],
+    link: 'https://multiversalwalkers.com/multipaper',
+    image: '/images/projects/multiversal_walkers.jpeg',
+    category: 'community',
+  },
+  {
     id: 1,
     title: 'Toshiverse Studio',
     description: 'Led operations at Toshiverse L4bs, managing end-to-end project launches for Wooshi World, On1Force, and Multiversal Walkers. Orchestrated collaborations with major NFT projects including Bored Ape Yacht Club and Doodles, building strategic partnerships that expanded community reach across social platforms.',
@@ -74,6 +92,15 @@ export const projects: Project[] = [
     category: 'development',
   },
   {
+    id: 12,
+    title: 'Toshiverse Studio',
+    description: 'Led operations at Toshiverse L4bs, managing end-to-end project launches for Wooshi World, On1Force, and Multiversal Walkers. Orchestrated collaborations with major NFT projects including Bored Ape Yacht Club and Doodles, building strategic partnerships that expanded community reach across social platforms.',
+    tags: ['Operations Management', 'NFT Development', 'Team Leadership', 'Partnership Development', 'Influencer Marketing'],
+    link: 'https://toshiverse.io/',
+    image: '/images/projects/Toshiverse_L4bs.jpeg',
+    category: 'community',
+  },
+  {
     id: 7,
     title: 'Wooshi World',
     description: 'Directed the launch of Wooshi World, managing project timelines, creative direction, and marketing strategy. Implemented robust community engagement initiatives that drove significant growth across social media platforms.',
@@ -81,5 +108,14 @@ export const projects: Project[] = [
     link: 'https://www.wooshi.world/',
     image: '/images/projects/wooshi_world.jpeg',
     category: 'development',
+  },
+  {
+    id: 13,
+    title: 'Wooshi World',
+    description: 'Directed the launch of Wooshi World, managing project timelines, creative direction, and marketing strategy. Implemented robust community engagement initiatives that drove significant growth across social media platforms.',
+    tags: ['Project Management', 'Creative Direction', 'Marketing Strategy', 'Community Management'],
+    link: 'https://www.wooshi.world/',
+    image: '/images/projects/wooshi_world.jpeg',
+    category: 'community',
   },
 ];
