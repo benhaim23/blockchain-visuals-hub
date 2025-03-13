@@ -61,7 +61,7 @@ export const projects: Project[] = [
     description: 'Led the successful launch of the Multiversal Walkers NFT project, coordinating creative development, marketing strategy, community building, and technical implementation.',
     tags: ['NFT Launch', 'Community Growth', 'Project Management'],
     link: 'https://multiversalwalkers.com/multipaper',
-    image: '/lovable-uploads/53557887-64a6-4193-9e46-f70b4d5397f3.png',
+    image: '/lovable-uploads/dc155fa2-6796-40df-92fc-adf5750527d6.png',
     category: 'development',
   },
   {
@@ -70,7 +70,7 @@ export const projects: Project[] = [
     description: 'Directed the launch of Wooshi World, a successful NFT collection with robust community engagement strategies that drove significant growth across social media platforms.',
     tags: ['NFT Launch', 'Community Management', 'Creative Direction'],
     link: 'https://www.wooshi.world/',
-    image: '/lovable-uploads/5b2709de-fbb4-4346-8075-3174c5497f06.png',
+    image: '/lovable-uploads/0fbdf9e7-b439-4b8f-922c-5d642479bb9e.png',
     category: 'development',
   },
   {
@@ -79,7 +79,7 @@ export const projects: Project[] = [
     description: 'Managed the On1Force NFT project launch, overseeing marketing strategy, community development, and partnerships that positioned it as a leading project in the NFT space.',
     tags: ['NFT Project', 'Marketing Strategy', 'Community Building'],
     link: 'https://www.0n1force.com/',
-    image: '/lovable-uploads/8eef8d55-7210-4a49-9781-a8a3e5dc1bf8.png',
+    image: '/lovable-uploads/8522e42a-57db-43a7-988b-f0088d154f2f.png',
     category: 'development',
   },
 ];
