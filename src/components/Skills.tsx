@@ -1,15 +1,15 @@
 
 import React from 'react';
 import { BarChart, PieChart, AreaChart, Users, Megaphone, Briefcase } from 'lucide-react';
-import { Progress } from '@/components/ui/progress';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
+import { Badge } from '@/components/ui/badge';
 
 interface SkillCategoryProps {
   title: string;
   description: string;
   icon: React.ReactNode;
-  skills: Array<{ name: string; level: number }>;
+  skills: Array<{ name: string; keywords?: string[] }>;
   className?: string;
 }
 
@@ -20,7 +20,7 @@ const SkillCategory: React.FC<SkillCategoryProps> = ({
   skills,
   className,
 }) => (
-  <Card className={cn("glass-card", className)}>
+  <Card className={cn("glass-card h-full", className)}>
     <CardHeader className="flex flex-row items-start space-x-4 pb-2">
       <div className="p-2 rounded-md bg-primary/10">{icon}</div>
       <div className="space-y-1">
@@ -32,11 +32,12 @@ const SkillCategory: React.FC<SkillCategoryProps> = ({
       <div className="space-y-4">
         {skills.map((skill) => (
           <div key={skill.name} className="space-y-2">
-            <div className="flex justify-between">
-              <span className="text-sm font-medium">{skill.name}</span>
-              <span className="text-sm text-muted-foreground">{skill.level}%</span>
+            <div className="flex flex-wrap gap-1.5">
+              <Badge variant="outline" className="font-medium text-primary">{skill.name}</Badge>
+              {skill.keywords?.map((keyword, idx) => (
+                <Badge key={idx} variant="secondary" className="text-xs">{keyword}</Badge>
+              ))}
             </div>
-            <Progress value={skill.level} className="h-2" />
           </div>
         ))}
       </div>
@@ -51,10 +52,10 @@ const Skills: React.FC = () => {
       description: "Tools and techniques for extracting insights",
       icon: <AreaChart className="h-6 w-6 text-primary" />,
       skills: [
-        { name: "Python, SQL, Tableau", level: 92 },
-        { name: "Time Series Analysis", level: 90 },
-        { name: "NumPy, Pandas, Matplotlib", level: 88 },
-        { name: "Data Warehousing (AWS, Snowflake)", level: 85 },
+        { name: "Data Processing", keywords: ["Python", "SQL", "Tableau"] },
+        { name: "Statistical Analysis", keywords: ["Time Series", "Forecasting"] },
+        { name: "Data Libraries", keywords: ["NumPy", "Pandas", "Matplotlib"] },
+        { name: "Cloud Solutions", keywords: ["AWS", "Snowflake"] },
       ],
     },
     {
@@ -62,10 +63,10 @@ const Skills: React.FC = () => {
       description: "Building and scaling products and businesses",
       icon: <Briefcase className="h-6 w-6 text-primary" />,
       skills: [
-        { name: "NFT Project Management", level: 95 },
-        { name: "Cross-functional Leadership", level: 90 },
-        { name: "Strategic Partnerships", level: 92 },
-        { name: "Revenue Generation", level: 88 },
+        { name: "Project Management", keywords: ["NFT", "Web3"] },
+        { name: "Leadership", keywords: ["Cross-functional", "Strategy"] },
+        { name: "Business Growth", keywords: ["Partnerships", "Scaling"] },
+        { name: "Revenue Strategy", keywords: ["Monetization", "Market Fit"] },
       ],
     },
     {
@@ -73,10 +74,10 @@ const Skills: React.FC = () => {
       description: "Building engaged communities and brand presence",
       icon: <Megaphone className="h-6 w-6 text-primary" />,
       skills: [
-        { name: "Community Development", level: 94 },
-        { name: "Influencer Campaigns", level: 90 },
-        { name: "Social Media Strategy", level: 92 },
-        { name: "Cross-Project Collaborations", level: 93 },
+        { name: "Community Building", keywords: ["Engagement", "Retention"] },
+        { name: "Influencer Marketing", keywords: ["Campaigns", "Outreach"] },
+        { name: "Social Strategy", keywords: ["Content", "Analytics"] },
+        { name: "Collaborations", keywords: ["Cross-Project", "Co-Marketing"] },
       ],
     },
     {
@@ -84,10 +85,10 @@ const Skills: React.FC = () => {
       description: "Expertise in blockchain technologies",
       icon: <BarChart className="h-6 w-6 text-primary" />,
       skills: [
-        { name: "DeFi Strategies & Tokenization", level: 94 },
-        { name: "Smart Contract Evaluation", level: 89 },
-        { name: "Onchain Data Analysis", level: 92 },
-        { name: "Dune Analytics", level: 86 },
+        { name: "DeFi Expertise", keywords: ["Tokenization", "Protocols"] },
+        { name: "Smart Contracts", keywords: ["Evaluation", "Integration"] },
+        { name: "Onchain Analysis", keywords: ["Transaction Data", "Metrics"] },
+        { name: "Analytics Tools", keywords: ["Dune", "Etherscan"] },
       ],
     },
     {
@@ -95,10 +96,10 @@ const Skills: React.FC = () => {
       description: "Trading systems and market analysis",
       icon: <PieChart className="h-6 w-6 text-primary" />,
       skills: [
-        { name: "Arbitrage & Hedging Strategies", level: 95 },
-        { name: "Quantitative & Predictive Modeling", level: 88 },
-        { name: "Risk Management", level: 90 },
-        { name: "Crypto Market Forecasting", level: 85 },
+        { name: "Trading Strategies", keywords: ["Arbitrage", "Hedging"] },
+        { name: "Quantitative Models", keywords: ["Predictive", "Risk"] },
+        { name: "Risk Management", keywords: ["Portfolio", "Exposure"] },
+        { name: "Market Analysis", keywords: ["Trends", "Forecasting"] },
       ],
     },
     {
@@ -106,10 +107,10 @@ const Skills: React.FC = () => {
       description: "Leading teams and executing complex projects",
       icon: <Users className="h-6 w-6 text-primary" />,
       skills: [
-        { name: "End-to-End Project Management", level: 95 },
-        { name: "Creative Direction", level: 88 },
-        { name: "Engineering Coordination", level: 87 },
-        { name: "Multi-stakeholder Alignment", level: 93 },
+        { name: "Project Lifecycle", keywords: ["End-to-End", "Delivery"] },
+        { name: "Creative Direction", keywords: ["Vision", "Execution"] },
+        { name: "Technical Coordination", keywords: ["Engineering", "Design"] },
+        { name: "Stakeholder Management", keywords: ["Alignment", "Communication"] },
       ],
     },
   ];
