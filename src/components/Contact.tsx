@@ -201,7 +201,7 @@ const Contact: React.FC = () => {
                   Ways to reach me directly
                 </CardDescription>
               </CardHeader>
-              <CardContent className="p-6 flex flex-col justify-between h-[calc(100%-76px)]">
+              <CardContent className="p-6 flex flex-col justify-between h-[calc(100%-76px)] min-h-[350px]">
                 <div className="space-y-6">
                   <div className="flex items-start space-x-3">
                     <div className="p-2 rounded-full bg-primary/10 text-primary">
