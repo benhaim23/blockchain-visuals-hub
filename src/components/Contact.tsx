@@ -234,16 +234,16 @@ const Contact: React.FC = () => {
                   </div>
                 </div>
                 
-                <div className="mt-6 pt-5 border-t border-primary/10 pb-2">
+                <div className="mt-6 pt-5 border-t border-primary/10">
                   <h3 className="text-lg font-semibold mb-3 flex items-center gap-2">
                     <Download className="h-4 w-4 text-primary" />
                     Resume
                   </h3>
-                  <p className="text-sm text-muted-foreground mb-3">
+                  <p className="text-sm text-muted-foreground mb-4">
                     View my full resume to learn more about my experience, projects, and qualifications.
                   </p>
                   <Button
-                    className="w-full hover:bg-primary/90 transition-colors"
+                    className="w-full bg-primary hover:bg-primary/90 transition-colors shadow-sm"
                     onClick={() => window.open('/images/misc/Mark_Benhaim_Resume.pdf', '_blank')}
                   >
                     <Download className="mr-2 h-4 w-4" />
