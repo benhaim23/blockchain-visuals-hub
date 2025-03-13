@@ -68,7 +68,7 @@ export const projects: Project[] = [
     description: 'Led operations at Toshiverse L4bs, managing end-to-end project launches for Wooshi World, On1Force, and Multiversal Walkers. Orchestrated collaborations with major NFT projects including Bored Ape Yacht Club and Doodles, building strategic partnerships that expanded community reach across social platforms.',
     tags: ['Operations Management', 'NFT Development', 'Team Leadership', 'Partnership Development', 'Influencer Marketing'],
     link: 'https://toshiverse.io/',
-    image: '/images/projects/Toshiverse_L4bs.jpeg',
+    image: '/images/projects/TOSHIVERSE.jpeg',
     category: 'development',
   },
   {
