@@ -1,8 +1,9 @@
 
 import React from 'react';
-import { Twitter, Linkedin, Github, Mail } from 'lucide-react';
+import { Twitter, Linkedin, Github, Mail, ArrowRight } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Separator } from '@/components/ui/separator';
+import { Card, CardContent } from '@/components/ui/card';
 
 const Footer: React.FC = () => {
   const currentYear = new Date().getFullYear();
@@ -11,53 +12,66 @@ const Footer: React.FC = () => {
     <footer className="py-12 px-4 bg-background/50 backdrop-blur-sm border-t border-border/30">
       <div className="container mx-auto max-w-7xl">
         <div className="flex flex-col md:flex-row justify-between items-center md:items-start gap-8 mb-8">
-          <div className="text-center md:text-left">
-            <div className="text-xl font-bold crypto-gradient">
+          <div className="text-center md:text-left animate-fade-in">
+            <div className="text-2xl font-bold crypto-gradient mb-2">
               Mark<span className="font-mono">Benhaim</span>
             </div>
-            <p className="text-muted-foreground mt-2 text-sm max-w-md">
+            <p className="text-muted-foreground mt-2 text-sm max-w-md leading-relaxed">
               Navigating the future of finance and technology through blockchain innovation, 
               trading expertise, and data-driven insights.
             </p>
+            <Button 
+              variant="ghost" 
+              className="mt-4 group" 
+              onClick={() => window.location.href = 'mailto:markbenhaim0@gmail.com'}
+            >
+              Contact Me <ArrowRight className="ml-1 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+            </Button>
           </div>
           
-          <div className="flex flex-col items-center md:items-end space-y-2">
-            <div className="text-sm font-medium mb-2">Connect with me</div>
-            <div className="flex space-x-4">
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                aria-label="Twitter"
-                onClick={() => window.open('https://x.com/inflationseries', '_blank')}
-              >
-                <Twitter className="h-5 w-5" />
-              </Button>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                aria-label="LinkedIn"
-                onClick={() => window.open('https://www.linkedin.com/in/mark-benhaim/', '_blank')}
-              >
-                <Linkedin className="h-5 w-5" />
-              </Button>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                aria-label="GitHub"
-                onClick={() => window.open('https://github.com/benhaim23', '_blank')}
-              >
-                <Github className="h-5 w-5" />
-              </Button>
-              <Button 
-                variant="ghost" 
-                size="icon" 
-                aria-label="Email"
-                onClick={() => window.location.href = 'mailto:markbenhaim0@gmail.com'}
-              >
-                <Mail className="h-5 w-5" />
-              </Button>
-            </div>
-          </div>
+          <Card className="w-full md:w-auto bg-background/60 backdrop-blur-sm border border-border/50 shadow-sm">
+            <CardContent className="p-6">
+              <div className="text-sm font-medium mb-3 text-center md:text-right crypto-gradient">Connect with me</div>
+              <div className="flex flex-wrap justify-center md:justify-end gap-2">
+                <Button 
+                  variant="outline" 
+                  size="icon" 
+                  aria-label="Twitter"
+                  className="hover:bg-primary/10 hover:text-primary transition-colors"
+                  onClick={() => window.open('https://x.com/inflationseries', '_blank')}
+                >
+                  <Twitter className="h-4 w-4" />
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="icon" 
+                  aria-label="LinkedIn"
+                  className="hover:bg-blue-500/10 hover:text-blue-500 transition-colors"
+                  onClick={() => window.open('https://www.linkedin.com/in/mark-benhaim/', '_blank')}
+                >
+                  <Linkedin className="h-4 w-4" />
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="icon" 
+                  aria-label="GitHub"
+                  className="hover:bg-gray-800/10 hover:text-gray-800 dark:hover:text-white transition-colors"
+                  onClick={() => window.open('https://github.com/benhaim23', '_blank')}
+                >
+                  <Github className="h-4 w-4" />
+                </Button>
+                <Button 
+                  variant="outline" 
+                  size="icon" 
+                  aria-label="Email"
+                  className="hover:bg-green-500/10 hover:text-green-500 transition-colors"
+                  onClick={() => window.location.href = 'mailto:markbenhaim0@gmail.com'}
+                >
+                  <Mail className="h-4 w-4" />
+                </Button>
+              </div>
+            </CardContent>
+          </Card>
         </div>
         
         <Separator className="mb-8" />
