@@ -42,15 +42,17 @@ const Index: React.FC = () => {
 
   return (
     <ThemeProvider>
-      <div className="relative min-h-screen">
+      <div className="relative min-h-screen overflow-x-hidden">
         <ParticleBackground />
         <Header />
-        <main>
+        <main className="flex flex-col items-center justify-center">
           <Hero />
-          <About />
-          <Projects />
-          <Skills />
-          <Contact />
+          <div className="w-full max-w-7xl mx-auto">
+            <About />
+            <Projects />
+            <Skills />
+            <Contact />
+          </div>
         </main>
         <Footer />
       </div>

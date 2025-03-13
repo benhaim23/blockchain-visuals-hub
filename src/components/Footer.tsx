@@ -9,9 +9,9 @@ const Footer: React.FC = () => {
   
   return (
     <footer className="py-12 px-4 bg-background/50 backdrop-blur-sm border-t border-border/30">
-      <div className="container mx-auto">
-        <div className="flex flex-col md:flex-row justify-between items-center mb-8">
-          <div className="mb-4 md:mb-0">
+      <div className="container mx-auto max-w-7xl">
+        <div className="flex flex-col md:flex-row justify-between items-center md:items-start gap-8 mb-8">
+          <div className="text-center md:text-left">
             <div className="text-xl font-bold crypto-gradient">
               Crypto<span className="font-mono">Portfolio</span>
             </div>
@@ -21,7 +21,7 @@ const Footer: React.FC = () => {
             </p>
           </div>
           
-          <div className="flex flex-col space-y-2">
+          <div className="flex flex-col items-center md:items-end space-y-2">
             <div className="text-sm font-medium mb-2">Connect with me</div>
             <div className="flex space-x-4">
               <Button variant="ghost" size="icon" aria-label="Twitter">
@@ -42,12 +42,12 @@ const Footer: React.FC = () => {
         
         <Separator className="mb-8" />
         
-        <div className="flex flex-col-reverse md:flex-row justify-between items-center">
+        <div className="flex flex-col md:flex-row justify-between items-center">
           <div className="text-sm text-muted-foreground mt-4 md:mt-0">
             © {currentYear} CryptoPortfolio. All rights reserved.
           </div>
           
-          <div className="flex space-x-6">
+          <div className="flex space-x-6 mt-4 md:mt-0">
             <a href="#" className="text-sm text-muted-foreground hover:text-foreground transition-colors">
               Privacy Policy
             </a>

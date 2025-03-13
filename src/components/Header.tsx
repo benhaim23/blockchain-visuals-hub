@@ -35,7 +35,7 @@ const Header: React.FC = () => {
         scrolled ? 'glass py-3' : 'bg-transparent py-5'
       )}
     >
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8">
+      <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
         <div className="flex items-center justify-between">
           <div className="flex-shrink-0">
             <a 
@@ -47,17 +47,17 @@ const Header: React.FC = () => {
           </div>
           
           {/* Desktop navigation */}
-          <nav className="hidden md:flex items-center space-x-8">
+          <nav className="hidden md:flex items-center space-x-6">
             {navigation.map((item) => (
               <a
                 key={item.name}
                 href={item.href}
-                className="text-foreground/80 hover:text-foreground transition-colors px-2 py-1 text-sm rounded-md hover:bg-foreground/5"
+                className="text-foreground/80 hover:text-foreground transition-colors px-3 py-2 text-sm font-medium rounded-md hover:bg-foreground/5"
               >
                 {item.name}
               </a>
             ))}
-            <ThemeToggle />
+            <ThemeToggle className="ml-2" />
           </nav>
           
           {/* Mobile menu button */}
