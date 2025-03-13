@@ -38,7 +38,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, index }) => {
           </AspectRatio>
         </div>
         <CardHeader className="flex-grow">
-          <CardTitle>{project.title}</CardTitle>
+          <CardTitle className="mt-2">{project.title}</CardTitle>
           <CardDescription>{project.description}</CardDescription>
         </CardHeader>
         <CardContent>
