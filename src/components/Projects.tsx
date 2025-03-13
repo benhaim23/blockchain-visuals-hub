@@ -5,6 +5,7 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { cn } from '@/lib/utils';
+import { AspectRatio } from '@/components/ui/aspect-ratio';
 
 interface Project {
   id: number;
@@ -23,7 +24,7 @@ const projects: Project[] = [
     description: 'Led operations at Toshiverse L4bs, managing end-to-end project launches for Wooshi World, On1Force, and Multiversal Walkers across community development, marketing, engineering, and creative direction.',
     tags: ['Operations Management', 'NFT Development', 'Team Leadership'],
     link: 'https://toshiverse.io/',
-    image: 'data:image/svg+xml;charset=UTF-8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="560" height="320" viewBox="0 0 560 320" fill="none"%3E%3Crect width="560" height="320" fill="%230066CC" fill-opacity="0.05"/%3E%3Cpath d="M280 160m-50 0a50 50 0 1 0 100 0a50 50 0 1 0 -100 0" stroke="%230066CC" stroke-width="2" stroke-dasharray="4 4"/%3E%3Cpath d="M280 120L330 190H230L280 120Z" stroke="%230066CC" stroke-width="2"/%3E%3C/svg%3E',
+    image: '/placeholder.svg',
     category: 'development',
   },
   {
@@ -32,8 +33,8 @@ const projects: Project[] = [
     description: 'Orchestrated collaborations with major NFT projects including Bored Ape Yacht Club and Doodles, building strategic partnerships that expanded community reach across Instagram, Twitter, and Discord.',
     tags: ['Partnership Development', 'Influencer Marketing', 'Community Building'],
     link: 'https://www.wooshi.world/',
-    image: 'data:image/svg+xml;charset=UTF-8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="560" height="320" viewBox="0 0 560 320" fill="none"%3E%3Crect width="560" height="320" fill="%23AA00AA" fill-opacity="0.05"/%3E%3Cpath d="M140 140H420" stroke="%23AA00AA" stroke-width="2" stroke-dasharray="6 6"/%3E%3Cpath d="M140 180H420" stroke="%23AA00AA" stroke-width="2" stroke-dasharray="6 6"/%3E%3Cpath d="M140 100v120" stroke="%23AA00AA" stroke-width="2" stroke-dasharray="6 6"/%3E%3Cpath d="M420 100v120" stroke="%23AA00AA" stroke-width="2" stroke-dasharray="6 6"/%3E%3Cpath d="M280 120L330 180H230L280 120Z" fill="%23AA00AA" fill-opacity="0.2" stroke="%23AA00AA" stroke-width="2"/%3E%3C/svg%3E',
-    category: 'community',
+    image: 'https://i.seadn.io/gcs/files/d0afe44c103cc4c24bcaaf0dcfab19fa.jpg',
+    category: 'development',
   },
   {
     id: 3,
@@ -41,7 +42,7 @@ const projects: Project[] = [
     description: 'Crafted robust evaluation frameworks using Dune Analytics, Python, and SQL to convert complex on-chain data into critical insights that informed lending strategies.',
     tags: ['Dune Analytics', 'Data Visualization', 'On-Chain Data'],
     link: 'https://github.com/benhaim23',
-    image: 'data:image/svg+xml;charset=UTF-8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="560" height="320" viewBox="0 0 560 320" fill="none"%3E%3Crect width="560" height="320" fill="%2300AA88" fill-opacity="0.05"/%3E%3Cpath d="M140 220L230 160L280 200L350 120L420 180" stroke="%2300AA88" stroke-width="2"/%3E%3Ccircle cx="140" cy="220" r="5" fill="%2300AA88"/%3E%3Ccircle cx="230" cy="160" r="5" fill="%2300AA88"/%3E%3Ccircle cx="280" cy="200" r="5" fill="%2300AA88"/%3E%3Ccircle cx="350" cy="120" r="5" fill="%2300AA88"/%3E%3Ccircle cx="420" cy="180" r="5" fill="%2300AA88"/%3E%3C/svg%3E',
+    image: 'https://dune.com/assets/poster.png',
     category: 'analytics',
   },
   {
@@ -50,7 +51,7 @@ const projects: Project[] = [
     description: 'Executed arbitrage and hedging strategies using 15 exchanges, spot trading pairs, and perpetual futures to identify market inefficiencies and optimize returns with 675% YoY growth.',
     tags: ['Arbitrage', 'Hedging', 'Trading Algorithms'],
     link: 'https://github.com/benhaim23',
-    image: 'data:image/svg+xml;charset=UTF-8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="560" height="320" viewBox="0 0 560 320" fill="none"%3E%3Crect width="560" height="320" fill="%23AA00AA" fill-opacity="0.05"/%3E%3Cpath d="M140 140H420" stroke="%23AA00AA" stroke-width="2" stroke-dasharray="6 6"/%3E%3Cpath d="M140 180H420" stroke="%23AA00AA" stroke-width="2" stroke-dasharray="6 6"/%3E%3Cpath d="M140 100v120" stroke="%23AA00AA" stroke-width="2" stroke-dasharray="6 6"/%3E%3Cpath d="M420 100v120" stroke="%23AA00AA" stroke-width="2" stroke-dasharray="6 6"/%3E%3Cpath d="M280 120L330 180H230L280 120Z" fill="%23AA00AA" fill-opacity="0.2" stroke="%23AA00AA" stroke-width="2"/%3E%3C/svg%3E',
+    image: 'https://images.unsplash.com/photo-1518770660439-4636190af475',
     category: 'trading',
   },
   {
@@ -59,7 +60,7 @@ const projects: Project[] = [
     description: 'Architected a sophisticated analytical model merging social media sentiment evaluation with financial metrics on Bitcoin performance to identify primary market volatility factors.',
     tags: ['Sentiment Analysis', 'Financial Metrics', 'Market Volatility'],
     link: 'https://github.com/benhaim23',
-    image: 'data:image/svg+xml;charset=UTF-8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="560" height="320" viewBox="0 0 560 320" fill="none"%3E%3Crect width="560" height="320" fill="%23CC4400" fill-opacity="0.05"/%3E%3Ccircle cx="280" cy="160" r="70" stroke="%23CC4400" stroke-width="2" stroke-dasharray="8 8"/%3E%3Ccircle cx="280" cy="160" r="40" stroke="%23CC4400" stroke-width="2"/%3E%3Cpath d="M260 140L300 180M260 180L300 140" stroke="%23CC4400" stroke-width="2"/%3E%3C/svg%3E',
+    image: 'https://images.unsplash.com/photo-1605810230434-7631ac76ec81',
     category: 'analytics',
   },
   {
@@ -68,8 +69,26 @@ const projects: Project[] = [
     description: 'Led the successful launch of the Multiversal Walkers NFT project, coordinating creative development, marketing strategy, community building, and technical implementation.',
     tags: ['NFT Launch', 'Community Growth', 'Project Management'],
     link: 'https://multiversalwalkers.com/multipaper',
-    image: 'data:image/svg+xml;charset=UTF-8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="560" height="320" viewBox="0 0 560 320" fill="none"%3E%3Crect width="560" height="320" fill="%230088AA" fill-opacity="0.05"/%3E%3Cpath d="M200 120h160m-160 40h160m-160 40h160m-160 40h80" stroke="%230088AA" stroke-width="2" stroke-dasharray="4 4"/%3E%3Crect x="180" y="100" width="200" height="140" rx="5" stroke="%230088AA" stroke-width="2"/%3E%3C/svg%3E',
-    category: 'community',
+    image: 'https://i.seadn.io/gcs/files/de2b7d6fa1c95c94c37cd238a14c2c50.gif',
+    category: 'development',
+  },
+  {
+    id: 7,
+    title: 'Wooshi World NFT',
+    description: 'Directed the launch of Wooshi World, a successful NFT collection with robust community engagement strategies that drove significant growth across social media platforms.',
+    tags: ['NFT Launch', 'Community Management', 'Creative Direction'],
+    link: 'https://www.wooshi.world/',
+    image: 'https://i.seadn.io/gcs/files/6d83fc15d76ea34fa95e4dd85620e5b8.gif',
+    category: 'development',
+  },
+  {
+    id: 8,
+    title: 'On1Force NFT',
+    description: 'Managed the On1Force NFT project launch, overseeing marketing strategy, community development, and partnerships that positioned it as a leading project in the NFT space.',
+    tags: ['NFT Project', 'Marketing Strategy', 'Community Building'],
+    link: 'https://www.0n1force.com/',
+    image: 'https://pbs.twimg.com/media/E_MoK6TXsAUlNdl?format=jpg&name=large',
+    category: 'development',
   },
 ];
 
@@ -137,12 +156,14 @@ const Projects: React.FC = () => {
             style={{ animationDelay: `${index * 0.1}s` }}
           >
             <Card className="glass-card h-full overflow-hidden flex flex-col">
-              <div className="aspect-video overflow-hidden">
-                <img 
-                  src={project.image} 
-                  alt={project.title} 
-                  className="w-full h-full object-cover transition-transform duration-500 hover:scale-110" 
-                />
+              <div className="overflow-hidden">
+                <AspectRatio ratio={16 / 9} className="bg-muted">
+                  <img 
+                    src={project.image} 
+                    alt={project.title} 
+                    className="w-full h-full object-cover transition-transform duration-500 hover:scale-110" 
+                  />
+                </AspectRatio>
               </div>
               <CardHeader className="flex-grow">
                 <CardTitle>{project.title}</CardTitle>
