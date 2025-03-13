@@ -26,14 +26,9 @@ const ExpertiseCard: React.FC<ExpertiseCardProps> = ({ icon, title, description,
 const About: React.FC = () => {
   const expertiseAreas = [
     {
-      icon: <Briefcase className="h-6 w-6 text-primary" />,
-      title: "Operations Management",
-      description: "Crafting robust evaluation frameworks and orchestrating cross-functional collaboration for data-driven business strategies and workflow optimization.",
-    },
-    {
-      icon: <TrendingUp className="h-6 w-6 text-primary" />,
-      title: "Trading & Fund Management",
-      description: "Executing arbitrage and hedging strategies across exchanges with 675% YoY growth while developing custom trading dashboards and automation tools.",
+      icon: <BarChart className="h-6 w-6 text-primary" />,
+      title: "Blockchain Research",
+      description: "Analyzing on-chain data and DeFi protocols to identify opportunities and risks, creating comprehensive analytical reports on blockchain financial mechanisms.",
     },
     {
       icon: <PieChart className="h-6 w-6 text-primary" />,
@@ -46,14 +41,19 @@ const About: React.FC = () => {
       description: "Co-founded and scaled an NFT studio, leading a 20-person team and launching innovative projects generating over $4M USD in first-year revenue.",
     },
     {
-      icon: <BarChart className="h-6 w-6 text-primary" />,
+      icon: <Briefcase className="h-6 w-6 text-primary" />,
+      title: "Operations Management",
+      description: "Crafting robust evaluation frameworks and orchestrating cross-functional collaboration for data-driven business strategies and workflow optimization.",
+    },
+    {
+      icon: <Database className="h-6 w-6 text-primary" />,
       title: "Predictive Modeling",
       description: "Developing end-to-end pipelines with cutting-edge algorithms for crypto price predictions and market analysis to inform trading strategies.",
     },
     {
-      icon: <Database className="h-6 w-6 text-primary" />,
-      title: "Blockchain Research",
-      description: "Analyzing on-chain data and DeFi protocols to identify opportunities and risks, creating comprehensive analytical reports on blockchain financial mechanisms.",
+      icon: <TrendingUp className="h-6 w-6 text-primary" />,
+      title: "Trading & Fund Management",
+      description: "Executing arbitrage and hedging strategies across exchanges with 675% YoY growth while developing custom trading dashboards and automation tools.",
     },
   ];
 

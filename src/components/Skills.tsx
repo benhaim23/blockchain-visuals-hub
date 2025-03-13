@@ -196,11 +196,11 @@ const Skills: React.FC = () => {
             <CardContent>
               <ul className="space-y-3">
                 {[
-                  "Blockchain and Digital Currencies at UNIC",
-                  "Tableau Desktop Specialist",
-                  "Python for Trading - Quantinsti",
+                  "Blockchain and Digital Currencies - UNIC",
+                  "Brainstation Data Science Bootcamp",
                   "IBM Professional Certificate for Data Science",
-                  "Brainstation Data Science Bootcamp"
+                  "Python for Trading - Quantinsti",
+                  "Tableau Desktop Specialist"
                 ].map((cert, index) => (
                   <li key={index} className="flex items-start gap-2 group">
                     <Badge variant="outline" className="mt-0.5 group-hover:bg-primary/20 transition-colors">
