@@ -51,13 +51,6 @@ const Projects: React.FC = () => {
           >
             Analytics
           </Button>
-          <Button
-            variant={filter === "community" ? "default" : "outline"}
-            className="rounded-full text-sm"
-            onClick={() => setFilter("community")}
-          >
-            Community
-          </Button>
         </div>
       </div>
 
