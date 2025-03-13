@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Mail, MessageSquare, Send, Download, MapPin, Clock } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -38,17 +37,14 @@ const Contact: React.FC = () => {
   const onSubmit = async (data: FormValues) => {
     setIsSubmitting(true);
     
-    // Add the recipient email directly
     const mailtoData = {
       ...data,
       to: 'markbenhaim0@gmail.com',
     };
     
-    // Simulate API call
     try {
       await new Promise((resolve) => setTimeout(resolve, 1500));
       
-      // Create a mailto link to open in the user's mail client
       const mailtoUrl = `mailto:markbenhaim0@gmail.com?subject=${encodeURIComponent(data.subject)}&body=${encodeURIComponent(`Name: ${data.name}\nEmail: ${data.email}\n\n${data.message}`)}`;
       window.open(mailtoUrl, '_blank');
       
@@ -243,7 +239,7 @@ const Contact: React.FC = () => {
                     View my full resume to learn more about my experience, projects, and qualifications.
                   </p>
                   <Button
-                    className="w-full bg-primary hover:bg-primary/90 transition-colors shadow-sm"
+                    className="w-full bg-primary hover:bg-primary/90 transition-colors shadow-sm mb-5"
                     onClick={() => window.open('/images/misc/Mark_Benhaim_Resume.pdf', '_blank')}
                   >
                     <Download className="mr-2 h-4 w-4" />
