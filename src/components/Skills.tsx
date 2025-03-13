@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { BarChart, PieChart, AreaChart, Users, Megaphone, Briefcase, Code, Database, Network, Shield, Search, FlaskConical } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -114,25 +113,25 @@ const Skills: React.FC = () => {
       ],
     },
     {
-      title: "Programming",
-      description: "Technical implementation and software development",
+      title: "Technical Skills",
+      description: "Basic programming and data tools",
       icon: <Code className="h-6 w-6 text-primary" />,
       skills: [
-        { name: "Data Science", keywords: ["Python", "R", "Jupyter", "Machine Learning"] },
-        { name: "Version Control", keywords: ["Git", "GitHub", "CI/CD"] },
-        { name: "Backend Development", keywords: ["Flask", "Django", "FastAPI"] },
-        { name: "Scripting", keywords: ["Automation", "Data Processing", "ETL"] },
+        { name: "Python", keywords: ["Data Analysis", "Jupyter", "Basic Scripting"] },
+        { name: "Version Control", keywords: ["Git", "GitHub"] },
+        { name: "SQL", keywords: ["Queries", "Data Extraction", "MySQL"] },
+        { name: "Data Tools", keywords: ["Excel", "Google Sheets", "Tableau"] },
       ],
     },
     {
-      title: "Data Engineering",
-      description: "Building data infrastructure and pipelines",
+      title: "Data Fundamentals",
+      description: "Working with data and basic infrastructure",
       icon: <Database className="h-6 w-6 text-primary" />,
       skills: [
-        { name: "Database Management", keywords: ["MySQL", "SQL Server", "PostgreSQL"] },
-        { name: "ETL Processes", keywords: ["Data Pipelines", "Automation", "Integration"] },
-        { name: "Big Data", keywords: ["Hadoop", "Spark", "Data Lakes"] },
-        { name: "Data Quality", keywords: ["Validation", "Cleaning", "Governance"] },
+        { name: "Database Basics", keywords: ["MySQL", "SQL Queries", "Data Models"] },
+        { name: "Data Extraction", keywords: ["APIs", "Basic ETL", "CSV/JSON"] },
+        { name: "Analytics", keywords: ["Dashboards", "Reporting", "KPIs"] },
+        { name: "Visualization", keywords: ["Charts", "Graphs", "Presentation"] },
       ],
     },
     {
