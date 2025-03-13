@@ -31,6 +31,13 @@ const Projects: React.FC = () => {
             All Projects
           </Button>
           <Button
+            variant={filter === "analytics" ? "default" : "outline"}
+            className="rounded-full text-sm"
+            onClick={() => setFilter("analytics")}
+          >
+            Analytics
+          </Button>
+          <Button
             variant={filter === "development" ? "default" : "outline"}
             className="rounded-full text-sm"
             onClick={() => setFilter("development")}
@@ -43,13 +50,6 @@ const Projects: React.FC = () => {
             onClick={() => setFilter("trading")}
           >
             Trading
-          </Button>
-          <Button
-            variant={filter === "analytics" ? "default" : "outline"}
-            className="rounded-full text-sm"
-            onClick={() => setFilter("analytics")}
-          >
-            Analytics
           </Button>
         </div>
       </div>
