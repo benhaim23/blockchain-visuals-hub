@@ -30,11 +30,11 @@ export const projects: Project[] = [
   },
   {
     id: 4,
-    title: 'Arbitrage Trading System',
-    description: 'Executed arbitrage and hedging strategies using 15 exchanges, spot trading pairs, and perpetual futures to identify market inefficiencies and optimize returns with 675% YoY growth.',
-    tags: ['Arbitrage', 'Hedging', 'Trading Algorithms'],
+    title: 'GMB Capital - Arbitrage Trading',
+    description: 'Executed arbitrage and hedging strategies at GMB Capital using 15 exchanges, spot trading pairs, and perpetual futures to identify market inefficiencies and optimize returns with 675% YoY growth.',
+    tags: ['Arbitrage', 'Hedging', 'Trading Algorithms', 'Fund Management'],
     link: 'https://github.com/benhaim23',
-    image: '/placeholder.svg',
+    image: '/images/projects/gmb_capital.jpeg',
     category: 'trading',
   },
   {
@@ -72,5 +72,14 @@ export const projects: Project[] = [
     link: 'https://www.0n1force.com/',
     image: '/images/projects/0n1force.jpeg',
     category: 'development',
+  },
+  {
+    id: 9,
+    title: '3iQ Research & Development',
+    description: 'Worked within the Research and Development department at 3iQ, building project initiatives in Real World Asset Tokenization and DeFi treasury management. Conducted in-depth analysis of DeFi protocols and blockchain financial mechanisms to identify investment opportunities and risks.',
+    tags: ['RWA Tokenization', 'DeFi Treasury', 'Blockchain Research', 'Investment Analysis'],
+    link: 'https://3iq.io/',
+    image: '/images/projects/3iq.jpeg',
+    category: 'analytics',
   },
 ];
