@@ -114,14 +114,14 @@ const Skills: React.FC = () => {
       ],
     },
     {
-      title: "Programming & Development",
+      title: "Programming",
       description: "Technical implementation and software development",
       icon: <Code className="h-6 w-6 text-primary" />,
       skills: [
-        { name: "Frontend", keywords: ["React", "JavaScript", "HTML/CSS", "UI/UX"] },
         { name: "Data Science", keywords: ["Python", "R", "Jupyter", "Machine Learning"] },
-        { name: "API Integration", keywords: ["REST", "GraphQL", "Web3", "Webhooks"] },
         { name: "Version Control", keywords: ["Git", "GitHub", "CI/CD"] },
+        { name: "Backend Development", keywords: ["Flask", "Django", "FastAPI"] },
+        { name: "Scripting", keywords: ["Automation", "Data Processing", "ETL"] },
       ],
     },
     {
@@ -129,7 +129,7 @@ const Skills: React.FC = () => {
       description: "Building data infrastructure and pipelines",
       icon: <Database className="h-6 w-6 text-primary" />,
       skills: [
-        { name: "Database Management", keywords: ["SQL", "NoSQL", "Data Modeling"] },
+        { name: "Database Management", keywords: ["MySQL", "SQL Server", "PostgreSQL"] },
         { name: "ETL Processes", keywords: ["Data Pipelines", "Automation", "Integration"] },
         { name: "Big Data", keywords: ["Hadoop", "Spark", "Data Lakes"] },
         { name: "Data Quality", keywords: ["Validation", "Cleaning", "Governance"] },
