@@ -47,36 +47,36 @@ const SkillCategory: React.FC<SkillCategoryProps> = ({
 const Skills: React.FC = () => {
   const skillCategories = [
     {
-      title: "Technical Skills",
-      description: "Development and implementation expertise",
+      title: "Data Analysis & Visualization",
+      description: "Tools and techniques for extracting insights",
       icon: <AreaChart className="h-6 w-6 text-primary" />,
       skills: [
-        { name: "Blockchain Development", level: 90 },
-        { name: "Smart Contract Auditing", level: 85 },
-        { name: "DeFi Protocol Integration", level: 80 },
-        { name: "Web3 Frontend Development", level: 75 },
+        { name: "Python, SQL, Tableau", level: 92 },
+        { name: "Time Series Analysis", level: 90 },
+        { name: "NumPy, Pandas, Matplotlib", level: 88 },
+        { name: "Data Warehousing (AWS, Snowflake)", level: 85 },
       ],
     },
     {
-      title: "Trading & Investment",
-      description: "Market analysis and investment strategies",
+      title: "Blockchain & Crypto",
+      description: "Expertise in blockchain technologies",
       icon: <BarChart className="h-6 w-6 text-primary" />,
       skills: [
-        { name: "Technical Analysis", level: 92 },
-        { name: "Risk Management", level: 88 },
-        { name: "Algorithmic Trading", level: 82 },
-        { name: "Portfolio Optimization", level: 85 },
+        { name: "DeFi Strategies & Tokenization", level: 94 },
+        { name: "Smart Contract Evaluation", level: 89 },
+        { name: "Onchain Data Analysis", level: 92 },
+        { name: "Dune Analytics", level: 86 },
       ],
     },
     {
-      title: "Data & Analytics",
-      description: "Research and data-driven insights",
+      title: "Trading & Analytics",
+      description: "Trading systems and market analysis",
       icon: <PieChart className="h-6 w-6 text-primary" />,
       skills: [
-        { name: "On-Chain Data Analysis", level: 87 },
-        { name: "Market Sentiment Analysis", level: 83 },
-        { name: "Financial Modeling", level: 80 },
-        { name: "Data Visualization", level: 90 },
+        { name: "Arbitrage & Hedging Strategies", level: 95 },
+        { name: "Quantitative & Predictive Modeling", level: 88 },
+        { name: "Risk Management", level: 90 },
+        { name: "Crypto Market Forecasting", level: 85 },
       ],
     },
   ];
@@ -87,7 +87,7 @@ const Skills: React.FC = () => {
         <div className="badge badge-primary inline-block mb-2">My Expertise</div>
         <h2 className="section-title">Skills & Proficiencies</h2>
         <p className="section-subtitle">
-          With a diverse skill set spanning technical development, trading strategies, and data analytics,
+          With a diverse skill set spanning data science, blockchain technologies, and trading strategies,
           I bring comprehensive expertise to navigate the complexities of the crypto ecosystem.
         </p>
       </div>
@@ -107,6 +107,42 @@ const Skills: React.FC = () => {
             />
           </div>
         ))}
+      </div>
+
+      <div className="mt-12 glass-card p-8 animate-fade-in-up">
+        <h3 className="text-xl font-semibold mb-6 text-center">Certifications & Education</h3>
+        
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+          <div>
+            <h4 className="font-medium text-lg mb-4">Certifications</h4>
+            <ul className="space-y-2 list-disc pl-5">
+              <li>AWS Certified Data Engineer Associate (in progress)</li>
+              <li>Tableau Desktop Specialist (in progress)</li>
+              <li>SnowPro Core Certification (in progress)</li>
+              <li>Python for Trading - Quantinsti</li>
+              <li>IBM Professional Certificate for Data Science</li>
+            </ul>
+          </div>
+          
+          <div>
+            <h4 className="font-medium text-lg mb-4">Education</h4>
+            <ul className="space-y-4">
+              <li>
+                <div className="font-medium">Master's in Applied Data Science</div>
+                <div className="text-sm text-muted-foreground">University of Michigan, 2023 - Present</div>
+              </li>
+              <li>
+                <div className="font-medium">Master's in Blockchain & Digital Currency</div>
+                <div className="text-sm text-muted-foreground">University of Nicosia, 2018 - 2019</div>
+              </li>
+              <li>
+                <div className="font-medium">Bachelor of Commerce (Accounting)</div>
+                <div className="text-sm text-muted-foreground">Concordia University, John Molson School of Business, 2015 - 2018</div>
+                <div className="text-xs text-muted-foreground">Honors: Ernst & Young Scholarship, Beta Gamma Sigma, Dean's Honor List</div>
+              </li>
+            </ul>
+          </div>
+        </div>
       </div>
     </section>
   );

@@ -27,33 +27,33 @@ const About: React.FC = () => {
   const expertiseAreas = [
     {
       icon: <Briefcase className="h-6 w-6 text-primary" />,
-      title: "Project Management",
-      description: "Leading blockchain projects from conception to delivery, ensuring seamless coordination and timely execution.",
+      title: "Operations Management",
+      description: "Crafting robust evaluation frameworks and orchestrating cross-functional collaboration for data-driven business strategies and workflow optimization.",
     },
     {
       icon: <TrendingUp className="h-6 w-6 text-primary" />,
-      title: "Trading Strategies",
-      description: "Developing and implementing sophisticated crypto trading strategies with proven track records.",
+      title: "Trading & Fund Management",
+      description: "Executing arbitrage and hedging strategies across exchanges with 675% YoY growth while developing custom trading dashboards and automation tools.",
     },
     {
       icon: <PieChart className="h-6 w-6 text-primary" />,
-      title: "Fund Management",
-      description: "Managing crypto portfolios with strategic asset allocation and risk management to maximize returns.",
+      title: "Data Analytics",
+      description: "Leveraging Python, SQL, and visualization tools to extract meaningful insights from blockchain data, identifying market trends and investment opportunities.",
     },
     {
       icon: <Braces className="h-6 w-6 text-primary" />,
-      title: "Development",
-      description: "Overseeing technical implementations and smart contract development for blockchain applications.",
+      title: "NFT Development",
+      description: "Co-founded and scaled an NFT studio, leading a 20-person team and launching innovative projects generating over $4M USD in first-year revenue.",
     },
     {
       icon: <BarChart className="h-6 w-6 text-primary" />,
-      title: "Operations",
-      description: "Streamlining processes and operations for crypto ventures to ensure efficiency and scalability.",
+      title: "Predictive Modeling",
+      description: "Developing end-to-end pipelines with cutting-edge algorithms for crypto price predictions and market analysis to inform trading strategies.",
     },
     {
       icon: <Database className="h-6 w-6 text-primary" />,
-      title: "Data Analytics",
-      description: "Extracting valuable insights from blockchain data to inform strategic decisions and identify opportunities.",
+      title: "Blockchain Research",
+      description: "Analyzing on-chain data and DeFi protocols to identify opportunities and risks, creating comprehensive analytical reports on blockchain financial mechanisms.",
     },
   ];
 
@@ -63,8 +63,8 @@ const About: React.FC = () => {
         <div className="badge badge-primary inline-block mb-2">About Me</div>
         <h2 className="section-title">Expertise in the Crypto Ecosystem</h2>
         <p className="section-subtitle">
-          With extensive experience across the blockchain industry, I bring a comprehensive skill set
-          to help projects navigate the complex crypto landscape and achieve sustainable success.
+          With experience spanning operations, trading, analytics, and development in the blockchain space,
+          I bring a comprehensive skill set to navigate the complexities of the crypto landscape.
         </p>
       </div>
 

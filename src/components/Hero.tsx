@@ -17,13 +17,24 @@ const Hero: React.FC = () => {
       <div className="container mx-auto max-w-5xl px-4 sm:px-6 text-center z-10">
         <div className="space-y-8 mx-auto">
           <div className="space-y-4 animate-fade-in-down">
+            <div className="flex justify-center mb-4">
+              <div className="w-32 h-32 rounded-full overflow-hidden border-2 border-primary">
+                <img 
+                  src="/lovable-uploads/c1f53f20-7d2f-4470-bb3c-3ef6792fa74a.png" 
+                  alt="Mark Benhaim" 
+                  className="w-full h-full object-cover"
+                />
+              </div>
+            </div>
             <div className="badge badge-primary inline-block mb-3">Blockchain & Crypto Expert</div>
             <h1 className="text-4xl md:text-6xl font-bold leading-tight">
-              Transforming Ideas into
-              <span className="crypto-gradient"> Blockchain Reality</span>
+              Mark Benhaim
             </h1>
+            <h2 className="text-2xl md:text-3xl font-semibold text-foreground/80">
+              Transforming Data into <span className="crypto-gradient">Blockchain Solutions</span>
+            </h2>
             <p className="text-muted-foreground text-lg md:text-xl mt-6 max-w-2xl mx-auto">
-              Project Management · Trading · Fund Management · Operations · Research · Data Analytics
+              Operations · Fund Management · Data Analytics · Trading · NFT Development · Blockchain Research
             </p>
           </div>
           

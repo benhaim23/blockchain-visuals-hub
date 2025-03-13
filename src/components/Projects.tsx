@@ -19,55 +19,55 @@ interface Project {
 const projects: Project[] = [
   {
     id: 1,
-    title: 'DeFi Portfolio Manager',
-    description: 'A comprehensive dashboard for managing DeFi investments across multiple protocols with real-time analytics.',
-    tags: ['Smart Contracts', 'React', 'Web3.js', 'DeFi'],
-    link: '#',
+    title: 'NFT Studio & Marketplace',
+    description: 'Co-founded and scaled an NFT studio that generated over $4M USD in first-year revenue, leading a 20-person team across engineering, marketing, and creative domains.',
+    tags: ['NFT Development', 'Team Leadership', 'Revenue Generation'],
+    link: 'https://github.com/benhaim23',
     image: 'data:image/svg+xml;charset=UTF-8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="560" height="320" viewBox="0 0 560 320" fill="none"%3E%3Crect width="560" height="320" fill="%230066CC" fill-opacity="0.05"/%3E%3Cpath d="M280 160m-50 0a50 50 0 1 0 100 0a50 50 0 1 0 -100 0" stroke="%230066CC" stroke-width="2" stroke-dasharray="4 4"/%3E%3Cpath d="M280 120L330 190H230L280 120Z" stroke="%230066CC" stroke-width="2"/%3E%3C/svg%3E',
     category: 'development',
   },
   {
     id: 2,
-    title: 'Crypto Fund Performance Analysis',
-    description: 'Detailed analysis of top crypto funds performance metrics with comparative insights against market benchmarks.',
-    tags: ['Data Analysis', 'Fund Management', 'Python', 'TradingView'],
-    link: '#',
+    title: 'Dune Analytics Dashboard',
+    description: 'Crafted robust evaluation frameworks using Dune Analytics, Python, and SQL to convert complex on-chain data into critical insights that informed lending strategies.',
+    tags: ['Dune Analytics', 'Data Visualization', 'On-Chain Data'],
+    link: 'https://github.com/benhaim23',
     image: 'data:image/svg+xml;charset=UTF-8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="560" height="320" viewBox="0 0 560 320" fill="none"%3E%3Crect width="560" height="320" fill="%2300AA88" fill-opacity="0.05"/%3E%3Cpath d="M140 220L230 160L280 200L350 120L420 180" stroke="%2300AA88" stroke-width="2"/%3E%3Ccircle cx="140" cy="220" r="5" fill="%2300AA88"/%3E%3Ccircle cx="230" cy="160" r="5" fill="%2300AA88"/%3E%3Ccircle cx="280" cy="200" r="5" fill="%2300AA88"/%3E%3Ccircle cx="350" cy="120" r="5" fill="%2300AA88"/%3E%3Ccircle cx="420" cy="180" r="5" fill="%2300AA88"/%3E%3C/svg%3E',
     category: 'analytics',
   },
   {
     id: 3,
-    title: 'Arbitrage Trading Bot',
-    description: 'Automated trading system that identifies and executes on price discrepancies across multiple cryptocurrency exchanges.',
-    tags: ['Trading', 'Algorithms', 'Node.js', 'APIs'],
-    link: '#',
+    title: 'Arbitrage Trading System',
+    description: 'Executed arbitrage and hedging strategies using 15 exchanges, spot trading pairs, and perpetual futures to identify market inefficiencies and optimize returns with 675% YoY growth.',
+    tags: ['Arbitrage', 'Hedging', 'Trading Algorithms'],
+    link: 'https://github.com/benhaim23',
     image: 'data:image/svg+xml;charset=UTF-8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="560" height="320" viewBox="0 0 560 320" fill="none"%3E%3Crect width="560" height="320" fill="%23AA00AA" fill-opacity="0.05"/%3E%3Cpath d="M140 140H420" stroke="%23AA00AA" stroke-width="2" stroke-dasharray="6 6"/%3E%3Cpath d="M140 180H420" stroke="%23AA00AA" stroke-width="2" stroke-dasharray="6 6"/%3E%3Cpath d="M140 100v120" stroke="%23AA00AA" stroke-width="2" stroke-dasharray="6 6"/%3E%3Cpath d="M420 100v120" stroke="%23AA00AA" stroke-width="2" stroke-dasharray="6 6"/%3E%3Cpath d="M280 120L330 180H230L280 120Z" fill="%23AA00AA" fill-opacity="0.2" stroke="%23AA00AA" stroke-width="2"/%3E%3C/svg%3E',
     category: 'trading',
   },
   {
     id: 4,
-    title: 'Blockchain Data Analytics Platform',
-    description: 'Platform for extracting and visualizing on-chain data to identify patterns and insights for investment decisions.',
-    tags: ['Big Data', 'Blockchain', 'Visualization', 'Python'],
-    link: '#',
+    title: 'Bitcoin Sentiment Analysis',
+    description: 'Architected a sophisticated analytical model merging social media sentiment evaluation with financial metrics on Bitcoin performance to identify primary market volatility factors.',
+    tags: ['Sentiment Analysis', 'Financial Metrics', 'Market Volatility'],
+    link: 'https://github.com/benhaim23',
     image: 'data:image/svg+xml;charset=UTF-8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="560" height="320" viewBox="0 0 560 320" fill="none"%3E%3Crect width="560" height="320" fill="%23CC4400" fill-opacity="0.05"/%3E%3Ccircle cx="280" cy="160" r="70" stroke="%23CC4400" stroke-width="2" stroke-dasharray="8 8"/%3E%3Ccircle cx="280" cy="160" r="40" stroke="%23CC4400" stroke-width="2"/%3E%3Cpath d="M260 140L300 180M260 180L300 140" stroke="%23CC4400" stroke-width="2"/%3E%3C/svg%3E',
     category: 'analytics',
   },
   {
     id: 5,
-    title: 'NFT Market Analysis Tool',
-    description: 'Comprehensive tool for analyzing NFT market trends, floor prices, and transaction volumes to identify investment opportunities.',
-    tags: ['NFT', 'Market Analysis', 'React', 'APIs'],
-    link: '#',
+    title: 'BTC LSTM Prediction Model',
+    description: 'Innovated an end-to-end pipeline featuring cutting-edge long short-term memory algorithms focused on refining crypto price predictions to inform trading decisions.',
+    tags: ['Machine Learning', 'Time Series', 'Price Prediction'],
+    link: 'https://github.com/benhaim23',
     image: 'data:image/svg+xml;charset=UTF-8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="560" height="320" viewBox="0 0 560 320" fill="none"%3E%3Crect width="560" height="320" fill="%23AAAA00" fill-opacity="0.05"/%3E%3Crect x="200" y="120" width="160" height="100" rx="10" stroke="%23AAAA00" stroke-width="2"/%3E%3Cpath d="M230 140l20 20m0-20l-20 20" stroke="%23AAAA00" stroke-width="2"/%3E%3Cpath d="M310 140l20 20m0-20l-20 20" stroke="%23AAAA00" stroke-width="2"/%3E%3Cpath d="M250 180h60" stroke="%23AAAA00" stroke-width="2"/%3E%3C/svg%3E',
     category: 'analytics',
   },
   {
     id: 6,
-    title: 'Smart Contract Security Audit Platform',
-    description: 'Automated platform for identifying vulnerabilities and security issues in smart contracts before deployment.',
-    tags: ['Security', 'Solidity', 'Audit', 'Smart Contracts'],
-    link: '#',
+    title: 'Trading Dashboard Automation',
+    description: 'Engineered a custom dashboard automating trade execution processes, achieving a 30% reduction in manual oversight hours while enhancing precision in real-time monitoring.',
+    tags: ['Dashboard Development', 'Process Automation', 'Real-time Monitoring'],
+    link: 'https://github.com/benhaim23',
     image: 'data:image/svg+xml;charset=UTF-8,%3Csvg xmlns="http://www.w3.org/2000/svg" width="560" height="320" viewBox="0 0 560 320" fill="none"%3E%3Crect width="560" height="320" fill="%230088AA" fill-opacity="0.05"/%3E%3Cpath d="M280 120l-50 80h100l-50-80z" stroke="%230088AA" stroke-width="2"/%3E%3Ccircle cx="280" cy="150" r="10" fill="%230088AA" fill-opacity="0.2" stroke="%230088AA" stroke-width="2"/%3E%3Cpath d="M260 190h40" stroke="%230088AA" stroke-width="2"/%3E%3C/svg%3E',
     category: 'development',
   },
@@ -165,6 +165,17 @@ const Projects: React.FC = () => {
             </Card>
           </div>
         ))}
+      </div>
+      
+      <div className="mt-12 text-center">
+        <Button 
+          variant="outline" 
+          className="rounded-full"
+          onClick={() => window.open('https://github.com/benhaim23', '_blank')}
+        >
+          <Code className="mr-2 h-4 w-4" />
+          View More on GitHub
+        </Button>
       </div>
     </section>
   );
