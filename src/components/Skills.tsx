@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { BarChart, PieChart, AreaChart, Users, Megaphone, Briefcase, Code, Database, Network, Shield, Search, FlaskConical, Award, GraduationCap } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -48,6 +47,17 @@ const SkillCategory: React.FC<SkillCategoryProps> = ({
 const Skills: React.FC = () => {
   const skillCategories = [
     {
+      title: "Blockchain & Crypto",
+      description: "Expertise in blockchain technologies",
+      icon: <BarChart className="h-6 w-6 text-primary" />,
+      skills: [
+        { name: "DeFi Expertise", keywords: ["Tokenization", "Protocols", "Yield Farming"] },
+        { name: "Smart Contracts", keywords: ["Evaluation", "Integration", "Security Audits"] },
+        { name: "Onchain Analysis", keywords: ["Transaction Data", "Metrics", "Flow Analysis"] },
+        { name: "Analytics Tools", keywords: ["Dune", "Etherscan", "Nansen", "Messari"] },
+      ],
+    },
+    {
       title: "Data Analysis & Visualization",
       description: "Tools and techniques for extracting insights",
       icon: <AreaChart className="h-6 w-6 text-primary" />,
@@ -59,14 +69,14 @@ const Skills: React.FC = () => {
       ],
     },
     {
-      title: "Product & Business Development",
-      description: "Building and scaling products and businesses",
-      icon: <Briefcase className="h-6 w-6 text-primary" />,
+      title: "Data Fundamentals",
+      description: "Working with data and infrastructure",
+      icon: <Database className="h-6 w-6 text-primary" />,
       skills: [
-        { name: "Project Management", keywords: ["NFT", "Web3", "Agile"] },
-        { name: "Leadership", keywords: ["Cross-functional", "Strategy", "Team Building"] },
-        { name: "Business Growth", keywords: ["Partnerships", "Scaling", "Market Entry"] },
-        { name: "Revenue Strategy", keywords: ["Monetization", "Market Fit", "Pricing Models"] },
+        { name: "Database Basics", keywords: ["MySQL", "SQL Queries", "Data Models"] },
+        { name: "Data Extraction", keywords: ["APIs", "ETL", "CSV/JSON"] },
+        { name: "Analytics", keywords: ["Dashboards", "Reporting", "KPIs"] },
+        { name: "Visualization", keywords: ["Charts", "Graphs", "Presentation"] },
       ],
     },
     {
@@ -81,25 +91,25 @@ const Skills: React.FC = () => {
       ],
     },
     {
-      title: "Blockchain & Crypto",
-      description: "Expertise in blockchain technologies",
-      icon: <BarChart className="h-6 w-6 text-primary" />,
+      title: "Product & Business Development",
+      description: "Building and scaling products and businesses",
+      icon: <Briefcase className="h-6 w-6 text-primary" />,
       skills: [
-        { name: "DeFi Expertise", keywords: ["Tokenization", "Protocols", "Yield Farming"] },
-        { name: "Smart Contracts", keywords: ["Evaluation", "Integration", "Security Audits"] },
-        { name: "Onchain Analysis", keywords: ["Transaction Data", "Metrics", "Flow Analysis"] },
-        { name: "Analytics Tools", keywords: ["Dune", "Etherscan", "Nansen", "Messari"] },
+        { name: "Project Management", keywords: ["NFT", "Web3", "Agile"] },
+        { name: "Leadership", keywords: ["Cross-functional", "Strategy", "Team Building"] },
+        { name: "Business Growth", keywords: ["Partnerships", "Scaling", "Market Entry"] },
+        { name: "Revenue Strategy", keywords: ["Monetization", "Market Fit", "Pricing Models"] },
       ],
     },
     {
-      title: "Trading & Analytics",
-      description: "Trading systems and market analysis",
-      icon: <PieChart className="h-6 w-6 text-primary" />,
+      title: "Research & Analysis",
+      description: "In-depth investigation and strategic insights",
+      icon: <Search className="h-6 w-6 text-primary" />,
       skills: [
-        { name: "Trading Strategies", keywords: ["Arbitrage", "Hedging", "Spot/Futures"] },
-        { name: "Quantitative Models", keywords: ["Predictive", "Risk", "Backtesting"] },
-        { name: "Risk Management", keywords: ["Portfolio", "Exposure", "Position Sizing"] },
-        { name: "Market Analysis", keywords: ["Trends", "Forecasting", "Technical Analysis"] },
+        { name: "Market Research", keywords: ["Competitive Analysis", "Trends", "Opportunities"] },
+        { name: "Crypto Ecosystems", keywords: ["L1/L2", "NFT Markets", "GameFi", "Omnichain", "DEX", "DeFi"] },
+        { name: "Protocol Analysis", keywords: ["Technical", "Tokenomics", "Security"] },
+        { name: "Investment Research", keywords: ["Due Diligence", "Risk Assessment", "Valuation"] },
       ],
     },
     {
@@ -125,25 +135,14 @@ const Skills: React.FC = () => {
       ],
     },
     {
-      title: "Data Fundamentals",
-      description: "Working with data and infrastructure",
-      icon: <Database className="h-6 w-6 text-primary" />,
+      title: "Trading & Analytics",
+      description: "Trading systems and market analysis",
+      icon: <PieChart className="h-6 w-6 text-primary" />,
       skills: [
-        { name: "Database Basics", keywords: ["MySQL", "SQL Queries", "Data Models"] },
-        { name: "Data Extraction", keywords: ["APIs", "ETL", "CSV/JSON"] },
-        { name: "Analytics", keywords: ["Dashboards", "Reporting", "KPIs"] },
-        { name: "Visualization", keywords: ["Charts", "Graphs", "Presentation"] },
-      ],
-    },
-    {
-      title: "Research & Analysis",
-      description: "In-depth investigation and strategic insights",
-      icon: <Search className="h-6 w-6 text-primary" />,
-      skills: [
-        { name: "Market Research", keywords: ["Competitive Analysis", "Trends", "Opportunities"] },
-        { name: "Crypto Ecosystems", keywords: ["L1/L2", "NFT Markets", "GameFi", "Omnichain", "DEX", "DeFi"] },
-        { name: "Protocol Analysis", keywords: ["Technical", "Tokenomics", "Security"] },
-        { name: "Investment Research", keywords: ["Due Diligence", "Risk Assessment", "Valuation"] },
+        { name: "Trading Strategies", keywords: ["Arbitrage", "Hedging", "Spot/Futures"] },
+        { name: "Quantitative Models", keywords: ["Predictive", "Risk", "Backtesting"] },
+        { name: "Risk Management", keywords: ["Portfolio", "Exposure", "Position Sizing"] },
+        { name: "Market Analysis", keywords: ["Trends", "Forecasting", "Technical Analysis"] },
       ],
     },
   ];
