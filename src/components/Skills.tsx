@@ -141,7 +141,7 @@ const Skills: React.FC = () => {
       icon: <Search className="h-6 w-6 text-primary" />,
       skills: [
         { name: "Market Research", keywords: ["Competitive Analysis", "Trends", "Opportunities"] },
-        { name: "Crypto Ecosystems", keywords: ["L1/L2", "NFT Markets", "GameFi"] },
+        { name: "Crypto Ecosystems", keywords: ["L1/L2", "NFT Markets", "GameFi", "Omnichain", "DEX", "DeFi"] },
         { name: "Protocol Analysis", keywords: ["Technical", "Tokenomics", "Security"] },
         { name: "Investment Research", keywords: ["Due Diligence", "Risk Assessment", "Valuation"] },
       ],
