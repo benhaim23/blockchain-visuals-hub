@@ -182,7 +182,7 @@ const Contact: React.FC = () => {
                 </p>
                 <Button
                   className="w-full"
-                  onClick={() => window.open('/lovable-uploads/23405bf2-719d-4cf1-b466-92400c83ba9d.png', '_blank')}
+                  onClick={() => window.open('/images/misc/Mark_Benhaim_Resume.pdf', '_blank')}
                 >
                   Download Resume
                 </Button>
