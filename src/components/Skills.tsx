@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { BarChart, PieChart, AreaChart, Users, Megaphone, Briefcase } from 'lucide-react';
+import { BarChart, PieChart, AreaChart, Users, Megaphone, Briefcase, Code, Database, Network, Shield, Search, FlaskConical } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
@@ -52,10 +52,10 @@ const Skills: React.FC = () => {
       description: "Tools and techniques for extracting insights",
       icon: <AreaChart className="h-6 w-6 text-primary" />,
       skills: [
-        { name: "Data Processing", keywords: ["Python", "SQL", "Tableau"] },
-        { name: "Statistical Analysis", keywords: ["Time Series", "Forecasting"] },
-        { name: "Data Libraries", keywords: ["NumPy", "Pandas", "Matplotlib"] },
-        { name: "Cloud Solutions", keywords: ["AWS", "Snowflake"] },
+        { name: "Data Processing", keywords: ["Python", "SQL", "Tableau", "ETL"] },
+        { name: "Statistical Analysis", keywords: ["Time Series", "Forecasting", "Regression"] },
+        { name: "Data Libraries", keywords: ["NumPy", "Pandas", "Matplotlib", "Scikit-learn"] },
+        { name: "Cloud Solutions", keywords: ["AWS", "Snowflake", "Google Cloud"] },
       ],
     },
     {
@@ -63,10 +63,10 @@ const Skills: React.FC = () => {
       description: "Building and scaling products and businesses",
       icon: <Briefcase className="h-6 w-6 text-primary" />,
       skills: [
-        { name: "Project Management", keywords: ["NFT", "Web3"] },
-        { name: "Leadership", keywords: ["Cross-functional", "Strategy"] },
-        { name: "Business Growth", keywords: ["Partnerships", "Scaling"] },
-        { name: "Revenue Strategy", keywords: ["Monetization", "Market Fit"] },
+        { name: "Project Management", keywords: ["NFT", "Web3", "Agile"] },
+        { name: "Leadership", keywords: ["Cross-functional", "Strategy", "Team Building"] },
+        { name: "Business Growth", keywords: ["Partnerships", "Scaling", "Market Entry"] },
+        { name: "Revenue Strategy", keywords: ["Monetization", "Market Fit", "Pricing Models"] },
       ],
     },
     {
@@ -74,10 +74,10 @@ const Skills: React.FC = () => {
       description: "Building engaged communities and brand presence",
       icon: <Megaphone className="h-6 w-6 text-primary" />,
       skills: [
-        { name: "Community Building", keywords: ["Engagement", "Retention"] },
-        { name: "Influencer Marketing", keywords: ["Campaigns", "Outreach"] },
-        { name: "Social Strategy", keywords: ["Content", "Analytics"] },
-        { name: "Collaborations", keywords: ["Cross-Project", "Co-Marketing"] },
+        { name: "Community Building", keywords: ["Engagement", "Retention", "Discord"] },
+        { name: "Influencer Marketing", keywords: ["Campaigns", "Outreach", "Partnerships"] },
+        { name: "Social Strategy", keywords: ["Content", "Analytics", "Growth Hacking"] },
+        { name: "Collaborations", keywords: ["Cross-Project", "Co-Marketing", "Events"] },
       ],
     },
     {
@@ -85,10 +85,10 @@ const Skills: React.FC = () => {
       description: "Expertise in blockchain technologies",
       icon: <BarChart className="h-6 w-6 text-primary" />,
       skills: [
-        { name: "DeFi Expertise", keywords: ["Tokenization", "Protocols"] },
-        { name: "Smart Contracts", keywords: ["Evaluation", "Integration"] },
-        { name: "Onchain Analysis", keywords: ["Transaction Data", "Metrics"] },
-        { name: "Analytics Tools", keywords: ["Dune", "Etherscan"] },
+        { name: "DeFi Expertise", keywords: ["Tokenization", "Protocols", "Yield Farming"] },
+        { name: "Smart Contracts", keywords: ["Evaluation", "Integration", "Security Audits"] },
+        { name: "Onchain Analysis", keywords: ["Transaction Data", "Metrics", "Flow Analysis"] },
+        { name: "Analytics Tools", keywords: ["Dune", "Etherscan", "Nansen", "Messari"] },
       ],
     },
     {
@@ -96,10 +96,10 @@ const Skills: React.FC = () => {
       description: "Trading systems and market analysis",
       icon: <PieChart className="h-6 w-6 text-primary" />,
       skills: [
-        { name: "Trading Strategies", keywords: ["Arbitrage", "Hedging"] },
-        { name: "Quantitative Models", keywords: ["Predictive", "Risk"] },
-        { name: "Risk Management", keywords: ["Portfolio", "Exposure"] },
-        { name: "Market Analysis", keywords: ["Trends", "Forecasting"] },
+        { name: "Trading Strategies", keywords: ["Arbitrage", "Hedging", "Spot/Futures"] },
+        { name: "Quantitative Models", keywords: ["Predictive", "Risk", "Backtesting"] },
+        { name: "Risk Management", keywords: ["Portfolio", "Exposure", "Position Sizing"] },
+        { name: "Market Analysis", keywords: ["Trends", "Forecasting", "Technical Analysis"] },
       ],
     },
     {
@@ -107,10 +107,43 @@ const Skills: React.FC = () => {
       description: "Leading teams and executing complex projects",
       icon: <Users className="h-6 w-6 text-primary" />,
       skills: [
-        { name: "Project Lifecycle", keywords: ["End-to-End", "Delivery"] },
-        { name: "Creative Direction", keywords: ["Vision", "Execution"] },
-        { name: "Technical Coordination", keywords: ["Engineering", "Design"] },
-        { name: "Stakeholder Management", keywords: ["Alignment", "Communication"] },
+        { name: "Project Lifecycle", keywords: ["End-to-End", "Delivery", "Sprints"] },
+        { name: "Creative Direction", keywords: ["Vision", "Execution", "Branding"] },
+        { name: "Technical Coordination", keywords: ["Engineering", "Design", "QA"] },
+        { name: "Stakeholder Management", keywords: ["Alignment", "Communication", "Reporting"] },
+      ],
+    },
+    {
+      title: "Programming & Development",
+      description: "Technical implementation and software development",
+      icon: <Code className="h-6 w-6 text-primary" />,
+      skills: [
+        { name: "Frontend", keywords: ["React", "JavaScript", "HTML/CSS", "UI/UX"] },
+        { name: "Data Science", keywords: ["Python", "R", "Jupyter", "Machine Learning"] },
+        { name: "API Integration", keywords: ["REST", "GraphQL", "Web3", "Webhooks"] },
+        { name: "Version Control", keywords: ["Git", "GitHub", "CI/CD"] },
+      ],
+    },
+    {
+      title: "Data Engineering",
+      description: "Building data infrastructure and pipelines",
+      icon: <Database className="h-6 w-6 text-primary" />,
+      skills: [
+        { name: "Database Management", keywords: ["SQL", "NoSQL", "Data Modeling"] },
+        { name: "ETL Processes", keywords: ["Data Pipelines", "Automation", "Integration"] },
+        { name: "Big Data", keywords: ["Hadoop", "Spark", "Data Lakes"] },
+        { name: "Data Quality", keywords: ["Validation", "Cleaning", "Governance"] },
+      ],
+    },
+    {
+      title: "Research & Analysis",
+      description: "In-depth investigation and strategic insights",
+      icon: <Search className="h-6 w-6 text-primary" />,
+      skills: [
+        { name: "Market Research", keywords: ["Competitive Analysis", "Trends", "Opportunities"] },
+        { name: "Crypto Ecosystems", keywords: ["L1/L2", "NFT Markets", "GameFi"] },
+        { name: "Protocol Analysis", keywords: ["Technical", "Tokenomics", "Security"] },
+        { name: "Investment Research", keywords: ["Due Diligence", "Risk Assessment", "Valuation"] },
       ],
     },
   ];
