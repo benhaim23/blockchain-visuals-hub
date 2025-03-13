@@ -1,5 +1,5 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { ArrowRight } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
@@ -30,6 +30,11 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, index }) => {
     ? project.image 
     : project.image;
 
+  // For debugging purposes
+  useEffect(() => {
+    console.log(`Loading image for ${project.title}:`, imageSrc);
+  }, [project.title, imageSrc]);
+
   return (
     <div
       className="animate-fade-in-up"
@@ -42,6 +47,7 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, index }) => {
             {imageError ? (
               <div className="w-full h-full flex items-center justify-center bg-muted">
                 <p className="text-muted-foreground text-sm">Image not available</p>
+                <p className="text-muted-foreground text-xs mt-1">{imageSrc}</p>
               </div>
             ) : (
               <img 
