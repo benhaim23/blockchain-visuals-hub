@@ -25,15 +25,16 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, index }) => {
     setImageLoaded(true); // We mark it as loaded to remove the skeleton
   };
 
-  // Determine if the image is an external URL or a local path
-  const imageSrc = project.image.startsWith('http') 
-    ? project.image 
-    : project.image;
+  // Reset state when project changes
+  useEffect(() => {
+    setImageLoaded(false);
+    setImageError(false);
+  }, [project.image]);
 
   // For debugging purposes
   useEffect(() => {
-    console.log(`Loading image for ${project.title}:`, imageSrc);
-  }, [project.title, imageSrc]);
+    console.log(`Loading image for ${project.title}:`, project.image);
+  }, [project.title, project.image]);
 
   return (
     <div
@@ -45,15 +46,14 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, index }) => {
           <AspectRatio ratio={16 / 9} className="bg-muted">
             {!imageLoaded && <Skeleton className="absolute inset-0 z-10" />}
             {imageError ? (
-              <div className="w-full h-full flex items-center justify-center bg-muted">
-                <p className="text-muted-foreground text-sm">Image not available</p>
-                <p className="text-muted-foreground text-xs mt-1">{imageSrc}</p>
+              <div className="w-full h-full flex flex-col items-center justify-center bg-muted p-4">
+                <p className="text-muted-foreground text-sm">Image could not be loaded</p>
+                <p className="text-muted-foreground text-xs mt-1 text-center truncate max-w-full">{project.image}</p>
               </div>
             ) : (
               <img 
-                src={imageSrc} 
+                src={project.image} 
                 alt={project.title}
-                crossOrigin="anonymous" 
                 className={cn(
                   "w-full h-full object-cover transition-transform duration-500 hover:scale-110",
                   !imageLoaded && "opacity-0"
