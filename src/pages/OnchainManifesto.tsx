@@ -36,6 +36,13 @@ const OnchainManifesto: React.FC = () => {
   };
 
   useEffect(() => {
+    // Update the document title based on the current page/chapter
+    if (activeTab === "toc") {
+      document.title = "The Onchain Manifesto | Mark Benhaim";
+    } else if (activeTab === "reader" && manifestoChapters[currentChapter]) {
+      document.title = `${manifestoChapters[currentChapter].title} | The Onchain Manifesto`;
+    }
+    
     const loadContent = async () => {
       setIsLoading(true);
       const chapter = manifestoChapters[currentChapter];
@@ -73,7 +80,7 @@ const OnchainManifesto: React.FC = () => {
     };
 
     loadContent();
-  }, [currentChapter]);
+  }, [currentChapter, activeTab]);
 
   return (
     <>
