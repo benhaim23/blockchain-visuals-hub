@@ -54,16 +54,22 @@ const TextProcessor: React.FC<TextProcessorProps> = ({ text }) => {
     return parts.length > 0 ? parts : input;
   };
   
-  // Process bold text after handling links
+  // Clean all standalone ** characters and properly format bold text
   const processBoldText = (textNode: string | React.ReactNode): React.ReactNode => {
     if (typeof textNode !== 'string') {
       return textNode;
     }
     
-    // Properly handle bold text (text between ** markers)
-    // This regex finds proper pairs of ** that surround text
+    // First, remove any standalone ** that aren't part of proper bold formatting
+    let cleanedText = textNode;
+    
+    // Replace any remaining standalone ** that aren't properly paired
+    cleanedText = cleanedText.replace(/\*\*(?!\s)(?![^*]*\*\*)/g, ''); // Leading **
+    cleanedText = cleanedText.replace(/(?<!\*\*[^*]*)\*\*/g, '');     // Trailing **
+    
+    // Now process properly paired ** for bold text
     const boldRegex = /\*\*([^*]+)\*\*/g;
-    const segments = textNode.split(boldRegex);
+    const segments = cleanedText.split(boldRegex);
     
     return segments.map((segment, idx) => {
       // For odd indices, these are the captures from the regex (the content between **)
