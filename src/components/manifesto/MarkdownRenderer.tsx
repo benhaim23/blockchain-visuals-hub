@@ -24,9 +24,27 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
         // Lists
         else if (line.startsWith('- ')) {
           return <li key={index} className="ml-6 mb-1">{line.substring(2)}</li>;
-        } else if (line.startsWith('**')) {
-          const content = line.replace(/\*\*/g, '');
-          return <p key={index} className="font-bold mb-2">{content}</p>;
+        } 
+        
+        // Bold text - we'll handle the ** markers properly
+        else if (line.includes('**')) {
+          // Replace ** with span for bold text
+          const parts = line.split('**');
+          
+          if (parts.length > 1) {
+            return (
+              <p key={index} className="mb-4">
+                {parts.map((part, i) => {
+                  // Every even index (0, 2, 4...) is regular text
+                  // Every odd index (1, 3, 5...) is bold text
+                  return i % 2 === 0 ? 
+                    <React.Fragment key={i}>{part}</React.Fragment> : 
+                    <strong key={i}>{part}</strong>;
+                })}
+              </p>
+            );
+          }
+          return <p key={index} className="mb-4">{line}</p>;
         }
         
         // Blockquotes

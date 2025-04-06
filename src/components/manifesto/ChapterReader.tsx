@@ -37,7 +37,7 @@ const ChapterReader: React.FC<ChapterReaderProps> = ({
           Previous
         </Button>
 
-        <span className="font-medium">
+        <span className="font-medium text-purple-500">
           {currentChapter === 0 ? 'Executive Summary' : `Chapter ${currentChapter}`}: {chapter?.title}
         </span>
 
