@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -232,7 +233,7 @@ const OnchainManifesto: React.FC = () => {
                     <ScrollArea className="h-[600px] w-full pr-4">
                       <div className="prose dark:prose-invert max-w-none">
                         {mdContent.split('\n').map((line, index) => {
-                          if (line.startsWith('# ')) {
+                           if (line.startsWith('# ')) {
                             return <h1 key={index} className="text-2xl font-bold mt-6 mb-4">{line.substring(2)}</h1>;
                           } else if (line.startsWith('## ')) {
                             return <h2 key={index} className="text-xl font-bold mt-5 mb-3">{line.substring(3)}</h2>;
