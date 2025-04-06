@@ -86,21 +86,13 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
       
       // Headers
       if (line.startsWith('# ')) {
-        // Check if it's a chapter header (with number at the beginning)
-        const chapterMatch = line.substring(2).match(/^(\d+)\.\s+(.+)/);
-        if (chapterMatch) {
-          renderedLines.push(
-            <h1 key={i} className="text-3xl font-bold mt-6 mb-4 bg-gradient-to-r from-indigo-600 to-purple-500 dark:from-indigo-400 dark:to-purple-300 bg-clip-text text-transparent">
-              {cleanHeaderText(line.substring(2))}
-            </h1>
-          );
-        } else {
-          renderedLines.push(
-            <h1 key={i} className="text-3xl font-bold mt-6 mb-4 text-indigo-900 dark:text-indigo-300">
-              {cleanHeaderText(line.substring(2))}
-            </h1>
-          );
-        }
+        // Apply the gradient to ALL chapter headings, not just numbered ones
+        // This will ensure headers have a consistent style
+        renderedLines.push(
+          <h1 key={i} className="text-3xl font-bold mt-6 mb-4 bg-gradient-to-r from-indigo-600 to-purple-500 dark:from-indigo-400 dark:to-purple-300 bg-clip-text text-transparent">
+            {cleanHeaderText(line.substring(2))}
+          </h1>
+        );
       } else if (line.startsWith('## ')) {
         renderedLines.push(
           <h2 key={i} className="text-2xl font-bold mt-5 mb-3 text-indigo-800 dark:text-indigo-400">
