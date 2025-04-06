@@ -113,9 +113,18 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
           // Skip the opening and closing code block markers
           return null;
         }
-        else if (line === 'sql') {
-          // Skip language indicators in code blocks
+        // Skip language indicators in code blocks
+        else if (line === 'sql' || line === 'javascript' || line === 'typescript' || line === 'json') {
           return null;
+        }
+        // Handle code content - detect if this line is within a code block
+        else if (animatedContent.split('\n').slice(0, index).some(l => l.startsWith('```')) && 
+                !animatedContent.split('\n').slice(0, index).slice(animatedContent.split('\n').slice(0, index).lastIndexOf('```')).includes('```')) {
+          return (
+            <div key={index} className="font-mono text-sm bg-slate-100 dark:bg-slate-800 p-1 rounded-sm text-indigo-600 dark:text-indigo-400">
+              {line}
+            </div>
+          );
         }
         
         // Regular paragraph
