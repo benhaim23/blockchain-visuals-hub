@@ -86,10 +86,8 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
       
       // Headers
       if (line.startsWith('# ')) {
-        // Apply the gradient to ALL chapter headings, not just numbered ones
-        // This will ensure headers have a consistent style
         renderedLines.push(
-          <h1 key={i} className="text-3xl font-bold mt-6 mb-4 bg-gradient-to-r from-indigo-600 to-purple-500 dark:from-indigo-400 dark:to-purple-300 bg-clip-text text-transparent">
+          <h1 key={i} className="text-3xl font-bold mt-6 mb-4 text-indigo-900 dark:text-indigo-300">
             {cleanHeaderText(line.substring(2))}
           </h1>
         );
