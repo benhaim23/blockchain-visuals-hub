@@ -22,7 +22,7 @@ const ChapterReader: React.FC<ChapterReaderProps> = ({
   onNextChapter 
 }) => {
   const chapter = chapters[currentChapter];
-  const showMarkdown = chapter?.mdPath && mdContent;
+  const showMarkdown = chapter && mdContent; // Always prefer markdown if available
   
   return (
     <div className="bg-card/80 backdrop-blur-sm rounded-lg border border-border min-h-[600px] flex flex-col">
@@ -52,18 +52,24 @@ const ChapterReader: React.FC<ChapterReaderProps> = ({
         </Button>
       </div>
 
-      <div className="flex-1 p-4">
+      <div className="flex-1 p-6">
         {showMarkdown ? (
           <ScrollArea className="h-[600px] pr-4">
             <MarkdownRenderer content={mdContent} />
           </ScrollArea>
         ) : (
-          <div className="h-[600px] w-full">
-            <iframe
-              src={chapter?.pdfPath}
-              className="w-full h-full"
-              title={`Chapter ${currentChapter}: ${chapter?.title}`}
-            />
+          <div className="h-[600px] w-full flex items-center justify-center">
+            <p className="text-muted-foreground">
+              This chapter is only available as a PDF. 
+              <a 
+                href={chapter?.pdfPath} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="ml-2 text-primary hover:underline"
+              >
+                Open PDF
+              </a>
+            </p>
           </div>
         )}
       </div>

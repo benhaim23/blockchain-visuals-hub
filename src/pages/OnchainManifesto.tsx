@@ -39,7 +39,15 @@ const OnchainManifesto: React.FC = () => {
     const loadContent = async () => {
       setIsLoading(true);
       const chapter = manifestoChapters[currentChapter];
+
+      // If we have markdown content for this chapter
+      if (chapter?.mdContent) {
+        setMdContent(chapter.mdContent);
+        setIsLoading(false);
+        return;
+      }
       
+      // If we have a markdown path but no content yet
       if (chapter?.mdPath) {
         try {
           const response = await fetch(chapter.mdPath);
