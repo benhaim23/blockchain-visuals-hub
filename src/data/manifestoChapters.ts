@@ -18,7 +18,7 @@ export const manifestoChapters: ManifestoChapter[] = [
   },
   { 
     number: 1,
-    title: "Why Onchain Data Matters",
+    title: "What Does an Onchain Data Analyst Do?",
     pdfPath: "/Onchain Manifesto/01. Why Onchain Data Matters.pdf",
     mdPath: "/Onchain Manifesto/01. What Does an Onchain Data Analyst Do.md"
   },
