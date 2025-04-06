@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { ChevronDown, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
@@ -19,7 +20,8 @@ const Hero: React.FC = () => {
     { text: "Transforming" },
     { text: "Data" },
     { text: "into" },
-    { text: "Blockchain Solutions", className: "text-blue-500 dark:text-blue-400 font-bold" },
+    { text: "Blockchain", className: "crypto-gradient font-bold" },
+    { text: "Solutions", className: "crypto-gradient font-bold" },
   ];
 
   return (
@@ -114,6 +116,7 @@ const Hero: React.FC = () => {
         </div>
       </div>
       
+      {/* Enhanced decorative elements */}
       <div className={cn(
         "absolute -top-40 -right-40 w-96 h-96 rounded-full blur-3xl opacity-50",
         theme === 'dark' ? 'bg-primary/10' : 'bg-primary/5'
