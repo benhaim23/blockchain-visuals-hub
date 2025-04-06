@@ -34,18 +34,19 @@ const ChapterReader: React.FC<ChapterReaderProps> = ({
   
   return (
     <div className="bg-white/90 dark:bg-card/80 backdrop-blur-sm rounded-lg border-2 border-blue-200 dark:border-slate-700 min-h-[600px] flex flex-col shadow-lg transition-all duration-300 hover:shadow-xl dark:hover:border-primary/40 hover:border-blue-300">
-      <div className="p-2 md:p-4 border-b-2 border-blue-100 dark:border-slate-700 flex items-center justify-between bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-slate-800 dark:to-slate-800 rounded-t-lg">
+      <div className={`p-3 md:p-4 border-b-2 border-blue-100 dark:border-slate-700 flex items-center justify-between bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-slate-800 dark:to-slate-800 rounded-t-lg ${isMobile ? 'flex-wrap gap-1' : ''}`}>
         <Button 
           variant="ghost" 
           onClick={onPreviousChapter}
           disabled={currentChapter <= 0}
-          className="gap-1 md:gap-2 text-xs md:text-sm text-blue-600 hover:text-blue-700 hover:bg-blue-100/50 transition-all duration-300 hover:scale-105 dark:text-blue-400 dark:hover:text-blue-300 dark:hover:bg-blue-900/20"
+          className="gap-1 md:gap-2 text-sm md:text-base text-blue-600 hover:text-blue-700 hover:bg-blue-100/50 transition-all duration-300 hover:scale-105 dark:text-blue-400 dark:hover:text-blue-300 dark:hover:bg-blue-900/20"
+          size={isMobile ? "sm" : "default"}
         >
-          <ChevronLeft className="h-3 w-3 md:h-4 md:w-4" />
-          <span className="hidden sm:inline">Previous</span>
+          <ChevronLeft className="h-4 w-4" />
+          <span>Previous</span>
         </Button>
 
-        <span className="text-sm md:text-base font-medium text-indigo-700 dark:text-indigo-300 px-1 text-center truncate">
+        <span className={`font-medium text-indigo-700 dark:text-indigo-300 text-center ${isMobile ? 'text-sm w-full order-first mb-1' : ''}`}>
           {currentChapter === 0 ? 'Executive Summary' : `Chapter ${currentChapter}`}: {chapter?.title}
         </span>
 
@@ -53,19 +54,18 @@ const ChapterReader: React.FC<ChapterReaderProps> = ({
           variant="ghost" 
           onClick={onNextChapter}
           disabled={currentChapter >= chapters.length - 1}
-          className="gap-1 md:gap-2 text-xs md:text-sm text-blue-600 hover:text-blue-700 hover:bg-blue-100/50 transition-all duration-300 hover:scale-105 dark:text-blue-400 dark:hover:text-blue-300 dark:hover:bg-blue-900/20"
+          className="gap-1 md:gap-2 text-sm md:text-base text-blue-600 hover:text-blue-700 hover:bg-blue-100/50 transition-all duration-300 hover:scale-105 dark:text-blue-400 dark:hover:text-blue-300 dark:hover:bg-blue-900/20"
+          size={isMobile ? "sm" : "default"}
         >
-          <span className="hidden sm:inline">Next</span>
-          <ChevronRight className="h-3 w-3 md:h-4 md:w-4" />
+          <span>Next</span>
+          <ChevronRight className="h-4 w-4" />
         </Button>
       </div>
 
-      <div className="flex-1 p-3 md:p-6">
+      <div className="flex-1 p-4 md:p-6">
         {showMarkdown ? (
-          <ScrollArea className="h-[600px] pr-0 md:pr-4">
-            <div className="px-0 md:px-1">
-              <MarkdownRenderer content={mdContent} />
-            </div>
+          <ScrollArea className="h-[600px] pr-2 md:pr-4">
+            <MarkdownRenderer content={mdContent} />
             
             {/* Call-to-action link at the end of each chapter except the last one */}
             {!isLastChapter && (
@@ -73,7 +73,7 @@ const ChapterReader: React.FC<ChapterReaderProps> = ({
                 <Button 
                   variant="link" 
                   onClick={onNextChapter}
-                  className="group flex items-center gap-2 text-indigo-700 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 text-base md:text-lg"
+                  className="group flex items-center gap-2 text-indigo-700 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 text-lg"
                 >
                   {isMobile ? (
                     <span>Next Chapter</span>
