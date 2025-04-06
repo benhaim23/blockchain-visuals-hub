@@ -1,7 +1,7 @@
 
 "use client"
 
-import React, { useEffect, useState, memo } from "react"
+import React, { useEffect, useState } from "react"
 import { motion } from "framer-motion"
 import { cn } from "@/lib/utils"
 
@@ -9,17 +9,18 @@ interface CustomCursorProps {
   className?: string
 }
 
-export const CustomCursor = memo(({ className }: CustomCursorProps) => {
+export function CustomCursor({ className }: CustomCursorProps) {
   const [mousePosition, setMousePosition] = useState({ x: -100, y: -100 })
+  const [isClicking, setIsClicking] = useState(false)
   const [isHovering, setIsHovering] = useState(false)
 
   useEffect(() => {
     const updateMousePosition = (e: MouseEvent) => {
-      // Use requestAnimationFrame for smoother performance
-      requestAnimationFrame(() => {
-        setMousePosition({ x: e.clientX, y: e.clientY })
-      })
+      setMousePosition({ x: e.clientX, y: e.clientY })
     }
+
+    const handleMouseDown = () => setIsClicking(true)
+    const handleMouseUp = () => setIsClicking(false)
 
     const handleMouseOver = (e: MouseEvent) => {
       if (e.target instanceof HTMLElement) {
@@ -32,48 +33,63 @@ export const CustomCursor = memo(({ className }: CustomCursorProps) => {
           e.target.closest('input') ||
           e.target.dataset.interactive === 'true';
         
-        setIsHovering(!!isInteractive)
+        setIsHovering(isInteractive)
       }
     }
 
-    // Use passive event listeners for better performance
-    window.addEventListener("mousemove", updateMousePosition, { passive: true })
-    window.addEventListener("mouseover", handleMouseOver, { passive: true })
+    window.addEventListener("mousemove", updateMousePosition)
+    window.addEventListener("mousedown", handleMouseDown)
+    window.addEventListener("mouseup", handleMouseUp)
+    window.addEventListener("mouseover", handleMouseOver)
 
     return () => {
       window.removeEventListener("mousemove", updateMousePosition)
+      window.removeEventListener("mousedown", handleMouseDown)
+      window.removeEventListener("mouseup", handleMouseUp)
       window.removeEventListener("mouseover", handleMouseOver)
     }
   }, [])
 
   return (
-    <motion.div
-      className={cn(
-        "fixed top-0 left-0 pointer-events-none z-[9999]",
-        className
-      )}
-      animate={{
-        x: mousePosition.x,
-        y: mousePosition.y,
-        transition: {
-          type: "spring",
-          damping: 50,  // Increased damping for less oscillation
-          stiffness: 800, // Increased stiffness for faster response
-          mass: 0.2,     // Reduced mass for faster movement
-          restDelta: 0.01 // Smaller values create more precise movements
-        }
-      }}
-    >
-      <div
+    <>
+      {/* Main cursor dot */}
+      <motion.div
         className={cn(
-          "w-6 h-6 -ml-3 -mt-3",
-          "bg-primary opacity-60 rounded-full", // Reduced opacity
-          isHovering ? "scale-125" : "scale-100",
-          "will-change-transform transition-transform duration-100" // Shorter duration, added will-change for GPU acceleration
+          "fixed top-0 left-0 w-5 h-5 rounded-full pointer-events-none z-50 mix-blend-difference",
+          "bg-primary",
+          isClicking ? "scale-75" : "scale-100",
+          isHovering ? "scale-150" : "scale-100",
+          className
         )}
+        animate={{
+          x: mousePosition.x - 10,
+          y: mousePosition.y - 10,
+          transition: {
+            type: "spring",
+            damping: 25,
+            stiffness: 350,
+            mass: 0.5
+          }
+        }}
       />
-    </motion.div>
-  )
-})
 
-CustomCursor.displayName = "CustomCursor"
+      {/* Cursor trailing ring */}
+      <motion.div
+        className="fixed top-0 left-0 w-8 h-8 rounded-full border-2 border-primary/50 pointer-events-none z-50 mix-blend-difference"
+        animate={{
+          x: mousePosition.x - 16,
+          y: mousePosition.y - 16,
+          scale: isHovering ? 1.5 : 1,
+          opacity: isHovering ? 0.5 : 0.8,
+          transition: {
+            type: "spring",
+            damping: 20,
+            stiffness: 250,
+            mass: 0.8,
+            delay: 0.03
+          }
+        }}
+      />
+    </>
+  )
+}
