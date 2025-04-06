@@ -1,14 +1,23 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, lazy, Suspense } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { BookOpen, FileText, Sparkles } from "lucide-react";
 import Header from '@/components/Header';
 import { Squares } from "@/components/ui/squares-background";
 import { manifestoChapters } from '@/data/manifestoChapters_updated';
-import TableOfContents from '@/components/manifesto/TableOfContents';
-import ChapterReader from '@/components/manifesto/ChapterReader';
 import { toast } from '@/components/ui/use-toast';
 import { MatrixText } from '@/components/ui/matrix-text';
+
+// Lazy load the larger components
+const TableOfContents = lazy(() => import('@/components/manifesto/TableOfContents'));
+const ChapterReader = lazy(() => import('@/components/manifesto/ChapterReader'));
+
+// Loading placeholder component
+const LoadingPlaceholder = () => (
+  <div className="bg-white/90 dark:bg-card/80 backdrop-blur-sm rounded-lg border-2 border-blue-200 dark:border-slate-700 min-h-[600px] flex items-center justify-center shadow-lg">
+    <p className="text-blue-600 dark:text-blue-400 animate-pulse">Loading content...</p>
+  </div>
+);
 
 const OnchainManifesto: React.FC = () => {
   const [activeTab, setActiveTab] = useState("toc");
@@ -16,24 +25,28 @@ const OnchainManifesto: React.FC = () => {
   const [mdContent, setMdContent] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const goToNextChapter = () => {
+  // Memoized callback functions
+  const goToNextChapter = useCallback(() => {
     if (currentChapter < manifestoChapters.length - 1) {
       setCurrentChapter(currentChapter + 1);
       setActiveTab("reader");
     }
-  };
+  }, [currentChapter]);
 
-  const goToPreviousChapter = () => {
+  const goToPreviousChapter = useCallback(() => {
     if (currentChapter > 0) {
       setCurrentChapter(currentChapter - 1);
       setActiveTab("reader");
     }
-  };
+  }, [currentChapter]);
 
-  const handleSelectChapter = (chapterIndex: number) => {
+  const handleSelectChapter = useCallback((chapterIndex: number) => {
     setCurrentChapter(chapterIndex);
     setActiveTab("reader");
-  };
+  }, []);
+
+  // Memoize the chapters array to prevent unnecessary rerenders
+  const chapters = useMemo(() => manifestoChapters, []);
 
   useEffect(() => {
     // Update the document title based on the current page/chapter
@@ -44,9 +57,13 @@ const OnchainManifesto: React.FC = () => {
     }
     
     const loadContent = async () => {
+      // Skip loading if we're not in reader mode
+      if (activeTab !== "reader") return;
+      
       setIsLoading(true);
       const chapter = manifestoChapters[currentChapter];
 
+      // Check if we already have the content (memory cache)
       if (chapter?.mdContent) {
         setMdContent(chapter.mdContent);
         setIsLoading(false);
@@ -102,9 +119,9 @@ const OnchainManifesto: React.FC = () => {
             <MatrixText 
               text="The Onchain Manifesto" 
               className="h-auto text-indigo-800 dark:text-indigo-300" 
-              initialDelay={800}
-              letterAnimationDuration={900}
-              letterInterval={180}
+              initialDelay={500}
+              letterAnimationDuration={700}
+              letterInterval={100}
             />
           </div>
           <p className="text-slate-700 dark:text-muted-foreground mb-8 text-lg text-center leading-relaxed">
@@ -132,25 +149,27 @@ const OnchainManifesto: React.FC = () => {
             </TabsList>
 
             <TabsContent value="toc" className="mt-0">
-              <TableOfContents 
-                chapters={manifestoChapters} 
-                onSelectChapter={handleSelectChapter} 
-              />
+              <Suspense fallback={<LoadingPlaceholder />}>
+                <TableOfContents 
+                  chapters={chapters} 
+                  onSelectChapter={handleSelectChapter} 
+                />
+              </Suspense>
             </TabsContent>
 
             <TabsContent value="reader" className="mt-0">
               {isLoading ? (
-                <div className="bg-white/90 dark:bg-card/80 backdrop-blur-sm rounded-lg border-2 border-blue-200 dark:border-slate-700 min-h-[600px] flex items-center justify-center shadow-lg">
-                  <p className="text-blue-600 dark:text-blue-400 animate-pulse">Loading chapter content...</p>
-                </div>
+                <LoadingPlaceholder />
               ) : (
-                <ChapterReader 
-                  currentChapter={currentChapter}
-                  chapters={manifestoChapters}
-                  mdContent={mdContent}
-                  onPreviousChapter={goToPreviousChapter}
-                  onNextChapter={goToNextChapter}
-                />
+                <Suspense fallback={<LoadingPlaceholder />}>
+                  <ChapterReader 
+                    currentChapter={currentChapter}
+                    chapters={chapters}
+                    mdContent={mdContent}
+                    onPreviousChapter={goToPreviousChapter}
+                    onNextChapter={goToNextChapter}
+                  />
+                </Suspense>
               )}
             </TabsContent>
           </Tabs>

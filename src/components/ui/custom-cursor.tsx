@@ -1,7 +1,7 @@
 
 "use client"
 
-import React, { useEffect, useState } from "react"
+import React, { useEffect, useState, memo } from "react"
 import { motion } from "framer-motion"
 import { cn } from "@/lib/utils"
 
@@ -9,7 +9,7 @@ interface CustomCursorProps {
   className?: string
 }
 
-export function CustomCursor({ className }: CustomCursorProps) {
+export const CustomCursor = memo(({ className }: CustomCursorProps) => {
   const [mousePosition, setMousePosition] = useState({ x: -100, y: -100 })
   const [isHovering, setIsHovering] = useState(false)
 
@@ -69,4 +69,6 @@ export function CustomCursor({ className }: CustomCursorProps) {
       />
     </motion.div>
   )
-}
+})
+
+CustomCursor.displayName = "CustomCursor"
