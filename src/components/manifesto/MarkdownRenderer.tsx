@@ -36,6 +36,11 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
         // Clean up formatting markers
         const cleanLine = (str: string) => str.replace(/\*\*(.*?)\*\*/g, '$1').replace(/\*(.*?)\*/g, '$1');
         
+        // Skip horizontal rules (------) completely
+        if (line.trim() === '------') {
+          return null;
+        }
+        
         // Headers
         if (line.startsWith('# ')) {
           return <h1 key={index} className="text-3xl font-bold mt-6 mb-4 text-indigo-900 dark:text-indigo-300">{cleanLine(line.substring(2))}</h1>;
