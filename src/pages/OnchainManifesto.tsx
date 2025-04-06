@@ -3,7 +3,6 @@ import React, { useState, useEffect } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { BookOpen, FileText, Sparkles } from "lucide-react";
 import Header from '@/components/Header';
-import Footer from '@/components/Footer';
 import { Squares } from "@/components/ui/squares-background";
 import { manifestoChapters } from '@/data/manifestoChapters';
 import TableOfContents from '@/components/manifesto/TableOfContents';
@@ -178,7 +177,6 @@ const OnchainManifesto: React.FC = () => {
           </Tabs>
         </div>
       </div>
-      <Footer />
     </>
   );
 };
