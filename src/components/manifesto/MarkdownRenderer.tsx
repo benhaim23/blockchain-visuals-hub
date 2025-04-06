@@ -2,13 +2,15 @@
 import React, { useEffect, useState } from 'react';
 import { useAnimatedText } from '@/hooks/useAnimatedText';
 import SqlCodeBlock from './renderers/SqlCodeBlock';
+import TextProcessor from './renderers/TextProcessor';
 import CodeBlock from './renderers/CodeBlock';
 import TableRow from './renderers/TableRow';
-import LineRenderer from './renderers/LineRenderer';
 import { 
+  isWithinCodeBlock, 
+  isSqlCodeBlock, 
+  extractCodeBlock, 
+  cleanHeaderText,
   isStandaloneQuery,
-  extractCodeBlock,
-  isSqlCodeBlock,
   extractSqlQueries
 } from './utils/markdownUtils';
 
@@ -45,14 +47,15 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
     
     // Code blocks starting
     if (line.trim().startsWith('```')) {
-      // Extract and render the code block
+      // Check if this is an SQL code block
       if (isSqlCodeBlock(allLines, i)) {
         // Extract the complete code block
         const { content: codeContent, endIndex } = extractCodeBlock(allLines, i);
+        const blockIndex = renderedContent.length;
         
         renderedContent.push(
           <div key={`code-${i}`}>
-            <SqlCodeBlock content={codeContent} blockIndex={renderedContent.length} />
+            <SqlCodeBlock content={codeContent} blockIndex={blockIndex} />
           </div>
         );
         
@@ -78,6 +81,60 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
       // Skip to the end of the code block
       i = endIndex;
       continue;
+    }
+    
+    // Headers
+    if (line.startsWith('# ')) {
+      renderedContent.push(
+        <h1 key={i} className="text-3xl font-bold mt-6 mb-4 text-indigo-900 dark:text-indigo-300">
+          {cleanHeaderText(line.substring(2))}
+        </h1>
+      );
+    } else if (line.startsWith('## ')) {
+      renderedContent.push(
+        <h2 key={i} className="text-2xl font-bold mt-5 mb-3 text-indigo-800 dark:text-indigo-400">
+          {cleanHeaderText(line.substring(3))}
+        </h2>
+      );
+    } else if (line.startsWith('### ')) {
+      renderedContent.push(
+        <h3 key={i} className="text-xl font-bold mt-4 mb-2 text-indigo-700 dark:text-indigo-400">
+          {cleanHeaderText(line.substring(4))}
+        </h3>
+      );
+    } else if (line.startsWith('#### ')) {
+      renderedContent.push(
+        <h4 key={i} className="text-lg font-bold mt-3 mb-2 text-indigo-700 dark:text-indigo-400">
+          {cleanHeaderText(line.substring(5))}
+        </h4>
+      );
+    }
+    
+    // Lists
+    else if (line.startsWith('- ')) {
+      renderedContent.push(
+        <li key={i} className="ml-6 mb-1 text-slate-700 dark:text-slate-300">
+          <TextProcessor text={line.substring(2)} />
+        </li>
+      );
+    } 
+    
+    // Bold text or regular text with ** formatting
+    else if (line.includes('**')) {
+      renderedContent.push(
+        <p key={i} className="mb-4 text-slate-700 dark:text-slate-300">
+          <TextProcessor text={line} />
+        </p>
+      );
+    }
+    
+    // Blockquotes
+    else if (line.startsWith('> ')) {
+      renderedContent.push(
+        <blockquote key={i} className="border-l-4 border-blue-400 dark:border-blue-500 bg-blue-50 dark:bg-blue-900/20 pl-4 py-2 italic my-4 text-slate-600 dark:text-slate-300 rounded-r">
+          <TextProcessor text={line.substring(2)} />
+        </blockquote>
+      );
     }
     
     // Tables
@@ -108,14 +165,25 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
       );
     }
     
+    // Horizontal rule
+    else if (line === '---') {
+      renderedContent.push(<hr key={i} className="my-6 border-t-2 border-blue-100 dark:border-slate-700" />);
+    }
+    
+    // Empty line
+    else if (line.trim() === '') {
+      renderedContent.push(<div key={i} className="h-4"></div>);
+    }
+    
     // Check for standalone SQL queries and render them as SQL blocks
     else if (isStandaloneQuery(line) && line.includes(' ')) {
       // Collect all following lines that look like they're part of the same query
       const { content: queryContent, endIndex } = extractSqlQueries(allLines, i);
+      const blockIndex = renderedContent.length;
       
       renderedContent.push(
         <div key={`sql-query-${i}`}>
-          <SqlCodeBlock content={queryContent} blockIndex={renderedContent.length} />
+          <SqlCodeBlock content={queryContent} blockIndex={blockIndex} />
         </div>
       );
       
@@ -124,15 +192,13 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
       continue;
     }
     
-    // For all other line types, use the LineRenderer
+    // Regular paragraph
     else {
+      // Process inline formatting 
       renderedContent.push(
-        <LineRenderer 
-          key={i} 
-          line={line} 
-          index={i} 
-          allLines={allLines} 
-        />
+        <p key={i} className="mb-4 text-slate-700 dark:text-slate-300">
+          <TextProcessor text={line} />
+        </p>
       );
     }
   }
