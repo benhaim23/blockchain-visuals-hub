@@ -5,7 +5,6 @@ import SqlCodeBlock from './renderers/SqlCodeBlock';
 import TextProcessor from './renderers/TextProcessor';
 import CodeBlock from './renderers/CodeBlock';
 import TableRow from './renderers/TableRow';
-import { useIsMobile } from '@/hooks/use-mobile';
 import { 
   isWithinCodeBlock, 
   isSqlCodeBlock, 
@@ -22,7 +21,6 @@ interface MarkdownRendererProps {
 const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
   const [isVisible, setIsVisible] = useState(false);
   const animatedContent = useAnimatedText(content, "\n");
-  const isMobile = useIsMobile();
   
   useEffect(() => {
     setIsVisible(true);
@@ -57,7 +55,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
           const blockIndex = renderedLines.length;
           
           renderedLines.push(
-            <div key={`code-${i}`} className="my-5 w-full">
+            <div key={`code-${i}`}>
               <SqlCodeBlock content={codeContent} blockIndex={blockIndex} />
             </div>
           );
@@ -89,25 +87,25 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
       // Headers
       if (line.startsWith('# ')) {
         renderedLines.push(
-          <h1 key={i} className={`text-2xl md:text-3xl font-bold mt-8 mb-5 text-indigo-900 dark:text-indigo-300 ${isMobile ? 'px-1' : ''}`}>
+          <h1 key={i} className="text-3xl font-bold mt-6 mb-4 text-indigo-900 dark:text-indigo-300">
             {cleanHeaderText(line.substring(2))}
           </h1>
         );
       } else if (line.startsWith('## ')) {
         renderedLines.push(
-          <h2 key={i} className={`text-xl md:text-2xl font-bold mt-6 mb-4 text-indigo-800 dark:text-indigo-400 ${isMobile ? 'px-1' : ''}`}>
+          <h2 key={i} className="text-2xl font-bold mt-5 mb-3 text-indigo-800 dark:text-indigo-400">
             {cleanHeaderText(line.substring(3))}
           </h2>
         );
       } else if (line.startsWith('### ')) {
         renderedLines.push(
-          <h3 key={i} className={`text-lg md:text-xl font-bold mt-5 mb-3 text-indigo-700 dark:text-indigo-400 ${isMobile ? 'px-1' : ''}`}>
+          <h3 key={i} className="text-xl font-bold mt-4 mb-2 text-indigo-700 dark:text-indigo-400">
             {cleanHeaderText(line.substring(4))}
           </h3>
         );
       } else if (line.startsWith('#### ')) {
         renderedLines.push(
-          <h4 key={i} className={`text-base md:text-lg font-bold mt-4 mb-2 text-indigo-700 dark:text-indigo-400 ${isMobile ? 'px-1' : ''}`}>
+          <h4 key={i} className="text-lg font-bold mt-3 mb-2 text-indigo-700 dark:text-indigo-400">
             {cleanHeaderText(line.substring(5))}
           </h4>
         );
@@ -116,7 +114,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
       // Lists
       else if (line.startsWith('- ')) {
         renderedLines.push(
-          <li key={i} className={`ml-4 mb-2 text-slate-700 dark:text-slate-300 ${isMobile ? 'pr-2' : ''}`}>
+          <li key={i} className="ml-6 mb-1 text-slate-700 dark:text-slate-300">
             <TextProcessor text={line.substring(2)} />
           </li>
         );
@@ -125,7 +123,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
       // Bold text or regular text with ** formatting
       else if (line.includes('**')) {
         renderedLines.push(
-          <p key={i} className={`mb-4 text-slate-700 dark:text-slate-300 ${isMobile ? 'px-1' : ''}`}>
+          <p key={i} className="mb-4 text-slate-700 dark:text-slate-300">
             <TextProcessor text={line} />
           </p>
         );
@@ -134,7 +132,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
       // Blockquotes
       else if (line.startsWith('> ')) {
         renderedLines.push(
-          <blockquote key={i} className={`border-l-4 border-blue-400 dark:border-blue-500 bg-blue-50 dark:bg-blue-900/20 pl-4 py-3 my-5 text-slate-600 dark:text-slate-300 rounded-r ${isMobile ? 'mx-1 pr-2' : 'pr-4'}`}>
+          <blockquote key={i} className="border-l-4 border-blue-400 dark:border-blue-500 bg-blue-50 dark:bg-blue-900/20 pl-4 py-2 italic my-4 text-slate-600 dark:text-slate-300 rounded-r">
             <TextProcessor text={line.substring(2)} />
           </blockquote>
         );
@@ -185,7 +183,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
         const blockIndex = renderedLines.length;
         
         renderedLines.push(
-          <div key={`sql-query-${i}`} className="my-5 w-full">
+          <div key={`sql-query-${i}`}>
             <SqlCodeBlock content={queryContent} blockIndex={blockIndex} />
           </div>
         );
@@ -199,7 +197,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
       else {
         // Process inline formatting 
         renderedLines.push(
-          <p key={i} className={`mb-4 text-slate-700 dark:text-slate-300 ${isMobile ? 'px-1 pr-2' : ''}`}>
+          <p key={i} className="mb-4 text-slate-700 dark:text-slate-300">
             <TextProcessor text={line} />
           </p>
         );
@@ -207,10 +205,10 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
     }
     
     return renderedLines;
-  }, [animatedContent, isMobile]);
+  }, [animatedContent]);
 
   return (
-    <div className={`prose dark:prose-invert max-w-none prose-slate prose-headings:text-indigo-900 dark:prose-headings:text-indigo-300 prose-a:text-blue-600 dark:prose-a:text-blue-400 transition-opacity duration-500 ${isMobile ? 'pr-2' : ''} ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
+    <div className={`prose dark:prose-invert max-w-none prose-slate prose-headings:text-indigo-900 dark:prose-headings:text-indigo-300 prose-a:text-blue-600 dark:prose-a:text-blue-400 transition-opacity duration-500 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
       {renderedContent}
     </div>
   );
