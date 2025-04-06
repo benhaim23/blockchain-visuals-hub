@@ -1,3 +1,4 @@
+import { advancedChapters } from './manifestoChapters/chaptersAdvanced';
 
 export interface ManifestoChapter {
   number: number;
@@ -7,7 +8,8 @@ export interface ManifestoChapter {
   mdContent?: string;
 }
 
-export const manifestoChapters: ManifestoChapter[] = [
+// Basic chapters (0-10)
+const basicChapters: ManifestoChapter[] = [
   { 
     number: 0, 
     title: "The Onchain Analyst Decoding the Transparent Economy", 
