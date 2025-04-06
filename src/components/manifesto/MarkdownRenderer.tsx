@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useAnimatedText } from '@/hooks/useAnimatedText';
 import { Table, TableHeader, TableRow, TableHead, TableBody, TableCell } from "@/components/ui/table";
@@ -34,12 +33,12 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
     );
     
     return (
-      <div className="my-6 w-full overflow-auto rounded-lg bg-gray-900 border border-slate-700 dark:border-slate-600 shadow-md">
+      <div className="my-6 w-full overflow-auto">
         <Table className="border-collapse w-full">
           <TableHeader>
             <TableRow>
               {headerRow.map((header, idx) => (
-                <TableHead key={idx} className="font-semibold py-3 px-6">
+                <TableHead key={idx} className="bg-slate-100 dark:bg-slate-800 font-medium py-2 px-4">
                   {header.trim()}
                 </TableHead>
               ))}
@@ -47,9 +46,9 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
           </TableHeader>
           <TableBody>
             {dataRows.map((row, rowIdx) => (
-              <TableRow key={rowIdx}>
+              <TableRow key={rowIdx} className="hover:bg-slate-50 dark:hover:bg-slate-800/50">
                 {row.map((cell, cellIdx) => (
-                  <TableCell key={cellIdx} className="py-3 px-6">
+                  <TableCell key={cellIdx} className="py-2 px-4 border-t border-slate-200 dark:border-slate-700">
                     {cell.trim()}
                   </TableCell>
                 ))}
