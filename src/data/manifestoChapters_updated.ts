@@ -213,7 +213,7 @@ This article dives into the foundation of the onchain data stack. From Bitcoin's
 
 The two primary models in blockchain data are fundamentally different.
 
-#### 🔗 **Bitcoin: UTXO (Unspent Transaction Output)**
+#### 🔗 Bitcoin: UTXO (Unspent Transaction Output)
 
 Bitcoin doesn't track balances. Instead, every wallet's "balance" is the sum of unspent outputs it controls. Each transaction consumes previous outputs and generates new ones—like handing in old bills to receive change.
 
@@ -222,7 +222,7 @@ Bitcoin doesn't track balances. Instead, every wallet's "balance" is the sum of 
 - bitcoin.outputs: Where each BTC was sent
 - bitcoin.inputs: Where each BTC came from (linked to previous outputs)
 
-#### 📘 **Ethereum: Account-Based**
+#### 📘 Ethereum: Account-Based
 
 Ethereum uses a stateful model like a bank ledger. Wallets (EOAs) and smart contracts (CAs) have balances, and transactions mutate this shared state.
 
@@ -313,7 +313,7 @@ This is what separates surface-level data pulls from true onchain analytics. Whe
 - Decipher UTXO flows  
 - Join event logs with contract interactions  
 - Build modular spells that others can depend on  
-- Understand both data *and* the systems that generate it
+- Understand both data and the systems that generate it
 
 …you stop being a user of data and start becoming a builder of meaning.
 
@@ -365,7 +365,7 @@ Think of Dune as the **SQL-powered Google for blockchain activity**. It sits on 
 
 When you open [dune.com](https://dune.com), you'll find:
 
-### 🧾 **Queries**
+### 🧾 Queries
 
 This is where the magic happens. Every query is a SQL script that pulls from decoded blockchain tables.
 
@@ -373,7 +373,7 @@ This is where the magic happens. Every query is a SQL script that pulls from dec
 - Visualize results with tables, charts, or graphs
 - Save your queries, fork others, or share links publicly
 
-### 📊 **Dashboards**
+### 📊 Dashboards
 
 Dashboards are collections of queries with visualizations. They let you tell a story with data.
 
@@ -381,7 +381,7 @@ Dashboards are collections of queries with visualizations. They let you tell a s
 - Combine multiple chains or protocols in one place
 - Embed charts in blog posts, docs, or Notion pages
 
-### 📚 **Table Explorer**
+### 📚 Table Explorer
 
 Explore the underlying schema.
 
@@ -389,7 +389,7 @@ Explore the underlying schema.
 - Browse by category: \`transactions\`, \`token_transfers\`, \`logs\`, etc.
 - View column definitions and data samples
 
-### 🧙‍♀️ **Spellbook**
+### 🧙‍♀️ Spellbook
 
 A collection of curated, reusable models written by the Dune community and maintained in the open-source Spellbook repo.
 
