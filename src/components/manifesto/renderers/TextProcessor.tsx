@@ -15,6 +15,15 @@ const TextProcessor: React.FC<TextProcessorProps> = ({ text }) => {
   // Process the text to remove redundant next chapter text first
   const processedText = processNextChapterText(text);
   
+  // Clean up any standalone asterisks that aren't properly paired for bold formatting
+  const cleanAsterisks = (input: string) => {
+    // Replace standalone * not used for bold formatting
+    return input.replace(/\s\*\s/g, ' ');
+  };
+  
+  // Apply asterisk cleanup
+  const cleanedText = cleanAsterisks(processedText);
+  
   // First handle Markdown-style links: [text](url)
   const processLinks = (input: string) => {
     const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
@@ -60,7 +69,10 @@ const TextProcessor: React.FC<TextProcessorProps> = ({ text }) => {
       return textNode;
     }
     
-    const segments = textNode.split(/(\*\*[^*]+\*\*)/g);
+    // Fix cases where **text** might have spaces around the asterisks
+    const cleanedBoldText = textNode.replace(/\*\*\s+/g, '**').replace(/\s+\*\*/g, '**');
+    
+    const segments = cleanedBoldText.split(/(\*\*[^*]+\*\*)/g);
     
     return segments.map((segment, idx) => {
       // Check if this segment is bold (surrounded by **)
@@ -75,7 +87,7 @@ const TextProcessor: React.FC<TextProcessorProps> = ({ text }) => {
   };
   
   // Process links first, then handle bold text within the result
-  const linkProcessed = processLinks(processedText);
+  const linkProcessed = processLinks(cleanedText);
   
   if (Array.isArray(linkProcessed)) {
     return (
@@ -90,7 +102,7 @@ const TextProcessor: React.FC<TextProcessorProps> = ({ text }) => {
   }
   
   // If no links were found, just process bold text
-  return <>{processBoldText(processedText)}</>;
+  return <>{processBoldText(cleanedText)}</>;
 };
 
 export default TextProcessor;
