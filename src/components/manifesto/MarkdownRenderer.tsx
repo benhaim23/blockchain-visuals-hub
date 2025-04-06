@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from 'react';
 import { useAnimatedText } from '@/hooks/useAnimatedText';
 import { Copy, Check } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface MarkdownRendererProps {
   content: string;
@@ -41,7 +42,6 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
 
   // Check if a code block is SQL
   const isSqlCodeBlock = (lines: string[], startIndex: number): boolean => {
-    // Look for "sql" after the opening ```
     if (startIndex + 1 < lines.length) {
       const langLine = lines[startIndex + 1].trim().toLowerCase();
       return langLine === 'sql';
@@ -94,8 +94,10 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
             {/* Code block header with language and copy button */}
             <div className="flex items-center justify-between bg-slate-800 px-4 py-2">
               <div className="rounded-md bg-slate-700 px-2 py-1 text-sm font-medium text-slate-300">SQL</div>
-              <button
+              <Button
                 onClick={() => copyToClipboard(codeContent, blockIndex)}
+                variant="ghost"
+                size="icon"
                 className="text-slate-400 hover:text-white transition-colors"
                 aria-label="Copy code"
               >
@@ -104,7 +106,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
                 ) : (
                   <Copy className="h-4 w-4" />
                 )}
-              </button>
+              </Button>
             </div>
             
             {/* Code content */}
@@ -113,15 +115,17 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
                 {codeContent.split('\n').map((codeLine, idx) => (
                   <div key={idx} className="leading-relaxed">
                     {/* Apply syntax highlighting for SQL */}
-                    {codeLine
-                      .replace(/\b(SELECT|FROM|WHERE|ORDER BY|GROUP BY|HAVING|JOIN|LEFT JOIN|INNER JOIN|RIGHT JOIN|UNION|AS|ON|AND|OR|NOT|IN|BETWEEN|LIKE|CASE|WHEN|THEN|ELSE|END|COUNT|SUM|AVG|MIN|MAX|NULL|IS|DISTINCT)\b/gi, 
-                        match => `<span class="text-blue-400">${match}</span>`)
-                      .replace(/('[^']*')/g, 
-                        match => `<span class="text-amber-400">${match}</span>`)
-                      .replace(/\b(\d+(?:\.\d+)?)\b/g, 
-                        match => `<span class="text-cyan-300">${match}</span>`)
-                      .replace(/(-&gt;|=|&gt;|&lt;|\+|-|\*|\/|%)/g, 
-                        match => `<span class="text-pink-400">${match}</span>`)}
+                    <span dangerouslySetInnerHTML={{ 
+                      __html: codeLine
+                        .replace(/\b(SELECT|FROM|WHERE|ORDER BY|GROUP BY|HAVING|JOIN|LEFT JOIN|INNER JOIN|RIGHT JOIN|UNION|AS|ON|AND|OR|NOT|IN|BETWEEN|LIKE|CASE|WHEN|THEN|ELSE|END|COUNT|SUM|AVG|MIN|MAX|NULL|IS|DISTINCT)\b/gi, 
+                          match => `<span class="text-blue-400">${match}</span>`)
+                        .replace(/('[^']*')/g, 
+                          match => `<span class="text-amber-400">${match}</span>`)
+                        .replace(/\b(\d+(?:\.\d+)?)\b/g, 
+                          match => `<span class="text-cyan-300">${match}</span>`)
+                        .replace(/(-&gt;|=|&gt;|&lt;|\+|-|\*|\/|%)/g, 
+                          match => `<span class="text-pink-400">${match}</span>`)
+                    }} />
                   </div>
                 ))}
               </code>
