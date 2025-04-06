@@ -4,6 +4,7 @@ import { ChevronDown, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/context/ThemeContext';
+import { TypewriterEffectSmooth } from '@/components/ui/typewriter-effect';
 
 const Hero: React.FC = () => {
   const { theme } = useTheme();
@@ -14,6 +15,14 @@ const Hero: React.FC = () => {
       aboutSection.scrollIntoView({ behavior: 'smooth' });
     }
   };
+
+  const words = [
+    { text: "Transforming" },
+    { text: "Data" },
+    { text: "into" },
+    { text: "Blockchain", className: "crypto-gradient font-bold" },
+    { text: "Solutions", className: "crypto-gradient font-bold" },
+  ];
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16 px-4">
@@ -41,9 +50,13 @@ const Hero: React.FC = () => {
             </h1>
             
             <div className="relative">
-              <h2 className="text-2xl md:text-3xl font-semibold text-foreground/90 my-4">
-                Transforming Data into <span className="crypto-gradient font-bold">Blockchain Solutions</span>
-              </h2>
+              <div className="text-2xl md:text-3xl font-semibold text-foreground/90 my-4 flex justify-center">
+                <TypewriterEffectSmooth 
+                  words={words} 
+                  className="text-xl md:text-2xl font-semibold" 
+                  cursorClassName={theme === 'dark' ? "bg-primary" : "bg-primary/80"}
+                />
+              </div>
               
               <div className={cn(
                 "w-20 h-1 mx-auto mt-6 mb-8 rounded-full",
