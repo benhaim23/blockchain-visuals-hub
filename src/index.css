@@ -340,29 +340,3 @@
     transform: rotate(360deg);
   }
 }
-
-/* Custom cursor styles */
-html, 
-body, 
-button, 
-a, 
-input, 
-textarea, 
-select, 
-.cursor-none {
-  cursor: none !important;
-}
-
-/* Media query to disable custom cursor on mobile/touch devices */
-@media (max-width: 768px), (pointer: coarse) {
-  html, 
-  body, 
-  button, 
-  a, 
-  input, 
-  textarea, 
-  select, 
-  .cursor-none {
-    cursor: auto !important;
-  }
-}
