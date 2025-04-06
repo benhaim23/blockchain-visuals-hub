@@ -1,4 +1,3 @@
-
 import React, { useState } from 'react';
 import { Mail, MessageSquare, Send, Download, MapPin, Clock, File, X } from 'lucide-react';
 import { Input } from '@/components/ui/input';
@@ -15,7 +14,7 @@ import { useForm } from 'react-hook-form';
 const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
 const ACCEPTED_FILE_TYPES = [
   "application/pdf",
-  "application/msword",
+  "application/msword", 
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
   "image/jpeg",
   "image/png",
@@ -60,7 +59,6 @@ const Contact: React.FC = () => {
     if (files) {
       const fileArray = Array.from(files);
       
-      // Validate file size and type
       const validFiles = fileArray.filter(file => {
         const isValidSize = file.size <= MAX_FILE_SIZE;
         const isValidType = ACCEPTED_FILE_TYPES.includes(file.type);
@@ -100,20 +98,16 @@ const Contact: React.FC = () => {
     setIsSubmitting(true);
     
     try {
-      // Create FormData to handle files
       const formData = new FormData();
       formData.append('name', data.name);
       formData.append('email', data.email);
       formData.append('subject', data.subject);
       formData.append('message', data.message);
       
-      // Append files if any
       selectedFiles.forEach(file => {
         formData.append('attachments', file);
       });
       
-      // In a real implementation, you would send this to your backend
-      // For now, we'll simulate a successful submission
       await new Promise(resolve => setTimeout(resolve, 1500));
       
       toast({
@@ -121,7 +115,6 @@ const Contact: React.FC = () => {
         description: "Thank you for your message. I'll get back to you soon.",
       });
       
-      // Reset form and selected files
       form.reset();
       setSelectedFiles([]);
       
@@ -236,7 +229,6 @@ const Contact: React.FC = () => {
                       )}
                     />
                     
-                    {/* File Upload */}
                     <div className="space-y-3">
                       <div className="flex items-center justify-between">
                         <FormLabel>Attachments</FormLabel>
