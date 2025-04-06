@@ -11,7 +11,7 @@ export const manifestoChapters: ManifestoChapter[] = [
     number: 0, 
     title: "The Onchain Analyst Decoding the Transparent Economy", 
     pdfPath: "/Onchain Manifesto/The Onchain Analyst Decoding the Transparent Economy.pdf",
-    mdContent: `## **The Onchain Analyst Decoding the Transparent Economy**
+    mdContent: `# **The Onchain Analyst Decoding the Transparent Economy**
 
 > "What if the most transparent data system in the world was hiding in plain sight?"
 
@@ -498,7 +498,7 @@ In the next article, we'll dig deeper into the structure of blockchain tables—
     number: 4, 
     title: "Understanding Tables — Ethereum, Bitcoin, NFTs, ERC4337, and More", 
     pdfPath: "/Onchain Manifesto/04. Understanding Tables — Ethereum, Bitcoin, NFTs, ERC4337, and More.pdf",
-    mdContent: `# 04. Understanding Tables — Ethereum, Bitcoin, NFTs, ERC4337, and More
+    mdContent: `# **04. Understanding Tables — Ethereum, Bitcoin, NFTs, ERC4337, and More**
 
 If the blockchain is the raw ledger, and Dune is the window into it—then tables are the DNA of onchain analytics.
 
@@ -721,7 +721,7 @@ Once you master the table structure, the data opens up.
     number: 5, 
     title: "SQL Basics for Blockchain Analytics", 
     pdfPath: "/Onchain Manifesto/05. SQL Basics for Blockchain Analytics.pdf",
-    mdContent: `# 05. SQL Basics for Blockchain Analytics
+    mdContent: `# **05. SQL Basics for Blockchain Analytics**
 
 To unlock insights from onchain data, you need one essential tool: **SQL**.
 
@@ -945,7 +945,7 @@ You're not just writing queries—you're building visibility in a transparent ec
     number: 6, 
     title: "Useful Queries — From Token Transfers to Whale Watching", 
     pdfPath: "/Onchain Manifesto/06. Useful Queries — From Token Transfers to Whale Watching.pdf",
-    mdContent: `# 06. Useful Queries — From Token Transfers to Whale Watching
+    mdContent: `# **06. Useful Queries — From Token Transfers to Whale Watching**
 
 Once you're comfortable with SQL, the next step is mastering the right questions to ask.
 
@@ -1133,7 +1133,7 @@ Eventually, you'll recognize patterns before writing code:
     number: 7, 
     title: "NFT Analysis — Wash Trading, Mint Trends, and Market Health", 
     pdfPath: "/Onchain Manifesto/07. NFT Analysis — Wash Trading, Mint Trends, and Market Health.pdf",
-    mdContent: `# 07. NFT Analysis — Wash Trading, Mint Trends, and Market Health
+    mdContent: `# **07. NFT Analysis — Wash Trading, Mint Trends, and Market Health**
 
 NFTs are more than jpegs. They're programmable assets, social signals, financial instruments—and, occasionally, tools for manipulation.
 
@@ -1302,7 +1302,7 @@ They detect sybils before the airdrop. They flag suspicious volume before a pump
     number: 8, 
     title: "Lending Protocols — Risk, Liquidations, and User Behavior", 
     pdfPath: "/Onchain Manifesto/08. Lending Protocols — Risk, Liquidations, and User Behavior.pdf",
-    mdContent: `# 08. Lending Protocols — Risk, Liquidations, and User Behavior
+    mdContent: `# **08. Lending Protocols — Risk, Liquidations, and User Behavior**
 
 Lending protocols are the beating heart of DeFi. Billions in crypto assets are locked in platforms like Aave, Compound, and Morpho. Users borrow, lend, stake, and sometimes get liquidated—all onchain.
 
@@ -1467,7 +1467,7 @@ And always ask: **What story is the money telling?**
     number: 9, 
     title: "DeFi Analysis — Liquidity, Incentives, and TVL Dynamics", 
     pdfPath: "/Onchain Manifesto/09. DeFi Analysis — Liquidity, Incentives, and TVL Dynamics.pdf",
-    mdContent: `# 09. DeFi Analysis — Liquidity, Incentives, and TVL Dynamics
+    mdContent: `# **09. DeFi Analysis — Liquidity, Incentives, and TVL Dynamics**
 
 DeFi unlocked a new paradigm: transparent financial infrastructure. Every swap, deposit, and liquidation happens in plain sight, leaving behind a trail of data.
 
@@ -1650,7 +1650,7 @@ Whether you're analyzing a new yield farming protocol, tracking liquidity shifts
     number: 10, 
     title: "MEV on Uniswap — Understanding and Quantifying Extracted Value", 
     pdfPath: "/Onchain Manifesto/10. MEV on Uniswap — Understanding and Quantifying Extracted Value.pdf",
-    mdContent: `# 10. MEV on Uniswap — Understanding and Quantifying Extracted Value
+    mdContent: `# **10. MEV on Uniswap — Understanding and Quantifying Extracted Value**
 
 MEV—Maximal Extractable Value (formerly Miner Extractable Value)—is the invisible tax of the DeFi ecosystem. It represents the profit that can be extracted from users by controlling transaction ordering.
 
@@ -1852,7 +1852,7 @@ For onchain analysts, MEV represents one of the most technically fascinating are
     number: 11,
     title: "Uniswap Multichain Analytics — Comparing Deployments Across Chains",
     pdfPath: "/Onchain Manifesto/11. Uniswap Multichain Analytics — Comparing Deployments Across Chains.pdf",
-    mdContent: `## 11. Uniswap Multichain Analytics — Comparing Deployments Across Chains
+    mdContent: `# **11. Uniswap Multichain Analytics — Comparing Deployments Across Chains**
 
 Uniswap started on Ethereum, but it didn't stay there.
 
@@ -2028,7 +2028,7 @@ When you can analyze a protocol across 6+ ecosystems and surface trends in volum
     number: 12,
     title: "Useful Metrics Every Analyst Should Track",
     pdfPath: "/Onchain Manifesto/12. Useful Metrics Every Analyst Should Track.pdf",
-    mdContent: `# 12. Useful Metrics Every Analyst Should Track
+    mdContent: `# **12. Useful Metrics Every Analyst Should Track**
 
 In the ocean of onchain data, metrics are your compass.
 
@@ -2202,7 +2202,7 @@ Whether you're analyzing a new yield farming protocol, tracking liquidity shifts
     number: 13,
     title: "BTC Coin Days Destroyed — What HODLers Tell Us About the Market",
     pdfPath: "/Onchain Manifesto/13. BTC Coin Days Destroyed — What HODLers Tell Us About the Market.pdf",
-    mdContent: `# 13. BTC Coin Days Destroyed — What HODLers Tell Us About the Market
+    mdContent: `# **13. BTC Coin Days Destroyed — What HODLers Tell Us About the Market**
 
 Bitcoin may be pseudonymous, but it's far from opaque.
 
@@ -2363,7 +2363,7 @@ In the next few articles, we move into **infrastructure-level tooling**—starti
     number: 14,
     title: "Building with Spellbook — How to Contribute Reusable Models to the Community",
     pdfPath: "/Onchain Manifesto/14. Building with Spellbook — How to Contribute Reusable Models to the Community.pdf",
-    mdContent: `# 14. Building with Spellbook — How to Contribute Reusable Models to the Community
+    mdContent: `# **14. Building with Spellbook — How to Contribute Reusable Models to the Community**
 
 In the fast-growing world of onchain analytics, building once and reusing often is the key to scaling insights. That's where **Spellbook** comes in.
 
@@ -2582,7 +2582,7 @@ Next: 15. How to Build an Onchain App Using the Dune API
     number: 15,
     title: "How to Build an Onchain App Using the Dune API",
     pdfPath: "/Onchain Manifesto/15. How to Build an Onchain App Using the Dune API.pdf",
-    mdContent: `# 15. How to Build an Onchain App Using the Dune API
+    mdContent: `# **15. How to Build an Onchain App Using the Dune API**
 
 Onchain analysts aren't just dashboard builders. They're increasingly becoming **backend architects**—powering real-time applications, alerts, and user-facing data tools.
 
@@ -2776,7 +2776,7 @@ Now that you've built apps on top of blockchain data, let's dive deeper into **h
     number: 16,
     title: "Account Abstraction: Why It Matters for Wallet UX and Analysts",
     pdfPath: "/Onchain Manifesto/16. Account Abstraction — Why It Matters for Wallet UX and Analysts.pdf",
-    mdContent: `# 16. Account Abstraction: Why It Matters for Wallet UX and Analysts
+    mdContent: `# **16. Account Abstraction: Why It Matters for Wallet UX and Analysts**
 
 In crypto, the wallet is the interface to everything. It's your bank, your identity, your passport, and your remote control. But today's wallet UX is broken: confusing seed phrases, complex gas fees, and risky self-custody.
 
@@ -2930,7 +2930,7 @@ Next: 17. ERC-4337 Aggregated Tables Across EVM Chains
     number: 17,
     title: "ERC-4337 Aggregated Tables Across EVM Chains: Unified Analytics at Scale",
     pdfPath: "/Onchain Manifesto/17. ERC-4337 Aggregated Tables Across EVM Chains.pdf",
-    mdContent: `# 17. ERC-4337 Aggregated Tables Across EVM Chains: Unified Analytics at Scale
+    mdContent: `# **17. ERC-4337 Aggregated Tables Across EVM Chains: Unified Analytics at Scale**
 
 Account Abstraction isn't happening on just one chain—it's rolling out across the entire EVM ecosystem.
 
@@ -3119,7 +3119,7 @@ In the next (and final) article, we'll zoom out and ask: **Why is this all so im
     number: 18,
     title: "Why the Future Belongs to Onchain Analysts",
     pdfPath: "/Onchain Manifesto/18. Why the Future Belongs to Onchain Analysts.pdf",
-    mdContent: `# 18. Why the Future Belongs to Onchain Analysts
+    mdContent: `# **18. Why the Future Belongs to Onchain Analysts**
 
 As more of the world moves onchain, the power to read the blockchain becomes a form of literacy—and onchain analysts are the new interpreters.
 
