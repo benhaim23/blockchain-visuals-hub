@@ -40,7 +40,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
             <TableRow>
               {headerRow.map((header, idx) => (
                 <TableHead key={idx} className="font-semibold py-3 px-6">
-                  {header.trim()}
+                  {header.trim().replace(/\*\*/g, '')}
                 </TableHead>
               ))}
             </TableRow>
@@ -50,7 +50,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
               <TableRow key={rowIdx}>
                 {row.map((cell, cellIdx) => (
                   <TableCell key={cellIdx} className="py-3 px-6">
-                    {cell.trim()}
+                    {cell.trim().replace(/\*\*/g, '')}
                   </TableCell>
                 ))}
               </TableRow>
@@ -77,7 +77,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
     let tableContent: string[] = [];
     
     lines.forEach((line, index) => {
-      // Clean up asterisks from headers
+      // Clean up asterisks from headers and content
       const cleanLine = (str: string) => str.replace(/\*\*(.*?)\*\*/g, '$1');
       
       // Check for table start
