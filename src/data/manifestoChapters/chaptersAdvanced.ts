@@ -1,245 +1,1959 @@
 
 import { ManifestoChapter } from '../manifestoChapters';
 
-// Chapters 11-18: Advanced topics and conclusion
 export const chaptersAdvanced: ManifestoChapter[] = [
-  { 
-    number: 11, 
-    title: "Uniswap Multichain Analytics — Comparing Deployments Across Chains", 
-    pdfPath: "/Onchain Manifesto/11. Uniswap Multichain Analytics — Comparing Deployments Across Chains.pdf",
+  {
+    number: 11,
+    title: "Uniswap Multichain Analytics — Comparing Deployments Across Chains",
     mdContent: `# 11. Uniswap Multichain Analytics — Comparing Deployments Across Chains
 
-In the multichain era, protocols aren't confined to a single blockchain. Uniswap—the largest decentralized exchange by volume—now operates across Ethereum L1, Polygon, Arbitrum, Optimism, Base, and more. This fragmentation creates new analytical challenges.
+## Introduction to Multichain Analytics
 
-For onchain analysts, cross-chain analysis is no longer optional—it's essential. This article explores how to track, compare, and derive insights from Uniswap's multichain deployments.
+As Uniswap has expanded beyond Ethereum to multiple blockchains, analysts face both challenges and opportunities. This chapter provides a structured approach to comparing Uniswap deployments across different networks.
 
----
+Chains where Uniswap has deployed include:
+- Ethereum (mainnet)
+- Polygon
+- Arbitrum
+- Optimism
+- Celo
+- Base
+- BNB Chain
 
-## 🔄 The Multichain Expansion
+## Table Structure Differences
 
-Uniswap's journey from Ethereum-only to multichain deployment reflects the broader DeFi ecosystem's evolution:
+Each chain implementation may have subtle differences:
 
-**Ethereum L1** → High security, high gas costs  
-**L2s (Arbitrum, Optimism)** → Lower fees, inherited security  
-**Side chains (Polygon)** → Independent security, established ecosystem  
-**New L2s (Base)** → Emerging ecosystems, potential first-mover advantages
+| Chain | Table Structure | Special Considerations |
+|-------|----------------|------------------------|
+| Ethereum | Original format | Most comprehensive data |
+| Polygon | Similar to Ethereum | Requires matic_* tables |
+| Arbitrum | Similar to Ethereum | Uses arbitrum_* tables |
+| Optimism | Similar to Ethereum | Uses optimism_* tables |
+| Celo | Similar to Ethereum | Uses celo_* tables |
+| Base | Similar to Ethereum | Uses base_* tables |
+| BNB | Similar to Ethereum | Uses bnb_* tables |
 
-Each environment offers different:
-- Gas prices and fee structures
-- User demographics and behavior patterns
-- Liquidity depth and capital efficiency
-- MEV dynamics and market competition
-- Token availability and trading pairs
+## Cross-Chain Comparison Queries
 
----
-
-## 📊 Setting Up Cross-Chain Comparison
-
-Let's create a simple framework for comparing Uniswap's performance across chains:
+### Volume Comparison
 
 \`\`\`sql
-SELECT
-  blockchain,
-  COUNT(DISTINCT tx_hash) AS swap_count,
-  COUNT(DISTINCT trader) AS users,
-  SUM(amount_usd) AS volume_usd,
-  AVG(amount_usd) AS avg_swap_size_usd
-FROM uniswap_v3.trades
+WITH ethereum_vol AS (
+  SELECT 
+    date_trunc('day', block_time) as day,
+    sum(amount_usd) as volume,
+    'Ethereum' as chain
+  FROM dex.trades
+  WHERE project = 'uniswap' 
+    AND block_time > now() - interval '30 days'
+  GROUP BY 1
+),
+polygon_vol AS (
+  SELECT 
+    date_trunc('day', block_time) as day,
+    sum(amount_usd) as volume,
+    'Polygon' as chain
+  FROM polygon.dex_trades
+  WHERE project = 'uniswap'
+    AND block_time > now() - interval '30 days'
+  GROUP BY 1
+)
+-- Add similar CTEs for other chains
+
+SELECT * FROM ethereum_vol
+UNION ALL
+SELECT * FROM polygon_vol
+-- UNION ALL other chains
+ORDER BY day, chain
+\`\`\`
+
+### TVL Comparison
+
+\`\`\`sql
+WITH ethereum_tvl AS (
+  SELECT 
+    date_trunc('day', block_time) as day,
+    sum(token_amount_usd) as tvl,
+    'Ethereum' as chain
+  FROM ethereum.uniswap_pool_stats
+  WHERE block_time > now() - interval '30 days'
+  GROUP BY 1
+),
+polygon_tvl AS (
+  SELECT 
+    date_trunc('day', block_time) as day,
+    sum(token_amount_usd) as tvl,
+    'Polygon' as chain
+  FROM polygon.uniswap_pool_stats
+  WHERE block_time > now() - interval '30 days'
+  GROUP BY 1
+)
+-- Add more chains as needed
+
+SELECT * FROM ethereum_tvl
+UNION ALL
+SELECT * FROM polygon_tvl
+-- UNION ALL other chains
+ORDER BY day, chain
+\`\`\`
+
+## Fee Comparison
+
+Different chains have different fee structures and gas costs, making them more or less attractive for different types of users:
+
+| Chain | Typical Gas Fee | Block Time | Notes |
+|-------|----------------|------------|-------|
+| Ethereum | Highest | ~12 seconds | Best security, highest fees |
+| Polygon | Very low | ~2 seconds | Fast finality, very economical |  
+| Arbitrum | Medium | ~0.25-1 second | Lower than Ethereum, higher than other L2s |
+| Optimism | Medium | ~0.5-2 seconds | Competitive with Arbitrum |
+| Celo | Low | ~5 seconds | Mobile-first chain |
+| Base | Medium-low | ~2 seconds | Newer Coinbase L2 |
+| BNB | Low | ~3 seconds | High throughput |
+
+## User Behavior Analysis
+
+Do users behave differently on different chains?
+
+\`\`\`sql
+WITH user_stats AS (
+  SELECT
+    'Ethereum' as chain,
+    COUNT(DISTINCT trader_a) as active_users,
+    SUM(amount_usd)/COUNT(DISTINCT trader_a) as avg_volume_per_user,
+    COUNT(*)/COUNT(DISTINCT trader_a) as avg_trades_per_user
+  FROM dex.trades
+  WHERE project = 'uniswap'
+    AND block_time > now() - interval '30 days'
+  
+  UNION ALL
+  
+  SELECT
+    'Polygon' as chain,
+    COUNT(DISTINCT trader_a) as active_users,
+    SUM(amount_usd)/COUNT(DISTINCT trader_a) as avg_volume_per_user,
+    COUNT(*)/COUNT(DISTINCT trader_a) as avg_trades_per_user
+  FROM polygon.dex_trades
+  WHERE project = 'uniswap'
+    AND block_time > now() - interval '30 days'
+  -- Add more chains as needed
+)
+
+SELECT * FROM user_stats
+ORDER BY active_users DESC
+\`\`\`
+
+## Conclusion
+
+Multichain analytics allow us to see how Uniswap's ecosystem is evolving across different networks. Key observations:
+
+1. Ethereum remains the dominant chain for total volume and TVL
+2. L2s like Arbitrum and Optimism show strong adoption for frequent, smaller trades
+3. User behavior varies significantly by chain, with L2 users typically making more frequent but smaller trades
+4. Gas costs remain a key differentiator driving user choice of chain
+`,
+  },
+  {
+    number: 12,
+    title: "Useful Metrics Every Analyst Should Track",
+    mdContent: `# 12. Useful Metrics Every Analyst Should Track
+
+## Core Blockchain Health Metrics
+
+Every blockchain analyst should consistently track these fundamental metrics to understand the health and activity of a network:
+
+| Metric | Description | Significance |
+|--------|-------------|-------------|
+| Daily Active Addresses | Number of unique addresses active in 24h | User engagement |
+| Transaction Count | Total transactions per day | Network activity |
+| Average Transaction Value | Mean value of transactions | Usage patterns |
+| Gas Used | Total computational resources consumed | Network demand |
+| Average Gas Price | Mean price paid for computation | Fee market economics |
+| New Address Growth | New addresses created per day | Network growth |
+
+## DeFi Protocol Metrics
+
+For DeFi protocols, these metrics provide essential insights:
+
+\`\`\`sql
+-- TVL Tracking Query
+SELECT 
+  date_trunc('day', block_time) as day,
+  protocol,
+  SUM(token_amount_usd) as tvl
+FROM tvl_daily
+WHERE block_time > now() - interval '90 days'
+GROUP BY 1, 2
+ORDER BY day DESC, tvl DESC
+\`\`\`
+
+### Essential Protocol Metrics
+
+1. **TVL (Total Value Locked)**
+   - Most important DeFi metric
+   - Measures protocol trust and capital efficiency
+   - Should be tracked across tokens and chains
+
+2. **Volume**
+   - Trading/lending/borrowing volume
+   - Key indicator of actual usage
+   - Should normalize for wash trading
+
+3. **User Metrics**
+   - Daily/Weekly/Monthly active users
+   - New vs returning users
+   - User retention cohorts
+
+4. **Revenue**
+   - Protocol revenue (accruing to treasury/token)
+   - Supply-side revenue (accruing to LPs/lenders)
+   - Fee structure and capture mechanism
+
+## Token Metrics
+
+For token analysis, track:
+
+\`\`\`sql
+-- Token Distribution Analysis
+SELECT 
+  holder_address,
+  token_balance / token_total_supply as ownership_percentage,
+  CASE 
+    WHEN holder_address IN (SELECT contract_address FROM known_contracts WHERE type = 'protocol_treasury') THEN 'Treasury'
+    WHEN holder_address IN (SELECT contract_address FROM known_contracts WHERE type = 'team_multisig') THEN 'Team'
+    WHEN holder_address IN (SELECT address FROM whale_wallets) THEN 'Whale'
+    ELSE 'Other'
+  END as holder_type
+FROM token_balances
+WHERE token_address = '0x1234...' -- Target token
+  AND block_number = 15000000 -- Analysis block
+ORDER BY token_balance DESC
+LIMIT 100
+\`\`\`
+
+### Key Token Metrics
+
+* **Distribution**
+  * Concentration among top holders
+  * Gini coefficient
+  * Holder breakdown by type
+
+* **Liquidity**
+  * DEX liquidity depth
+  * Bid-ask spreads
+  * CEX vs DEX trading ratio
+
+* **Emissions & Inflation**
+  * Token emission schedule
+  * Actual vs projected inflation
+  * Distribution velocity
+
+* **Staking & Utility**
+  * Staking participation rate
+  * Token utility metrics
+  * Governance participation
+
+## NFT Market Metrics
+
+For NFT markets:
+
+\`\`\`sql
+-- Collection Performance
+SELECT 
+  collection,
+  COUNT(*) as sales_count,
+  SUM(amount_usd) as volume_usd,
+  AVG(amount_usd) as avg_price,
+  COUNT(DISTINCT seller) as unique_sellers,
+  COUNT(DISTINCT buyer) as unique_buyers
+FROM nft.trades
 WHERE block_time > now() - interval '30 days'
 GROUP BY 1
-ORDER BY 4 DESC
+ORDER BY volume_usd DESC
 \`\`\`
 
-This gives us a baseline of activity by chain—but we can go deeper.
+### NFT Specific Metrics
 
----
+* **Floor Price Evolution**
+* **Wash Trading Ratio**
+* **Royalty Compliance**
+* **Holder Concentration**
+* **Trading Velocity**
 
-## 🕰️ Activity Patterns by Chain
+## Technical Key Performance Indicators
 
-Different chains show different usage patterns throughout the day:
+Beyond basic metrics, track these technical KPIs:
 
-\`\`\`sql
-SELECT
-  blockchain,
-  date_trunc('hour', block_time) AS hour,
-  COUNT(*) AS swaps
-FROM uniswap_v3.trades
-WHERE block_time > now() - interval '7 days'
-GROUP BY 1, 2
-ORDER BY 1, 2
+1. **Network Effects**
+   * Metcalfe's Law application (value ∝ n²)
+   * Cross-protocol integrations
+   * Ecosystem expansion
+
+2. **Security Metrics**
+   * Hash rate (for PoW)
+   * Validator distribution (for PoS)
+   * Smart contract audit coverage
+
+3. **Developer Activity**
+   * GitHub commits
+   * Smart contract deployments
+   * Bug bounty participation
+
+4. **Scaling Metrics**
+   * TPS (Transactions Per Second)
+   * Block space utilization
+   * L2 bridging activity
+
+## Conclusion
+
+Tracking these metrics consistently provides a comprehensive view of blockchain ecosystem health. The most insightful analysis comes from:
+
+1. Comparing metrics across time periods
+2. Correlating different metrics against each other
+3. Contextualizing with market events
+4. Normalizing for market conditions
+5. Creating custom composite indicators
+
+Remember that raw data without context can be misleading. Always ask:
+* What's driving this change?
+* Is this sustainable?
+* How does this compare to similar projects?
+* What leading indicators predict this behavior?
+`,
+  },
+  {
+    number: 13,
+    title: "BTC Coin Days Destroyed — What HODLers Tell Us About the Market",
+    mdContent: `# 13. BTC Coin Days Destroyed — What HODLers Tell Us About the Market
+
+## Understanding Coin Days Destroyed (CDD)
+
+Coin Days Destroyed is a powerful on-chain metric that helps us understand Bitcoin holder behavior, particularly long-term holders (often called "HODLers").
+
+The concept builds on "coin days" — when 1 BTC remains unspent for 1 day, it accumulates 1 coin day. When those coins eventually move, their accumulated coin days are "destroyed" and reset to zero.
+
+The formula is simple:
+
+\`\`\`
+Coin Days Destroyed = Amount of BTC moved × Days since last movement
 \`\`\`
 
-This might reveal:
-- **Arbitrum**: Higher activity during Asian trading hours
-- **Ethereum**: More institutional/whale activity during US market hours
-- **Polygon**: More gaming-related token swaps tied to specific game activity times
+For example:
+- If 5 BTC haven't moved for 100 days and then get transferred, this destroys 500 coin days
+- If 0.1 BTC haven't moved for 1,000 days and then get transferred, this destroys 100 coin days
 
----
-
-## 💰 Capital Efficiency Comparison
-
-Uniswap V3 introduced concentrated liquidity, but how effectively is it used across chains?
+## Implementing CDD in SQL
 
 \`\`\`sql
-SELECT
-  blockchain,
-  AVG(tvl_usd) AS avg_tvl,
-  SUM(volume_usd) AS volume_usd,
-  SUM(volume_usd) / AVG(tvl_usd) AS capital_efficiency
-FROM (
-  -- Daily TVL by chain
+WITH bitcoin_transfers AS (
   SELECT
-    blockchain,
-    date_trunc('day', block_time) AS day,
-    SUM(liquidity_usd) AS tvl_usd
-  FROM uniswap_v3.pools_daily
-  WHERE block_time > now() - interval '30 days'
-  GROUP BY 1, 2
-) tvl
-JOIN (
-  -- Daily volume by chain
+    hash,
+    block_time,
+    "from" as sender,
+    "to" as recipient,
+    value as amount
+  FROM bitcoin.transactions
+  WHERE block_time > now() - interval '1 year'
+),
+
+prev_movement AS (
   SELECT
-    blockchain,
-    date_trunc('day', block_time) AS day,
-    SUM(amount_usd) AS volume_usd
-  FROM uniswap_v3.trades
-  WHERE block_time > now() - interval '30 days'
-  GROUP BY 1, 2
-) vol
-ON tvl.blockchain = vol.blockchain AND tvl.day = vol.day
-GROUP BY 1
-ORDER BY 4 DESC
-\`\`\`
-
-Higher capital efficiency = generating more volume with less locked liquidity.
-
----
-
-## 🔍 Types of Tokens Traded by Chain
-
-Different chains have different token ecosystems:
-
-\`\`\`sql
-WITH token_cat AS (
-  SELECT
-    blockchain,
-    token_address,
-    CASE
-      WHEN symbol IN ('USDC', 'USDT', 'DAI') THEN 'stablecoin'
-      WHEN category = 'gaming' THEN 'gaming'
-      WHEN category = 'defi' THEN 'defi'
-      ELSE 'other'
-    END AS token_category,
-    SUM(amount_usd) AS volume_usd
-  FROM uniswap_v3.trades
-  JOIN token_metadata USING (token_address)
-  WHERE block_time > now() - interval '30 days'
-  GROUP BY 1, 2, 3
+    recipient,
+    max(block_time) as last_movement_time,
+    sum(amount) as btc_balance
+  FROM bitcoin_transfers
+  GROUP BY recipient
 )
 
 SELECT
-  blockchain,
-  token_category,
-  SUM(volume_usd) AS volume_usd,
-  SUM(volume_usd) / SUM(SUM(volume_usd)) OVER (PARTITION BY blockchain) AS pct_of_chain
-FROM token_cat
-GROUP BY 1, 2
-ORDER BY 1, 4 DESC
+  bt.hash as transaction_hash,
+  bt.block_time,
+  bt.sender,
+  bt.amount,
+  bt.block_time - pm.last_movement_time as days_since_last_movement,
+  bt.amount * EXTRACT(EPOCH FROM (bt.block_time - pm.last_movement_time))/86400 as coin_days_destroyed
+FROM bitcoin_transfers bt
+JOIN prev_movement pm ON bt.sender = pm.recipient
+WHERE bt.block_time > now() - interval '90 days'
+ORDER BY coin_days_destroyed DESC
+LIMIT 1000
 \`\`\`
 
-This analysis might reveal:
-- **Polygon**: Higher % of gaming tokens
-- **Optimism**: More governance tokens
-- **Base**: Higher native protocol token dominance
+## CDD Variations and Interpretations
 
----
+### 1. Binary CDD Thresholds
 
-## 💸 Fee Tier Preferences by Chain
+Binary CDD classifies coins based on specific age thresholds:
 
-Uniswap V3 offers multiple fee tiers (0.01%, 0.05%, 0.3%, 1%). Usage varies by chain:
+\`\`\`sql
+-- Categorizing movements by holder type
+SELECT
+  date_trunc('week', block_time) as week,
+  SUM(CASE WHEN days_since_last_movement < 7 THEN amount ELSE 0 END) as short_term_movement,
+  SUM(CASE WHEN days_since_last_movement BETWEEN 7 AND 180 THEN amount ELSE 0 END) as mid_term_movement,
+  SUM(CASE WHEN days_since_last_movement > 180 THEN amount ELSE 0 END) as long_term_movement
+FROM coin_days_destroyed_table
+GROUP BY 1
+ORDER BY 1
+\`\`\`
+
+### 2. Adjusted CDD
+
+To account for increasing BTC supply over time:
 
 \`\`\`sql
 SELECT
+  date_trunc('day', block_time) as day,
+  SUM(coin_days_destroyed) as raw_cdd,
+  SUM(coin_days_destroyed) / (SELECT SUM(total_supply) FROM bitcoin_daily_metrics WHERE day = date_trunc('day', block_time)) as adjusted_cdd
+FROM coin_days_destroyed_table
+GROUP BY 1
+ORDER BY 1
+\`\`\`
+
+### 3. CDD Velocity
+
+Rate of change of CDD identifies accelerating or decelerating long-term holder activity:
+
+\`\`\`sql
+WITH daily_cdd AS (
+  SELECT
+    date_trunc('day', block_time) as day,
+    SUM(coin_days_destroyed) as daily_cdd
+  FROM coin_days_destroyed_table
+  GROUP BY 1
+)
+
+SELECT
+  current.day,
+  current.daily_cdd,
+  current.daily_cdd - prev.daily_cdd as cdd_change,
+  (current.daily_cdd - prev.daily_cdd) / NULLIF(prev.daily_cdd, 0) * 100 as cdd_velocity_percent
+FROM daily_cdd current
+JOIN daily_cdd prev ON current.day = prev.day + interval '1 day'
+ORDER BY current.day
+\`\`\`
+
+## Market Insights from CDD
+
+### Historical CDD Patterns
+
+CDD typically spikes during:
+
+1. **Market Tops**: Long-term holders selling into strength
+2. **Capitulation Events**: Holders giving up during extended downtrends
+3. **On-Chain Reorganizations**: Exchanges or large entities moving cold storage
+
+### Interpreting CDD for Market Analysis
+
+| CDD Pattern | Potential Interpretation |
+|-------------|--------------------------|
+| High CDD + Rising Price | Long-term holders taking profit (bearish) |
+| High CDD + Falling Price | Capitulation selling (potentially bottoming) |
+| Low CDD + Rising Price | Healthy accumulation phase (bullish) |
+| Low CDD + Falling Price | Disinterest phase, lack of activity |
+| Sudden CDD Spike | Large entity reorganization or single entity movement |
+
+## Relationship to HODL Waves
+
+CDD is closely related to HODL Waves, which visualize the age distribution of Bitcoin's supply:
+
+\`\`\`sql
+-- HODL Waves Analysis
+SELECT
+  day,
+  SUM(CASE WHEN age_days < 7 THEN supply ELSE 0 END) / total_supply as pct_1d_to_1w,
+  SUM(CASE WHEN age_days BETWEEN 7 AND 30 THEN supply ELSE 0 END) / total_supply as pct_1w_to_1m,
+  SUM(CASE WHEN age_days BETWEEN 30 AND 90 THEN supply ELSE 0 END) / total_supply as pct_1m_to_3m,
+  SUM(CASE WHEN age_days BETWEEN 90 AND 180 THEN supply ELSE 0 END) / total_supply as pct_3m_to_6m,
+  SUM(CASE WHEN age_days BETWEEN 180 AND 365 THEN supply ELSE 0 END) / total_supply as pct_6m_to_12m,
+  SUM(CASE WHEN age_days > 365 THEN supply ELSE 0 END) / total_supply as pct_over_1y
+FROM bitcoin_supply_age_distribution
+GROUP BY day, total_supply
+ORDER BY day
+\`\`\`
+
+## Limitations of CDD Analysis
+
+While powerful, CDD has limitations:
+
+1. **Exchange Movements**: Difficult to distinguish between exchange reshuffling and actual holder behavior
+2. **Lost Coins**: Permanently lost coins never destroy their accumulated coin days
+3. **Technical Movements**: Self-transfers or wallet reorganizations can falsely indicate holder activity
+4. **Mixed Signals**: Requires context and should not be used in isolation
+
+## Conclusion
+
+Coin Days Destroyed provides unique insight into Bitcoin holder behavior that price action alone cannot capture. By understanding when long-term holders are active, analysts can identify potential market turning points and validate other on-chain signals.
+
+The most effective approach combines CDD with other metrics:
+- MVRV Ratio
+- SOPR (Spent Output Profit Ratio)
+- NVT Ratio (Network Value to Transactions)
+- Realized Cap HODL Waves
+
+Together, these paint a comprehensive picture of Bitcoin's fundamental health and market sentiment structure.
+`,
+  },
+  {
+    number: 14,
+    title: "Building with Spellbook — How to Contribute Reusable Models to the Community",
+    mdContent: `# 14. Building with Spellbook — How to Contribute Reusable Models to the Community
+
+## Introduction to Spellbook
+
+Spellbook is a community-driven repository of SQL models that standardize blockchain data transformations across different protocols and chains. Built on top of the Dune Analytics platform, it leverages dbt (data build tool) to create reusable abstractions that simplify complex on-chain analytics.
+
+Key benefits of Spellbook include:
+- Standardized data models across protocols and chains
+- Elimination of redundant work through shared models
+- Improved data quality through community review
+- Accelerated analytics development
+
+## Architecture Overview
+
+Spellbook follows a layered approach to data modeling:
+
+![Spellbook Architecture](https://i.imgur.com/iLEQmZO.png)
+
+1. **Source Layer**: Raw blockchain data from Dune
+2. **Decoded/Standardized Layer**: Protocol-specific decoded events and transactions
+3. **Integration Layer**: Cross-protocol abstractions
+4. **Mart Layer**: Business-specific aggregations
+
+Each layer builds upon the previous one, creating increasingly useful abstractions.
+
+## Setting Up Your Environment
+
+Before contributing to Spellbook, set up your local environment:
+
+\`\`\`bash
+# Clone the repository
+git clone https://github.com/duneanalytics/spellbook
+
+# Navigate to project directory
+cd spellbook
+
+# Install dependencies
+pip install -r requirements.txt
+
+# Configure dbt profile
+cp ./profiles_template.yml ~/.dbt/profiles.yml
+# Edit the profiles.yml with your Dune API key
+\`\`\`
+
+## Anatomy of a Spellbook Model
+
+Let's examine the structure of a SQL model in Spellbook:
+
+\`\`\`sql
+-- models/uniswap/ethereum/uniswap_v3_ethereum_trades.sql
+
+{{
+  config(
+    schema = 'uniswap_v3_ethereum',
+    alias = 'trades',
+    materialized = 'incremental',
+    file_format = 'delta',
+    incremental_strategy = 'merge',
+    unique_key = ['tx_hash', 'evt_index'],
+    incremental_predicates = [incremental_predicate('DBT_INTERNAL_DEST.block_time')]
+  )
+}}
+
+-- Pull in the dex.trades abstraction for Uniswap v3 on Ethereum
+SELECT
+  block_time,
+  token_a_symbol,
+  token_b_symbol,
+  token_a_amount,
+  token_b_amount,
+  project,
+  version,
+  category,
+  trader_a,
+  trader_b,
+  token_a_amount_raw,
+  token_b_amount_raw,
+  usd_amount,
+  token_a_address,
+  token_b_address,
+  exchange_contract_address,
+  tx_hash,
+  tx_from,
+  tx_to,
+  trace_address,
+  evt_index,
+  row_number() OVER (PARTITION BY tx_hash, evt_index, trace_address) AS duplicates
+FROM {{ ref('dex_trades') }}
+WHERE project = 'Uniswap' 
+  AND version = '3'
+  AND blockchain = 'ethereum'
+  {% if is_incremental() %}
+  AND {{ incremental_predicate('block_time') }}
+  {% endif %}
+\`\`\`
+
+## Creating Your First Model
+
+### 1. Choose Your Contribution Area
+
+Identify where you can add value:
+- New protocol abstractions
+- Additional blockchain support
+- Enhanced existing models
+- Cross-protocol integrations
+
+### 2. Design Your Model Schema
+
+For a new protocol, design standardized schemas that align with existing patterns:
+
+\`\`\`sql
+-- Example schema for a lending protocol
+-- models/aave/ethereum/aave_v3_ethereum_borrows.sql
+
+{{
+  config(
+    schema = 'aave_v3_ethereum',
+    alias = 'borrows',
+    materialized = 'incremental',
+    file_format = 'delta',
+    incremental_strategy = 'merge',
+    unique_key = ['tx_hash', 'evt_index'],
+    incremental_predicates = [incremental_predicate('DBT_INTERNAL_DEST.block_time')]
+  )
+}}
+
+SELECT
+  b.evt_block_time AS block_time,
+  b.evt_block_number AS block_number,
+  'Aave' AS project,
+  '3' AS version,
+  'ethereum' AS blockchain,
+  b.reserve AS token_address,
+  t.symbol AS token_symbol,
+  b.user AS borrower,
+  b.onBehalfOf AS recipient,
+  b.amount / POW(10, t.decimals) AS amount,
+  b.amount AS amount_raw,
+  b.amount / POW(10, t.decimals) * p.price AS amount_usd,
+  b.interestRateMode AS interest_rate_mode,
+  b.evt_tx_hash AS tx_hash,
+  b.evt_index
+FROM {{ source('aave_v3_ethereum', 'LendingPool_evt_Borrow') }} b
+LEFT JOIN {{ ref('tokens_ethereum') }} t ON b.reserve = t.contract_address
+LEFT JOIN {{ source('prices', 'usd') }} p ON p.blockchain = 'ethereum' 
+  AND p.contract_address = b.reserve 
+  AND p.minute = date_trunc('minute', b.evt_block_time)
+WHERE 1=1
+{% if is_incremental() %}
+AND {{ incremental_predicate('b.evt_block_time') }}
+{% endif %}
+\`\`\`
+
+### 3. Implement Tests
+
+Create proper tests to validate your model:
+
+\`\`\`yaml
+# models/aave/ethereum/aave_v3_ethereum_schema.yml
+
+version: 2
+
+models:
+  - name: aave_v3_ethereum_borrows
+    description: "Borrow events on Aave V3 on Ethereum"
+    tests:
+      - dbt_utils.unique_combination_of_columns:
+          combination_of_columns:
+            - tx_hash
+            - evt_index
+    columns:
+      - name: block_time
+        description: "Timestamp of the block when the borrow occurred"
+        tests:
+          - not_null
+      - name: block_number
+        description: "Block number when the borrow occurred"
+        tests:
+          - not_null
+      # ... more column tests
+\`\`\`
+
+### 4. Document Your Model
+
+Add comprehensive documentation in the schema YAML file:
+
+\`\`\`yaml
+# Continued from above YAML
+    meta:
+      blockchain: ethereum
+      sector: lending
+      project: aave
+      contributors: ['your-github-username']
+    columns:
+      - name: block_time
+        description: "Timestamp of the block when the borrow occurred"
+      - name: block_number
+        description: "Block number when the borrow occurred"
+      - name: project
+        description: "Project name (Aave)"
+      # ... more column documentation
+\`\`\`
+
+## Best Practices for Spellbook Development
+
+1. **Performance Optimization**
+   - Use appropriate partitioning keys
+   - Apply efficient joins and filtering
+   - Consider query costs for large tables
+
+2. **Incremental Models**
+   - Always include incremental logic
+   - Use appropriate incremental predicates
+   - Test both full and incremental runs
+
+3. **Naming Conventions**
+   - Follow established patterns: `<protocol>_<chain>_<entity>`
+   - Use consistent column names across models
+   - Match entity names across protocols (borrows, supplies, trades)
+
+4. **Testing Strategy**
+   - Row count validations
+   - Uniqueness constraints
+   - Referential integrity
+   - Custom data quality checks
+
+## Contributing to Spellbook
+
+The contribution workflow:
+
+1. **Fork the Repository**
+   - Create your own fork of the Spellbook repository
+
+2. **Create a Branch**
+   - Name it according to the convention: `feature/protocol-name-model`
+
+3. **Local Development**
+   - Write and test your models locally
+   - Run `dbt compile` to check for syntax errors
+   - Run `dbt test --select your_model_name` to verify tests
+
+4. **Submit a Pull Request**
+   - Include comprehensive description
+   - Reference related issues
+   - Document expected outcomes
+
+5. **Review Process**
+   - Address reviewer comments
+   - Make requested changes
+   - Ensure CI/CD pipeline passes
+
+## Example: Creating a Spellbook Abstraction
+
+Let's walk through creating a simple integration model:
+
+\`\`\`sql
+-- models/integrations/defi/defi_lending_borrows.sql
+
+{{
+  config(
+    schema = 'integrations_defi',
+    alias = 'lending_borrows',
+    materialized = 'view',
+  )
+}}
+
+-- Unified borrow events across lending protocols
+SELECT
+  block_time,
+  block_number,
+  project,
+  version,
   blockchain,
-  fee_tier,
-  COUNT(*) AS swaps,
-  SUM(amount_usd) AS volume_usd
-FROM uniswap_v3.trades
+  token_address,
+  token_symbol,
+  borrower,
+  recipient,
+  amount,
+  amount_raw,
+  amount_usd,
+  interest_rate_mode,
+  tx_hash,
+  evt_index
+FROM {{ ref('aave_v3_ethereum_borrows') }}
+
+UNION ALL
+
+SELECT
+  block_time,
+  block_number,
+  project,
+  version,
+  blockchain,
+  token_address,
+  token_symbol,
+  borrower,
+  recipient,
+  amount,
+  amount_raw,
+  amount_usd,
+  interest_rate_mode,
+  tx_hash,
+  evt_index
+FROM {{ ref('compound_v2_ethereum_borrows') }}
+
+-- Add more lending protocols as they become available
+\`\`\`
+
+## Conclusion
+
+Contributing to Spellbook is a powerful way to improve the blockchain analytics ecosystem while establishing yourself as a contributor to open source data infrastructure. Your models enable countless analysts to build more sophisticated dashboards and derive deeper insights from on-chain data.
+
+By following this guide, you'll be well-equipped to create high-quality abstractions that become a valuable part of the Dune Analytics community.
+
+Remember that good Spellbook models:
+- Follow established patterns
+- Are well-documented
+- Include comprehensive tests
+- Optimize for performance
+- Support incremental loading
+`,
+  },
+  {
+    number: 15,
+    title: "How to Build an Onchain App Using the Dune API",
+    mdContent: `# 15. How to Build an Onchain App Using the Dune API
+
+## Introduction to the Dune API
+
+The Dune API provides programmatic access to Dune Analytics' powerful query engine and vast blockchain dataset. It enables developers to build data-driven applications, dashboards, and services on top of blockchain data without managing infrastructure.
+
+Key API features:
+- Query execution and management
+- Dataset retrieval
+- Analytics dashboard access
+- Timeseries and cross-chain data analysis
+
+## Getting Started with API Access
+
+Before building, you need to set up API access:
+
+1. **Obtain an API Key**
+   - Register for a Dune account at [dune.com](https://dune.com)
+   - Subscribe to a paid tier (API access requires a paid subscription)
+   - Navigate to Settings → API Keys to generate a key
+
+2. **API Authentication**
+   - All API requests require an Authentication header:
+   ```
+   Authorization: Bearer YOUR_API_KEY
+   ```
+
+3. **Rate Limits**
+   - API access is tiered based on subscription level
+   - Check your rate limits in the API dashboard
+   - Implement appropriate backoff strategies
+
+## Core API Endpoints
+
+The Dune API provides several key endpoints:
+
+### 1. Execute Query
+
+```
+POST /api/v1/query/{query_id}/execute
+```
+
+Parameters:
+- `query_id`: The ID of the query to execute
+
+Response:
+```json
+{
+  "execution_id": "01234567-89ab-cdef-0123-456789abcdef",
+  "state": "QUERY_STATE_PENDING"
+}
+```
+
+### 2. Get Execution Status
+
+```
+GET /api/v1/execution/{execution_id}/status
+```
+
+Parameters:
+- `execution_id`: The ID of the query execution to check
+
+Response:
+```json
+{
+  "execution_id": "01234567-89ab-cdef-0123-456789abcdef",
+  "query_id": 1234567,
+  "state": "QUERY_STATE_COMPLETED",
+  "submitted_at": "2023-01-01T12:00:00Z",
+  "expires_at": "2023-01-02T12:00:00Z"
+}
+```
+
+### 3. Get Execution Results
+
+```
+GET /api/v1/execution/{execution_id}/results
+```
+
+Parameters:
+- `execution_id`: The ID of the query execution to fetch results for
+
+Response:
+```json
+{
+  "execution_id": "01234567-89ab-cdef-0123-456789abcdef",
+  "query_id": 1234567,
+  "state": "QUERY_STATE_COMPLETED",
+  "submitted_at": "2023-01-01T12:00:00Z",
+  "expires_at": "2023-01-02T12:00:00Z",
+  "result": {
+    "rows": [
+      {"date": "2023-01-01", "value": 123.45},
+      {"date": "2023-01-02", "value": 234.56}
+    ],
+    "metadata": {
+      "column_names": ["date", "value"],
+      "column_types": ["DateTime", "Float64"]
+    }
+  }
+}
+```
+
+## Building a Simple API Client
+
+Let's build a basic API client in JavaScript:
+
+```javascript
+// dune-client.js
+const axios = require('axios');
+
+class DuneClient {
+  constructor(apiKey) {
+    this.apiKey = apiKey;
+    this.baseUrl = 'https://api.dune.com/api/v1';
+    this.client = axios.create({
+      baseURL: this.baseUrl,
+      headers: {
+        'Authorization': `Bearer ${this.apiKey}`,
+        'Content-Type': 'application/json'
+      }
+    });
+  }
+
+  async executeQuery(queryId, parameters = {}) {
+    try {
+      const response = await this.client.post(`/query/${queryId}/execute`, { parameters });
+      return response.data.execution_id;
+    } catch (error) {
+      console.error('Error executing query:', error);
+      throw error;
+    }
+  }
+
+  async getExecutionStatus(executionId) {
+    try {
+      const response = await this.client.get(`/execution/${executionId}/status`);
+      return response.data;
+    } catch (error) {
+      console.error('Error getting execution status:', error);
+      throw error;
+    }
+  }
+
+  async getQueryResults(executionId) {
+    try {
+      const response = await this.client.get(`/execution/${executionId}/results`);
+      return response.data.result;
+    } catch (error) {
+      console.error('Error getting query results:', error);
+      throw error;
+    }
+  }
+
+  async waitForQueryResults(executionId, maxRetries = 60, interval = 1000) {
+    let retries = 0;
+    
+    while (retries < maxRetries) {
+      const status = await this.getExecutionStatus(executionId);
+      
+      if (status.state === 'QUERY_STATE_COMPLETED') {
+        return await this.getQueryResults(executionId);
+      }
+      
+      if (status.state === 'QUERY_STATE_FAILED') {
+        throw new Error('Query execution failed');
+      }
+      
+      await new Promise(resolve => setTimeout(resolve, interval));
+      retries++;
+    }
+    
+    throw new Error('Query execution timed out');
+  }
+}
+
+module.exports = DuneClient;
+```
+
+## Building a Real-World Application
+
+Now, let's build a complete application that uses the Dune API to create a dashboard for Uniswap metrics.
+
+### 1. Project Setup
+
+```bash
+# Create a new project
+mkdir uniswap-metrics-dashboard
+cd uniswap-metrics-dashboard
+
+# Initialize npm
+npm init -y
+
+# Install dependencies
+npm install express axios dotenv chart.js react react-dom
+```
+
+### 2. API Service Layer
+
+```javascript
+// services/dune-service.js
+const DuneClient = require('../utils/dune-client');
+require('dotenv').config();
+
+const client = new DuneClient(process.env.DUNE_API_KEY);
+
+// Query IDs for Uniswap metrics
+const QUERIES = {
+  DAILY_VOLUME: 1234567,
+  TOP_PAIRS: 2345678,
+  USER_METRICS: 3456789,
+  FEE_GENERATION: 4567890
+};
+
+class DuneService {
+  async getDailyVolume(days = 30) {
+    const executionId = await client.executeQuery(QUERIES.DAILY_VOLUME, { days });
+    return await client.waitForQueryResults(executionId);
+  }
+
+  async getTopPairs(limit = 10) {
+    const executionId = await client.executeQuery(QUERIES.TOP_PAIRS, { limit });
+    return await client.waitForQueryResults(executionId);
+  }
+
+  async getUserMetrics(days = 30) {
+    const executionId = await client.executeQuery(QUERIES.USER_METRICS, { days });
+    return await client.waitForQueryResults(executionId);
+  }
+
+  async getFeeGeneration(days = 30) {
+    const executionId = await client.executeQuery(QUERIES.FEE_GENERATION, { days });
+    return await client.waitForQueryResults(executionId);
+  }
+}
+
+module.exports = new DuneService();
+```
+
+### 3. API Routes
+
+```javascript
+// routes/api.js
+const express = require('express');
+const router = express.Router();
+const duneService = require('../services/dune-service');
+
+router.get('/volume/daily', async (req, res) => {
+  try {
+    const days = parseInt(req.query.days) || 30;
+    const data = await duneService.getDailyVolume(days);
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.get('/pairs/top', async (req, res) => {
+  try {
+    const limit = parseInt(req.query.limit) || 10;
+    const data = await duneService.getTopPairs(limit);
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.get('/users/metrics', async (req, res) => {
+  try {
+    const days = parseInt(req.query.days) || 30;
+    const data = await duneService.getUserMetrics(days);
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+router.get('/fees/generation', async (req, res) => {
+  try {
+    const days = parseInt(req.query.days) || 30;
+    const data = await duneService.getFeeGeneration(days);
+    res.json(data);
+  } catch (error) {
+    res.status(500).json({ error: error.message });
+  }
+});
+
+module.exports = router;
+```
+
+### 4. Server Setup
+
+```javascript
+// server.js
+const express = require('express');
+const path = require('path');
+const apiRoutes = require('./routes/api');
+
+const app = express();
+const PORT = process.env.PORT || 3000;
+
+// Middleware
+app.use(express.json());
+app.use(express.static(path.join(__dirname, 'public')));
+
+// API Routes
+app.use('/api', apiRoutes);
+
+// Serve the React app
+app.get('*', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT}`);
+});
+```
+
+### 5. Frontend Dashboard
+
+```javascript
+// public/app.js
+const VolumeChart = {
+  init: async function() {
+    try {
+      const response = await fetch('/api/volume/daily');
+      const data = await response.json();
+      
+      const ctx = document.getElementById('volumeChart').getContext('2d');
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: data.rows.map(row => row.date),
+          datasets: [{
+            label: 'Daily Volume (USD)',
+            data: data.rows.map(row => row.volume_usd),
+            borderColor: 'rgb(75, 192, 192)',
+            tension: 0.1
+          }]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            title: {
+              display: true,
+              text: 'Uniswap Daily Trading Volume'
+            }
+          }
+        }
+      });
+    } catch (error) {
+      console.error('Error loading volume chart:', error);
+    }
+  }
+};
+
+const TopPairsTable = {
+  init: async function() {
+    try {
+      const response = await fetch('/api/pairs/top');
+      const data = await response.json();
+      
+      const tableBody = document.querySelector('#topPairsTable tbody');
+      data.rows.forEach(pair => {
+        const row = document.createElement('tr');
+        row.innerHTML = `
+          <td>${pair.pair_name}</td>
+          <td>${pair.volume_usd.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}</td>
+          <td>${pair.liquidity_usd.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}</td>
+          <td>${pair.fees_usd.toLocaleString('en-US', { style: 'currency', currency: 'USD' })}</td>
+        `;
+        tableBody.appendChild(row);
+      });
+    } catch (error) {
+      console.error('Error loading top pairs table:', error);
+    }
+  }
+};
+
+// Initialize components when the DOM is ready
+document.addEventListener('DOMContentLoaded', () => {
+  VolumeChart.init();
+  TopPairsTable.init();
+  // Initialize other components similarly
+});
+```
+
+### 6. HTML Dashboard
+
+```html
+<!-- public/index.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Uniswap Analytics Dashboard</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="container mt-4">
+    <h1>Uniswap Analytics Dashboard</h1>
+    
+    <div class="row mt-4">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header">Daily Trading Volume</div>
+          <div class="card-body">
+            <canvas id="volumeChart"></canvas>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <div class="row mt-4">
+      <div class="col-md-12">
+        <div class="card">
+          <div class="card-header">Top Trading Pairs</div>
+          <div class="card-body">
+            <table id="topPairsTable" class="table table-striped">
+              <thead>
+                <tr>
+                  <th>Pair</th>
+                  <th>Volume (USD)</th>
+                  <th>Liquidity (USD)</th>
+                  <th>Fees (USD)</th>
+                </tr>
+              </thead>
+              <tbody></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <!-- Add more dashboard components as needed -->
+  </div>
+  
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="/app.js"></script>
+</body>
+</html>
+```
+
+## Advanced API Usage
+
+### Parameterized Queries
+
+For more dynamic applications, use parameterized queries:
+
+```javascript
+async function getTokenMetrics(tokenAddress) {
+  const executionId = await client.executeQuery(QUERIES.TOKEN_METRICS, {
+    token_address: tokenAddress
+  });
+  return await client.waitForQueryResults(executionId);
+}
+```
+
+### Caching Strategy
+
+Implement a caching strategy to reduce API calls:
+
+```javascript
+const NodeCache = require('node-cache');
+const cache = new NodeCache({ stdTTL: 3600 }); // 1 hour TTL
+
+async function getCachedTokenMetrics(tokenAddress) {
+  const cacheKey = `token_metrics_${tokenAddress}`;
+  
+  // Check if data exists in cache
+  const cachedData = cache.get(cacheKey);
+  if (cachedData) {
+    return cachedData;
+  }
+  
+  // If not in cache, fetch from API
+  const data = await getTokenMetrics(tokenAddress);
+  
+  // Store in cache
+  cache.set(cacheKey, data);
+  
+  return data;
+}
+```
+
+### Batch Processing
+
+For applications needing to process multiple metrics:
+
+```javascript
+async function getDashboardData(params) {
+  // Execute all queries concurrently
+  const [volumeData, pairsData, userMetrics, feeData] = await Promise.all([
+    duneService.getDailyVolume(params.days),
+    duneService.getTopPairs(params.limit),
+    duneService.getUserMetrics(params.days),
+    duneService.getFeeGeneration(params.days)
+  ]);
+  
+  // Process and combine the data
+  return {
+    volume: processVolumeData(volumeData),
+    pairs: processPairsData(pairsData),
+    users: processUserMetrics(userMetrics),
+    fees: processFeeData(feeData)
+  };
+}
+```
+
+## Best Practices for Production Applications
+
+When building production applications with the Dune API:
+
+1. **Implement Robust Error Handling**
+   - Gracefully handle API failures
+   - Provide fallback data sources
+   - Log detailed error information
+
+2. **Optimize API Usage**
+   - Cache frequently requested data
+   - Use background jobs for regular updates
+   - Batch related requests when possible
+
+3. **Implement Rate Limiting**
+   - Add client-side rate limiting
+   - Use exponential backoff for retries
+   - Monitor quota usage
+
+4. **Data Transformation**
+   - Process API responses into application-specific formats
+   - Validate and sanitize data
+   - Handle missing or null values appropriately
+
+5. **Periodic Refreshes**
+   - Schedule regular data refreshes
+   - Use webhooks if available
+   - Implement a refresh strategy based on data volatility
+
+## Conclusion
+
+The Dune API enables developers to build sophisticated onchain applications with access to Dune's powerful blockchain data analytics. By following the patterns in this guide, you can create data-driven applications that provide valuable insights to your users.
+
+Remember that successful applications built on blockchain data typically:
+- Focus on specific use cases and metrics
+- Present data in intuitive, actionable formats
+- Combine multiple data sources for deeper insights
+- Provide timely and reliable information
+
+As blockchain ecosystems evolve, applications built on these data foundations will become increasingly valuable for users making informed decisions in this space.
+`,
+  },
+  {
+    number: 16,
+    title: "Account Abstraction Why It Matters for Wallet UX and Analysts",
+    mdContent: `# 16. Account Abstraction: Why It Matters for Wallet UX and Analysts
+
+## Understanding Account Abstraction
+
+Account abstraction (AA) represents one of the most significant evolutions in Ethereum's account model since its inception. At its core, account abstraction blurs the distinction between Externally Owned Accounts (EOAs) and Contract Accounts by allowing smart contracts to initiate transactions, effectively becoming "accounts" themselves.
+
+### The Current Two-Account Model
+
+Ethereum traditionally has two types of accounts:
+
+1. **Externally Owned Accounts (EOAs)**
+   - Controlled by private keys
+   - Can initiate transactions
+   - Cannot contain code
+   - Limited to a single signature scheme
+
+2. **Contract Accounts**
+   - Controlled by their code
+   - Cannot initiate transactions (only respond)
+   - Can implement complex logic
+   - Cannot pay for gas
+
+This dual system creates fundamental UX limitations that account abstraction aims to solve.
+
+## ERC-4337: The Path to Account Abstraction
+
+ERC-4337 provides a path to account abstraction without requiring consensus-layer changes to Ethereum. Let's understand its key components:
+
+### Architecture Overview
+
+![ERC-4337 Architecture](https://i.imgur.com/XgJvFGo.png)
+
+- **User Operation**: A new transaction-like object containing the user's intent
+- **Bundler**: Entity that packages UserOperations into a transaction
+- **Entry Point Contract**: Singleton contract validating and executing UserOperations
+- **Wallet Contract**: Smart contract implementing account logic (the abstracted account)
+- **Paymaster**: Optional contract that can sponsor gas fees
+
+### User Operation Structure
+
+\`\`\`solidity
+struct UserOperation {
+    address sender;           // The wallet contract
+    uint256 nonce;            // Anti-replay protection
+    bytes initCode;           // Code to create wallet if it doesn't exist
+    bytes callData;           // The method call to execute
+    uint256 callGasLimit;     // Gas limit for the main execution
+    uint256 verificationGasLimit; // Gas limit for verification
+    uint256 preVerificationGas;   // Gas to compensate bundler
+    uint256 maxFeePerGas;     // Similar to EIP-1559 max fee
+    uint256 maxPriorityFeePerGas; // Similar to EIP-1559 priority fee
+    bytes paymasterAndData;   // Paymaster contract address and data
+    bytes signature;          // Signature over the entire operation
+}
+\`\`\`
+
+## Breaking Down the UX Improvements
+
+Account abstraction enables several significant UX improvements:
+
+### 1. Advanced Signature Schemes
+
+Smart contract wallets can implement any signature verification logic:
+
+\`\`\`sql
+-- Analyzing signature types in AA transactions
+SELECT
+  date_trunc('day', block_time) as day,
+  signature_type,
+  COUNT(*) as signature_count
+FROM erc4337.user_operations
+JOIN erc4337.wallet_signatures ON user_operations.hash = wallet_signatures.user_op_hash
 WHERE block_time > now() - interval '30 days'
 GROUP BY 1, 2
-ORDER BY 1, 4 DESC
+ORDER BY 1 DESC, 3 DESC
 \`\`\`
 
-Lower fee tiers dominate on chains with lower gas costs, while higher fee tiers may be more common on L1.
+Possible signature types include:
+- Multi-signatures (M-of-N)
+- Threshold signatures
+- Social recovery
+- Passkeys / WebAuthn
+- Zero-knowledge proofs
 
----
+### 2. Sponsored Transactions (Paymasters)
 
-## 🏆 Pool Concentration by Chain
-
-Is liquidity more or less concentrated on certain chains?
+Paymasters enable gas abstraction, allowing:
+- Payment in ERC-20 tokens instead of ETH
+- Gas sponsorship by dApps or protocols
+- Subscription-based models
 
 \`\`\`sql
+-- Analyzing paymaster usage
 SELECT
-  blockchain,
-  COUNT(DISTINCT pool) AS pool_count,
-  COUNT(*) AS swaps,
-  SUM(amount_usd) AS volume_usd,
-  SUM(CASE WHEN pool_rank <= 10 THEN amount_usd ELSE 0 END) / SUM(amount_usd) AS top10_pool_concentration
-FROM (
+  date_trunc('day', block_time) as day,
+  paymaster,
+  COUNT(*) as sponsored_txs,
+  SUM(gas_used * effective_gas_price) / 1e18 as total_eth_sponsored
+FROM erc4337.user_operations
+WHERE paymaster IS NOT NULL
+  AND block_time > now() - interval '30 days'
+GROUP BY 1, 2
+ORDER BY 1 DESC, 4 DESC
+\`\`\`
+
+### 3. Batched Transactions
+
+Smart contract wallets can execute multiple actions in a single transaction:
+
+\`\`\`sql
+-- Analyzing batched transactions
+WITH batched_ops AS (
   SELECT
-    *,
-    ROW_NUMBER() OVER (PARTITION BY blockchain ORDER BY pool_volume DESC) AS pool_rank
+    wallet_address,
+    user_op_hash,
+    COUNT(*) as actions_per_op
+  FROM erc4337.user_operations
+  JOIN erc4337.user_operation_actions ON user_operations.hash = user_operation_actions.user_op_hash
+  WHERE block_time > now() - interval '30 days'
+  GROUP BY 1, 2
+)
+
+SELECT
+  actions_per_op,
+  COUNT(*) as operation_count,
+  COUNT(*) * 100.0 / SUM(COUNT(*)) OVER () as percentage
+FROM batched_ops
+GROUP BY 1
+ORDER BY 1
+\`\`\`
+
+### 4. Account Recovery
+
+Smart contract wallets enable advanced recovery mechanisms:
+
+- Social recovery (trusted guardians)
+- Time-locked recovery
+- Recovery through alternate authentication methods
+
+\`\`\`sql
+-- Analyzing recovery events
+SELECT
+  date_trunc('day', block_time) as day,
+  recovery_method,
+  COUNT(*) as recovery_count
+FROM erc4337.wallet_recovery_events
+WHERE block_time > now() - interval '90 days'
+GROUP BY 1, 2
+ORDER BY 1 DESC, 3 DESC
+\`\`\`
+
+### 5. Session Keys and Spending Limits
+
+Contract wallets can implement fine-grained permissions:
+
+\`\`\`sql
+-- Analyzing session key usage
+SELECT
+  wallet_address,
+  session_key,
+  permission_type,
+  MAX(block_time) as last_used
+FROM erc4337.session_key_operations
+WHERE block_time > now() - interval '30 days'
+GROUP BY 1, 2, 3
+ORDER BY 4 DESC
+\`\`\`
+
+## Implications for Onchain Analysts
+
+### 1. New Data Structures
+
+Account abstraction introduces new data structures that analysts need to track:
+
+\`\`\`sql
+-- New tables to track
+-- erc4337.user_operations
+-- erc4337.entry_point_events
+-- erc4337.wallet_deployments
+-- erc4337.paymaster_operations
+\`\`\`
+
+### 2. Attribution Challenges
+
+Identifying the "real" initiator of transactions becomes more complex:
+
+\`\`\`sql
+-- Tracing transaction origin with AA
+WITH aa_activity AS (
+  SELECT
+    wallet_address,
+    initiator_address,
+    COUNT(*) as operation_count
+  FROM erc4337.user_operations
+  JOIN erc4337.operation_initiators ON user_operations.hash = operation_initiators.user_op_hash
+  WHERE block_time > now() - interval '30 days'
+  GROUP BY 1, 2
+)
+
+SELECT
+  CASE
+    WHEN initiator_address = wallet_address THEN 'Self-initiated'
+    WHEN initiator_type = 'dapp' THEN 'dApp-initiated'
+    WHEN initiator_type = 'session_key' THEN 'Session key'
+    ELSE 'Other'
+  END as initiation_type,
+  COUNT(*) as operation_count,
+  COUNT(*) * 100.0 / SUM(COUNT(*)) OVER () as percentage
+FROM aa_activity
+JOIN erc4337.initiator_metadata ON aa_activity.initiator_address = initiator_metadata.address
+GROUP BY 1
+ORDER BY 3 DESC
+\`\`\`
+
+### 3. Gas Analysis Complexity
+
+Gas payment and consumption patterns become more complex:
+
+\`\`\`sql
+-- Analyzing gas payment methods
+SELECT
+  date_trunc('day', block_time) as day,
+  CASE
+    WHEN paymaster IS NULL THEN 'Direct ETH payment'
+    WHEN paymaster_type = 'token' THEN 'ERC20 payment'
+    WHEN paymaster_type = 'sponsor' THEN 'Sponsored'
+    WHEN paymaster_type = 'subscription' THEN 'Subscription'
+    ELSE 'Other'
+  END as payment_method,
+  COUNT(*) as tx_count
+FROM erc4337.user_operations
+LEFT JOIN erc4337.paymaster_metadata ON user_operations.paymaster = paymaster_metadata.address
+WHERE block_time > now() - interval '30 days'
+GROUP BY 1, 2
+ORDER BY 1 DESC, 3 DESC
+\`\`\`
+
+### 4. New User Behavior Patterns
+
+AA enables new user behaviors that analysts should monitor:
+
+\`\`\`sql
+-- Analyzing batch operation behaviors
+WITH user_batch_patterns AS (
+  SELECT
+    wallet_address,
+    AVG(actions_per_op) as avg_actions_per_op,
+    MAX(actions_per_op) as max_actions_per_op,
+    MIN(actions_per_op) as min_actions_per_op,
+    COUNT(DISTINCT user_op_hash) as total_ops
   FROM (
     SELECT
-      blockchain,
-      pool,
-      SUM(amount_usd) AS pool_volume
-    FROM uniswap_v3.trades
+      wallet_address,
+      user_op_hash,
+      COUNT(*) as actions_per_op
+    FROM erc4337.user_operations
+    JOIN erc4337.user_operation_actions ON user_operations.hash = user_operation_actions.user_op_hash
     WHERE block_time > now() - interval '30 days'
     GROUP BY 1, 2
-  ) pool_vol
-) ranked_pools
+  ) t
+  GROUP BY 1
+)
+
+SELECT
+  CASE
+    WHEN avg_actions_per_op < 1.2 THEN 'Single action users'
+    WHEN avg_actions_per_op < 3 THEN 'Occasional batchers'
+    ELSE 'Power batchers'
+  END as user_category,
+  COUNT(*) as wallet_count,
+  AVG(total_ops) as avg_operations
+FROM user_batch_patterns
 GROUP BY 1
-ORDER BY 5 DESC
+ORDER BY 2 DESC
 \`\`\`
 
-Higher concentration = more vulnerable to liquidity shocks.
+## Adoption Metrics for Account Abstraction
 
----
+To track adoption of account abstraction:
 
-## 🧠 Multichain Dashboards: Best Practices
-
-When building cross-chain Uniswap dashboards:
-
-1. **Always normalize by USD** for comparable metrics
-2. **Include time zones** (different regions dominate different chains)
-3. **Compare with chain-native DEXs** (e.g., Camelot on Arbitrum)
-4. **Track relative growth rates**, not just absolute values
-5. **Monitor bridge flows** to identify capital migration
-
----
-
-## 📈 Emerging Patterns from Multichain Analysis
-
-Analysis reveals:
-
-- **Chain-specific user behavior**: Different swap sizes, token preferences, and trading hours
-- **Different pool dynamics**: More speculative pools on newer chains, more stable pairs on L1
-- **Varying LP profitability**: MEV activity and competition varies dramatically by chain
-- **Growth pattern differences**: New chains often see initial high growth followed by stabilization
-
----
-
-## 🧠 Next-Level Analysis: User Journey Across Chains
-
-Advanced analysts track the same wallets across different chains:
+### 1. Wallet Creation Growth
 
 \`\`\`sql
-WITH cross_chain_users AS (
+-- Tracking new smart contract wallet deployments
+SELECT
+  date_trunc('week', block_time) as week,
+  wallet_implementation,
+  COUNT(*) as new_wallets
+FROM erc4337.wallet_deployments
+WHERE block_time > now() - interval '180 days'
+GROUP BY 1, 2
+ORDER BY 1 DESC, 3 DESC
+\`\`\`
+
+### 2. Transaction Volume
+
+\`\`\`sql
+-- AA transaction volume vs traditional EOA
+SELECT
+  date_trunc('day', block_time) as day,
+  'ERC-4337' as tx_type,
+  COUNT(*) as tx_count
+FROM erc4337.user_operations
+WHERE block_time > now() - interval '30 days'
+GROUP BY 1, 2
+
+UNION ALL
+
+SELECT
+  date_trunc('day', block_time) as day,
+  'Traditional EOA' as tx_type,
+  COUNT(*) as tx_count
+FROM ethereum.transactions
+WHERE block_time > now() - interval '30 days'
+  AND "from" NOT IN (SELECT bundler_address FROM erc4337.bundlers)
+GROUP BY 1, 2
+
+ORDER BY 1 DESC, 3 DESC
+\`\`\`
+
+### 3. User Activity Distribution
+
+\`\`\`sql
+-- User activity distribution
+WITH aa_user_activity AS (
   SELECT
-    trader,
-    COUNT(DISTINCT blockchain) AS chain_count
-  FROM uniswap_v3.trades
+    wallet_address,
+    COUNT(*) as operation_count
+  FROM erc4337.user_operations
+  WHERE block_time > now() - interval '30 days'
+  GROUP BY 1
+),
+traditional_user_activity AS (
+  SELECT
+    "from" as wallet_address,
+    COUNT(*) as tx_count
+  FROM ethereum.transactions
+  WHERE block_time > now() - interval '30 days'
+    AND "from" NOT IN (SELECT bundler_address FROM erc4337.bundlers)
+  GROUP BY 1
+)
+
+SELECT
+  CASE
+    WHEN operation_count = 1 THEN '1 operation'
+    WHEN operation_count BETWEEN 2 AND 5 THEN '2-5 operations'
+    WHEN operation_count BETWEEN 6 AND 20 THEN '6-20 operations'
+    ELSE '20+ operations'
+  END as activity_bucket,
+  COUNT(*) as wallet_count,
+  'AA Wallets' as wallet_type
+FROM aa_user_activity
+GROUP BY 1
+
+UNION ALL
+
+SELECT
+  CASE
+    WHEN tx_count = 1 THEN '1 operation'
+    WHEN tx_count BETWEEN 2 AND 5 THEN '2-5 operations'
+    WHEN tx_count BETWEEN 6 AND 20 THEN '6-20 operations'
+    ELSE '20+ operations'
+  END as activity_bucket,
+  COUNT(*) as wallet_count,
+  'EOA Wallets' as wallet_type
+FROM traditional_user_activity
+GROUP BY 1
+
+ORDER BY wallet_type, activity_bucket
+\`\`\`
+
+## The Future of Account Abstraction Analysis
+
+As AA adoption grows, analysts will need to focus on:
+
+1. **Cross-chain AA Analysis**: How AA wallets behave across different EVM chains
+2. **Industry-specific AA Patterns**: Different use cases across DeFi, gaming, NFTs
+3. **Security Event Monitoring**: New attack vectors specific to smart contract wallets
+4. **Wallet Feature Utilization**: Which AA capabilities are most utilized
+5. **Paymaster Economics**: Viability of various gas sponsorship models
+
+## Conclusion
+
+Account abstraction represents a significant shift in how users interact with blockchains. For onchain analysts, it creates both challenges in attribution and opportunities for deeper user behavior analysis.
+
+Key takeaways:
+- ERC-4337 enables significant UX improvements without consensus changes
+- New data structures require updated analytics approaches
+- Separating user intent from transaction mechanics becomes crucial
+- Gas analysis becomes more nuanced with paymasters
+- New wallet features create novel behavioral patterns to analyze
+
+By understanding these changes, analysts can better interpret on-chain activity in an increasingly abstracted blockchain ecosystem, gaining deeper insights into actual user behavior separated from the underlying transaction mechanics.
+`,
+  },
+  {
+    number: 17,
+    title: "ERC-4337 Aggregated Tables Across EVM Chains Unified Analytics at Scale",
+    mdContent: `# 17. ERC-4337 Aggregated Tables Across EVM Chains: Unified Analytics at Scale
+
+## Introduction to Cross-Chain ERC-4337 Analytics
+
+As account abstraction via ERC-4337 gains adoption across multiple EVM-compatible blockchains, analysts face the challenge of tracking and comparing smart account usage across different chains. This chapter explores the creation and use of aggregated tables that unify ERC-4337 data across chains.
+
+## The Cross-Chain Data Challenge
+
+Account abstraction is being implemented on numerous chains:
+
+* Ethereum Mainnet
+* Optimism
+* Arbitrum
+* Polygon
+* Base
+* Avalanche
+* BNB Chain
+* Gnosis Chain
+* And many more...
+
+Each chain has its own EntryPoint deployments, bundlers, paymasters, and wallet implementations. However, the underlying data structure of UserOperations remains largely consistent.
+
+## Building Cross-Chain ERC-4337 Tables
+
+### Step 1: Identify Common Data Structures
+
+We start by identifying the core ERC-4337 data elements that are consistent across chains:
+
+\`\`\`sql
+-- Common UserOperation fields across all chains
+CREATE TABLE erc4337_unified.user_operations (
+  id SERIAL PRIMARY KEY,
+  blockchain VARCHAR NOT NULL,   -- Chain identifier
+  block_number BIGINT NOT NULL,
+  block_time TIMESTAMP NOT NULL,
+  user_op_hash BYTEA NOT NULL,   -- Hash of the UserOperation
+  tx_hash BYTEA NOT NULL,        -- Transaction hash
+  sender BYTEA NOT NULL,         -- Wallet contract address
+  nonce NUMERIC NOT NULL,
+  entry_point BYTEA NOT NULL,    -- EntryPoint contract
+  paymaster BYTEA,               -- Optional paymaster
+  factory BYTEA,                 -- Optional factory (from initCode)
+  gas_used NUMERIC,
+  success BOOLEAN,
+  bundler BYTEA,                 -- Transaction sender
+  UNIQUE (blockchain, user_op_hash)
+);
+
+-- Index for efficient queries
+CREATE INDEX idx_user_operations_block_time ON erc4337_unified.user_operations (block_time);
+CREATE INDEX idx_user_operations_sender ON erc4337_unified.user_operations (sender);
+\`\`\`
+
+### Step 2: Create Unified Chain-Specific Views
+
+Next, we create chain-specific views that map to our unified schema:
+
+\`\`\`sql
+-- Ethereum Mainnet UserOperations
+CREATE VIEW erc4337_unified.user_operations_ethereum AS
+SELECT
+  'ethereum' as blockchain,
+  block_number,
+  block_time,
+  user_op_hash,
+  tx_hash,
+  sender,
+  nonce,
+  entry_point,
+  paymaster,
+  factory,
+  gas_used,
+  success,
+  bundler
+FROM ethereum.erc4337_user_operations;
+
+-- Optimism UserOperations
+CREATE VIEW erc4337_unified.user_operations_optimism AS
+SELECT
+  'optimism' as blockchain,
+  block_number,
+  block_time,
+  user_op_hash,
+  tx_hash,
+  sender,
+  nonce,
+  entry_point,
+  paymaster,
+  factory,
+  gas_used,
+  success,
+  bundler
+FROM optimism.erc4337_user_operations;
+
+-- Additional chains follow the same pattern...
+\`\`\`
+
+### Step 3: Create Unified Data Model with dbt
+
+Using dbt (data build tool), we can create a more maintainable unified model:
+
+\`\`\`sql
+-- models/erc4337/unified/unified_user_operations.sql
+{{
+  config(
+    schema = 'erc4337_unified',
+    alias = 'user_operations',
+    materialized = 'incremental',
+    file_format = 'delta',
+    incremental_strategy = 'merge',
+    unique_key = ['blockchain', 'user_op_hash']
+  )
+}}
+
+{% set chains = [
+  'ethereum',
+  'optimism',
+  'arbitrum',
+  'polygon',
+  'base',
+  'avalanche',
+  'bnb',
+  'gnosis'
+] %}
+
+{% for chain in chains %}
+SELECT
+  '{{ chain }}' as blockchain,
+  block_number,
+  block_time,
+  user_op_hash,
+  tx_hash,
+  sender,
+  nonce,
+  entry_point,
+  paymaster,
+  factory,
+  gas_used,
+  success,
+  bundler
+FROM {{ ref('erc4337_' ~ chain ~ '_user_operations') }}
+{% if not loop.last %} UNION ALL {% endif %}
+{% endfor %}
+\`\`\`
+
+## Cross-Chain Analytics Queries
+
+With our unified tables in place, we can now perform powerful cross-chain analyses:
+
+### 1. Adoption Comparison Across Chains
+
+\`\`\`sql
+-- Compare ERC-4337 adoption across chains
+SELECT
+  date_trunc('day', block_time) as day,
+  blockchain,
+  COUNT(*) as user_operations,
+  COUNT(DISTINCT sender) as active_wallets
+FROM erc4337_unified.user_operations
+WHERE block_time > now() - interval '90 days'
+GROUP BY 1, 2
+ORDER BY 1 DESC, 3 DESC
+\`\`\`
+
+### 2. Cross-Chain Wallet Usage
+
+Identify wallets that operate across multiple chains:
+
+\`\`\`sql
+-- Find wallets active on multiple chains
+WITH wallet_chains AS (
+  SELECT
+    sender,
+    COUNT(DISTINCT blockchain) as chain_count,
+    array_agg(DISTINCT blockchain) as chains_used
+  FROM erc4337_unified.user_operations
   WHERE block_time > now() - interval '30 days'
   GROUP BY 1
   HAVING COUNT(DISTINCT blockchain) > 1
@@ -247,2144 +1961,540 @@ WITH cross_chain_users AS (
 
 SELECT
   chain_count,
-  COUNT(DISTINCT trader) AS users,
-  COUNT(DISTINCT trader) / SUM(COUNT(DISTINCT trader)) OVER () AS pct_of_total
-FROM cross_chain_users
+  COUNT(*) as wallet_count,
+  100.0 * COUNT(*) / SUM(COUNT(*)) OVER () as percentage
+FROM wallet_chains
 GROUP BY 1
 ORDER BY 1
 \`\`\`
 
-This reveals what percentage of users operate across multiple chains and how they allocate capital.
+### 3. Chain Migration Patterns
 
----
-
-## 🏁 Conclusion: The Multichain Analyst's Edge
-
-Being able to compare Uniswap across chains provides:
-- Early signals of capital migration
-- Liquidity fragmentation risks
-- Emerging market opportunities
-- Protocol-specific growth strategies
-
-In a fragmented liquidity landscape, the analyst who can see the whole picture—across all chains—has a decisive advantage.
-
----
-
-**Next: 12. Useful Metrics Every Analyst Should Track**`
-  },
-  { 
-    number: 12, 
-    title: "Useful Metrics Every Analyst Should Track", 
-    pdfPath: "/Onchain Manifesto/12. Useful Metrics Every Analyst Should Track.pdf",
-    mdContent: `# 12. Useful Metrics Every Analyst Should Track
-
-In onchain analytics, there are certain metrics that serve as vital signs for the crypto ecosystem. Like a doctor's standard checkup, these indicators help you baseline health, detect anomalies, and spot emerging trends.
-
-This article outlines the must-track metrics for any serious onchain analyst—from macro flows to protocol-specific indicators. These are the numbers that tell you what's really happening beneath the price action.
-
----
-
-## 🌍 Macro Flow Metrics
-
-These ecosystem-wide metrics help you understand broad capital movements.
-
-### 1. Exchange Inflows/Outflows
-
-**What it tells you**: User sentiment and potential selling/accumulation pressure
+Analyze how users migrate between chains:
 
 \`\`\`sql
-SELECT 
-  date_trunc('day', block_time) AS day,
-  SUM(CASE WHEN to_is_cex THEN amount_usd ELSE 0 END) AS inflow_to_cex_usd,
-  SUM(CASE WHEN from_is_cex THEN amount_usd ELSE 0 END) AS outflow_from_cex_usd,
-  SUM(CASE WHEN to_is_cex THEN amount_usd ELSE 0 END) - 
-  SUM(CASE WHEN from_is_cex THEN amount_usd ELSE 0 END) AS net_flow_usd
-FROM (
-  SELECT
-    t.block_time,
-    t.from AS from_address,
-    t.to AS to_address,
-    is_cex(t.from) AS from_is_cex,
-    is_cex(t.to) AS to_is_cex,
-    t.amount / 1e18 * p.price AS amount_usd
-  FROM ethereum.token_transfers t
-  JOIN prices.usd p ON t.token_address = p.contract_address
-    AND date_trunc('minute', t.block_time) = p.minute
-  WHERE t.block_time > now() - interval '30 days'
-    AND t.token_address = LOWER('0xToken') -- e.g., USDT, WETH, etc.
-) flows
-GROUP BY 1
-ORDER BY 1
-\`\`\`
-
-**Red flags**: Sustained net inflows to exchanges often precede selling pressure.
-
----
-
-### 2. Stablecoin Supply Activity
-
-**What it tells you**: Dollar liquidity entering/exiting crypto
-
-\`\`\`sql
-SELECT 
-  date_trunc('day', block_time) AS day,
-  token_symbol,
-  SUM(amount / power(10, decimals)) AS daily_minted
-FROM stablecoin.mints
-WHERE block_time > now() - interval '90 days'
-  AND token_symbol IN ('USDT', 'USDC', 'DAI', 'BUSD')
-GROUP BY 1, 2
-ORDER BY 1, 2
-\`\`\`
-
-**Red flags**: Sharp declines in stablecoin supply often correlate with reduced trading volumes and market pullbacks.
-
----
-
-### 3. Smart Money Wallet Activity
-
-**What it tells you**: What sophisticated investors are doing
-
-\`\`\`sql
-SELECT 
-  date_trunc('day', block_time) AS day,
-  label,
-  COUNT(DISTINCT tx_hash) AS txs,
-  COUNT(DISTINCT smart_wallet) AS active_wallets
-FROM labeled_transactions
-WHERE block_time > now() - interval '30 days'
-  AND label IN ('VC', 'hedge_fund', 'whale_wallet')
-GROUP BY 1, 2
-ORDER BY 1, 2
-\`\`\`
-
-**Red flags**: When smart money begins moving to stablecoins or off-chain, it often precedes broader market movements.
-
----
-
-## 🔍 Ethereum Network Health
-
-These metrics focus specifically on Ethereum's network activity and usage.
-
-### 4. Gas Usage by Category
-
-**What it tells you**: What's driving blockchain demand
-
-\`\`\`sql
-SELECT 
-  date_trunc('day', block_time) AS day,
-  tx_type,
-  SUM(gas_used * gas_price) / 1e18 AS eth_spent_on_gas,
-  COUNT(*) AS tx_count
-FROM (
-  SELECT
-    t.block_time,
-    t.gas_used,
-    t.gas_price,
-    CASE 
-      WHEN t.to IN (SELECT address FROM dex_contracts) THEN 'DEX'
-      WHEN t.to IN (SELECT address FROM nft_contracts) THEN 'NFT'
-      WHEN t.to IN (SELECT address FROM lending_contracts) THEN 'Lending'
-      ELSE 'Other'
-    END AS tx_type
-  FROM ethereum.transactions t
-  WHERE t.block_time > now() - interval '30 days'
-) categorized
-GROUP BY 1, 2
-ORDER BY 1, 2
-\`\`\`
-
-**Red flags**: Sudden spikes in gas usage for speculative activities (like NFT mints or token launches) can indicate market froth.
-
----
-
-### 5. Active Addresses
-
-**What it tells you**: Real network usage and adoption
-
-\`\`\`sql
-SELECT 
-  date_trunc('day', block_time) AS day,
-  COUNT(DISTINCT from_address) AS active_senders,
-  COUNT(DISTINCT to_address) AS active_receivers,
-  COUNT(DISTINCT from_address OR to_address) AS total_active_addresses
-FROM ethereum.transactions
-WHERE block_time > now() - interval '30 days'
-GROUP BY 1
-ORDER BY 1
-\`\`\`
-
-**Red flags**: Declining active addresses despite rising prices can signal unsustainable price action.
-
----
-
-## 💎 DeFi Protocol Metrics
-
-These metrics help evaluate the health of major DeFi protocols.
-
-### 6. Yield vs. Risk
-
-**What it tells you**: Whether yields are sustainable
-
-\`\`\`sql
-SELECT 
-  pool_name,
-  asset,
-  current_apy,
-  volatility_30d,
-  current_apy / volatility_30d AS risk_adjusted_return,
-  tvl_usd
-FROM defi.yield_metrics
-WHERE timestamp = (SELECT MAX(timestamp) FROM defi.yield_metrics)
-ORDER BY 5 DESC
-\`\`\`
-
-**Red flags**: Yields significantly higher than market with low risk-adjusted returns often indicate hidden risks or unsustainable tokenomics.
-
----
-
-### 7. Protocol Revenue
-
-**What it tells you**: Sustainable value capture
-
-\`\`\`sql
-SELECT 
-  date_trunc('day', block_time) AS day,
-  protocol_name,
-  SUM(fee_usd) AS revenue_usd,
-  SUM(CASE WHEN accrues_to_protocol THEN fee_usd ELSE 0 END) AS protocol_revenue_usd,
-  SUM(CASE WHEN accrues_to_lps THEN fee_usd ELSE 0 END) AS lp_revenue_usd
-FROM defi.fees
-WHERE block_time > now() - interval '30 days'
-GROUP BY 1, 2
-ORDER BY 1, 2
-\`\`\`
-
-**Red flags**: Declining protocol revenue despite stable/growing TVL can indicate declining competitiveness or value capture.
-
----
-
-## 🎮 NFT Ecosystem Metrics
-
-For analysts tracking the NFT space, these metrics are essential.
-
-### 8. Marketplace Activity
-
-**What it tells you**: Where the volume is going
-
-\`\`\`sql
-SELECT 
-  date_trunc('day', block_time) AS day,
-  marketplace,
-  COUNT(*) AS sales,
-  COUNT(DISTINCT nft_contract_address) AS collections_traded,
-  COUNT(DISTINCT buyer) AS unique_buyers,
-  COUNT(DISTINCT seller) AS unique_sellers,
-  SUM(amount_usd) AS volume_usd,
-  SUM(amount_usd) / COUNT(*) AS avg_price_usd
-FROM nft.trades
-WHERE block_time > now() - interval '30 days'
-GROUP BY 1, 2
-ORDER BY 1, 2
-\`\`\`
-
-**Red flags**: Marketplace volume concentrated on a single platform can indicate vulnerability to policy changes.
-
----
-
-### 9. Buying vs. Minting
-
-**What it tells you**: Market saturation vs. new growth
-
-\`\`\`sql
-SELECT 
-  date_trunc('day', block_time) AS day,
-  COUNT(*) AS mint_count,
-  (SELECT COUNT(*) FROM nft.trades WHERE block_time BETWEEN day AND day + interval '1 day') AS sale_count,
-  COUNT(*) / (SELECT COUNT(*) FROM nft.trades WHERE block_time BETWEEN day AND day + interval '1 day') AS mint_to_sale_ratio
-FROM nft.mints
-WHERE block_time > now() - interval '30 days'
-GROUP BY 1
-ORDER BY 1
-\`\`\`
-
-**Red flags**: High mint counts but low secondary sales often indicate excessive supply with weak demand.
-
----
-
-## 🔐 Security Metrics
-
-These metrics help you monitor risk and security concerns.
-
-### 10. Bridge Volume and TVL
-
-**What it tells you**: Cross-chain risk exposure
-
-\`\`\`sql
-SELECT 
-  bridge_name,
-  source_chain,
-  destination_chain,
-  SUM(amount_usd) AS bridged_volume_30d,
-  COUNT(*) AS transaction_count_30d,
-  current_tvl_usd,
-  bridged_volume_30d / current_tvl_usd AS velocity
-FROM bridges.transfers
-WHERE block_time > now() - interval '30 days'
-GROUP BY 1, 2, 3, 6
-ORDER BY 4 DESC
-\`\`\`
-
-**Red flags**: High TVL on smaller bridges creates concentrated risk points.
-
----
-
-### 11. Protocol TVL Concentration
-
-**What it tells you**: Systemic risks in DeFi
-
-\`\`\`sql
-SELECT 
-  protocol,
-  category,
-  tvl_usd,
-  tvl_usd / SUM(tvl_usd) OVER () AS pct_of_total_tvl,
-  SUM(tvl_usd) OVER (PARTITION BY category) / SUM(tvl_usd) OVER () AS category_concentration
-FROM defi.tvl
-WHERE timestamp = (SELECT MAX(timestamp) FROM defi.tvl)
-ORDER BY 3 DESC
-\`\`\`
-
-**Red flags**: When a single protocol dominates TVL, it creates systemic risk.
-
----
-
-## 📊 Building Your Dashboard
-
-When constructing your analytics dashboard:
-
-**1. Layer these metrics**
-- Start with macro flows
-- Add network activity
-- Incorporate protocol-specific metrics
-
-**2. Standardize time periods**
-- Daily for recent trends (7-30 days)
-- Weekly for medium-term (30-90 days)
-- Monthly for long-term (90+ days)
-
-**3. Add ratio metrics**
-- Volume / TVL
-- Active Users / Total Users
-- Revenue / TVL
-
----
-
-## 🔮 Conclusion: Monitoring the Pulse of the Blockchain
-
-These metrics form a comprehensive vital signs monitor for onchain activity. By tracking them consistently, you'll develop an intuition for what's normal and what's not.
-
-The best analysts don't just track these numbers in isolation—they look for correlations, divergences, and leading indicators across metrics.
-
-Next time you see a price movement, check these metrics first—they'll often tell you whether the move is driven by fundamental activity or mere speculation.
-
----
-
-**Next: 13. BTC Coin Days Destroyed — What HODLers Tell Us About the Market**`
-  },
-  { 
-    number: 13, 
-    title: "BTC Coin Days Destroyed — What HODLers Tell Us About the Market", 
-    pdfPath: "/Onchain Manifesto/13. BTC Coin Days Destroyed — What HODLers Tell Us About the Market.pdf",
-    mdContent: `# 13. BTC Coin Days Destroyed — What HODLers Tell Us About the Market
-
-Bitcoin hodlers have long been considered the backbone of the crypto ecosystem—the true believers who hold through market cycles. But how do we measure their behavior in a quantifiable way?
-
-Enter **Coin Days Destroyed (CDD)**, one of the most powerful and underutilized metrics in Bitcoin analysis. CDD combines both the *amount* of Bitcoin moved and *how long* it was dormant before moving.
-
-This article explores how to calculate, interpret, and derive insights from CDD data—a metric that often signals major market shifts before they happen.
-
----
-
-## 🧮 Understanding Coin Days Destroyed
-
-Let's start with the basics:
-
-1. **Coin Days**: When 1 BTC remains unspent for 1 day, it accumulates 1 "coin day"
-2. **Destruction**: When those coins eventually move, the accumulated coin days are "destroyed"
-
-The formula is simple:
-```
-Coin Days Destroyed = Amount of BTC moved × Days since last movement
-```
-
-For example:
-- 10 BTC held for 100 days = 1,000 coin days
-- When moved, 1,000 coin days are "destroyed"
-
----
-
-## 🔍 Why CDD Matters
-
-CDD tells you something that raw transaction volume cannot:
-- **Low CDD**: Mostly recent coins moving (active traders)
-- **High CDD**: Long-dormant coins moving (potential smart money/OG decisions)
-
-Often, significant market tops and bottoms are preceded by spikes in CDD as long-term holders decide to sell or accumulate.
-
----
-
-## 📊 Calculating CDD on Dune
-
-Here's how to calculate CDD using Bitcoin's UTXO model:
-
-\`\`\`sql
-WITH utxo_lifespan AS (
-  SELECT
-    i.block_time AS spent_time,
-    o.block_time AS created_time,
-    i.value / 1e8 AS btc_amount,
-    date_diff('day', o.block_time, i.block_time) AS days_held
-  FROM bitcoin.inputs i
-  JOIN bitcoin.outputs o ON i.spent_tx_hash = o.tx_hash AND i.spent_index = o.index
-  WHERE i.block_time > now() - interval '30 days'
-    AND o.block_time < i.block_time -- sanity check
-)
-
-SELECT
-  date_trunc('day', spent_time) AS day,
-  SUM(btc_amount) AS btc_moved,
-  SUM(btc_amount * days_held) AS coin_days_destroyed
-FROM utxo_lifespan
-GROUP BY 1
-ORDER BY 1
-\`\`\`
-
-This query:
-1. Joins Bitcoin inputs (coins being spent) with their original outputs (when they were created)
-2. Calculates how many days each UTXO was dormant
-3. Multiplies the BTC amount by days held to get CDD
-4. Aggregates by day for a time series view
-
----
-
-## 🧪 Derived Metrics from CDD
-
-CDD can be further refined into several powerful derivative metrics:
-
-### 1. CDD 90-day Moving Average
-
-Shows the trend in long-term holder behavior:
-
-\`\`\`sql
-SELECT
-  day,
-  coin_days_destroyed,
-  AVG(coin_days_destroyed) OVER (ORDER BY day ROWS BETWEEN 90 PRECEDING AND CURRENT ROW) AS cdd_90d_ma
-FROM daily_cdd
-ORDER BY day
-\`\`\`
-
-### 2. CDD Velocity
-
-Measures how quickly accumulated coin days are being destroyed:
-
-\`\`\`sql
-WITH btc_supply AS (
-  SELECT
-    day,
-    21000000 - (21000000 - 6.25) * POW(0.5, block_height / 210000) AS estimated_supply
-  FROM daily_blocks
-)
-
-SELECT
-  c.day,
-  c.coin_days_destroyed,
-  c.coin_days_destroyed / s.estimated_supply AS cdd_velocity
-FROM daily_cdd c
-JOIN btc_supply s USING (day)
-ORDER BY day
-\`\`\`
-
-### 3. Binary CDD
-
-A boolean signal that flags unusual CDD spikes:
-
-\`\`\`sql
-SELECT
-  day,
-  coin_days_destroyed,
-  cdd_90d_ma,
-  CASE
-    WHEN coin_days_destroyed > cdd_90d_ma * 3 THEN 1
-    ELSE 0
-  END AS binary_cdd_signal
-FROM (
-  SELECT
-    day,
-    coin_days_destroyed,
-    AVG(coin_days_destroyed) OVER (ORDER BY day ROWS BETWEEN 90 PRECEDING AND CURRENT ROW) AS cdd_90d_ma
-  FROM daily_cdd
-) WITH_MA
-ORDER BY day
-\`\`\`
-
----
-
-## 👥 Cohort Analysis with CDD
-
-We can segment coins by age to see which vintage of HODLers is moving:
-
-\`\`\`sql
-SELECT
-  date_trunc('day', spent_time) AS day,
-  CASE
-    WHEN days_held < 7 THEN 'under_1w'
-    WHEN days_held < 30 THEN '1w_to_1m'
-    WHEN days_held < 90 THEN '1m_to_3m'
-    WHEN days_held < 365 THEN '3m_to_1y'
-    WHEN days_held < 1095 THEN '1y_to_3y'
-    ELSE 'over_3y'
-  END AS age_bucket,
-  SUM(btc_amount) AS btc_moved,
-  SUM(btc_amount * days_held) AS coin_days_destroyed
-FROM utxo_lifespan
-GROUP BY 1, 2
-ORDER BY 1, 2
-\`\`\`
-
-This tells you whether it's new coins or true "diamond hands" moving the market.
-
----
-
-## 📋 Interpreting CDD Signals
-
-### Bullish CDD Patterns
-
-- **Low CDD during corrections**: HODLers aren't selling despite price drops
-- **CDD spikes at established bottoms**: Smart money accumulating after capitulation
-- **Declining CDD over time**: Growing HODLer base with strong conviction
-
-### Bearish CDD Patterns
-
-- **Major CDD spikes after strong rallies**: Long-term holders taking profit
-- **Sustained high CDD**: Distribution phase may be underway
-- **CDD spikes with declining volume**: Smart money exiting quietly
-
----
-
-## 🔮 Historical CDD Case Studies
-
-Let's examine some historical examples:
-
-### December 2017: The Bull Market Top
-
-A massive spike in CDD occurred as Bitcoin approached $20,000:
-
-\`\`\`sql
-SELECT
-  day,
-  price_usd,
-  coin_days_destroyed,
-  cdd_90d_ma
-FROM daily_cdd
-JOIN prices.usd USING (day)
-WHERE day BETWEEN '2017-11-01' AND '2018-01-31'
-ORDER BY day
-\`\`\`
-
-Early bitcoiners who had held for years began taking profits, signaling the market top.
-
-### March 2020: COVID Crash and Recovery
-
-During the COVID crash:
-
-\`\`\`sql
-SELECT
-  day,
-  price_usd,
-  coin_days_destroyed,
-  cdd_90d_ma
-FROM daily_cdd
-JOIN prices.usd USING (day)
-WHERE day BETWEEN '2020-03-01' AND '2020-05-31'
-ORDER BY day
-\`\`\`
-
-We saw panic selling (high CDD) followed by accumulation from long-term holders—a classic bottoming pattern.
-
----
-
-## 🧠 Building a Holistic CDD Dashboard
-
-A complete CDD dashboard should include:
-
-1. **Raw CDD Time Series**: The foundational metric
-2. **Age-Segmented Movement**: Which cohorts are moving
-3. **CDD vs. Price**: Correlation and divergences
-4. **CDD Velocity**: Rate of old coin movement
-5. **Binary CDD Signals**: Highlighting extraordinary events
-
-Remember to normalize by total supply and market age, as the interpretation of what constitutes "high CDD" changes as Bitcoin matures.
-
----
-
-## 🔮 Conclusion: The Voice of the HODLers
-
-CDD lets you hear what the silent HODLers are saying with their actions. It's one of the few metrics that can give advance warning of major market shifts by detecting when the most experienced, patient participants decide to move their coins.
-
-By mastering CDD analysis, you gain insight into the conviction and behavior of Bitcoin's most steadfast believers—information that often precedes significant market movements.
-
-**Next: 14. Building with Spellbook — How to Contribute Reusable Models to the Community**`
-  },
-  { 
-    number: 14, 
-    title: "Building with Spellbook — How to Contribute Reusable Models to the Community", 
-    pdfPath: "/Onchain Manifesto/14. Building with Spellbook — How to Contribute Reusable Models to the Community.pdf",
-    mdContent: `# 14. Building with Spellbook — How to Contribute Reusable Models to the Community
-
-At the heart of the Dune ecosystem lies a powerful yet underutilized tool: **Spellbook**. This community-maintained repository of SQL models represents a paradigm shift in onchain analytics—moving from isolated queries to reusable, composable, and collaborative data models.
-
-This article will show you how to contribute to Spellbook, enabling you to both enhance your own analytics workflow and empower the broader community.
-
----
-
-## 🧙‍♂️ What Is Spellbook?
-
-Spellbook is Dune's open-source repository of SQL models built with dbt (data build tool). It takes raw blockchain data and transforms it into:
-
-- **Standardized views** (e.g., unified DEX trades across all chains)
-- **Reusable abstractions** (e.g., protocol-specific metrics)
-- **Production-ready models** (e.g., proper testing, documentation, and metadata)
-
-The models live in the [Spellbook GitHub repository](https://github.com/duneanalytics/spellbook) and, once merged, become available to every Dune user as part of DuneSQL.
-
----
-
-## 🧩 Why Spellbook Matters
-
-Before Spellbook, Dune analysts faced common challenges:
-
-- **Duplicate work**: Everyone writing similar queries for basic metrics
-- **Inconsistent calculations**: Different definitions of "active users" or "TVL"
-- **Hard-to-maintain dashboards**: Code duplication across queries
-
-Spellbook solves these by providing:
-
-- **Write once, use everywhere** functionality
-- **Community-validated models** with proper testing
-- **Version control and continuous integration**
-- **Consistent naming and documentation**
-
----
-
-## 🚀 Getting Started with Spellbook
-
-Before contributing, you'll need to:
-
-1. **Install required tools**:
-   - Python 3.9+
-   - dbt-core
-   - GitHub account
-
-2. **Fork the repository**:
-   - Visit [github.com/duneanalytics/spellbook](https://github.com/duneanalytics/spellbook)
-   - Click "Fork" in the top right
-   - Clone your fork locally
-
-3. **Set up your environment**:
-   ```bash
-   pip install -r requirements.txt
-   dbt deps
-   cp profiles_template.yml profiles.yml
-   # Edit profiles.yml with your Dune API key
-   ```
-
----
-
-## 📋 Anatomy of a Spellbook Model
-
-Spellbook models follow a standard structure:
-
-```
-models/
-  └── project_name/
-      ├── project_name_schema.yml    # Schema definitions
-      ├── base/                       # Base tables and views
-      │   └── base_project_table.sql
-      ├── aggregations/              # Aggregated tables
-      │   └── project_daily_metrics.sql
-      └── unified/                   # Cross-chain models
-          └── project_unified_trades.sql
-```
-
-Each SQL file contains a dbt model, structured like:
-
-```sql
-{{
-  config(
-    schema = 'project_name',
-    alias = 'metric_name',
-    partition_by = ['field'],
-    materialized = 'incremental',
-    file_format = 'delta',
-    incremental_strategy = 'merge',
-    unique_key = ['unique_field']
-  )
-}}
-
--- Model logic here using DuneSQL syntax
-SELECT
-  field1,
-  field2
-FROM {{ ref('another_model') }}
-WHERE condition
-```
-
----
-
-## 🧪 Example: Building a Uniswap V3 LP Profitability Model
-
-Let's create a Spellbook model for tracking Uniswap V3 LP profitability:
-
-1. **Create model file** at `models/uniswap/aggregations/uniswap_v3_lp_positions.sql`:
-
-   ```sql
-   {{
-     config(
-       schema = 'uniswap_v3',
-       alias = 'lp_positions',
-       materialized = 'incremental',
-       file_format = 'delta',
-       incremental_strategy = 'merge',
-       unique_key = ['position_id', 'blockchain', 'day']
-     )
-   }}
-
-   WITH positions AS (
-     SELECT
-       blockchain,
-       position_id,
-       liquidity,
-       pool,
-       tick_lower,
-       tick_upper,
-       block_time AS created_time
-     FROM {{ ref('uniswap_v3_positions') }}
-     WHERE block_time >= NOW() - INTERVAL '30 days'
-   ),
-
-   daily_metrics AS (
-     SELECT
-       date_trunc('day', block_time) AS day,
-       blockchain,
-       position_id,
-       SUM(fee_earned_usd) AS daily_fees_usd,
-       SUM(impermanent_loss_usd) AS daily_il_usd
-     FROM {{ ref('uniswap_v3_position_events') }}
-     WHERE block_time >= NOW() - INTERVAL '30 days'
-     GROUP BY 1, 2, 3
-   )
-
-   SELECT
-     d.day,
-     p.blockchain,
-     p.position_id,
-     p.pool,
-     p.liquidity,
-     p.tick_lower,
-     p.tick_upper,
-     d.daily_fees_usd,
-     d.daily_il_usd,
-     d.daily_fees_usd - d.daily_il_usd AS daily_profit_usd,
-     SUM(d.daily_fees_usd - d.daily_il_usd) OVER 
-       (PARTITION BY p.position_id, p.blockchain 
-        ORDER BY d.day 
-        ROWS BETWEEN UNBOUNDED PRECEDING AND CURRENT ROW)
-       AS cumulative_profit_usd
-   FROM positions p
-   JOIN daily_metrics d
-     ON p.position_id = d.position_id
-     AND p.blockchain = d.blockchain
-   WHERE {% if is_incremental() %}
-     d.day >= date_trunc('day', NOW() - INTERVAL '7 days')
-   {% else %}
-     d.day >= date_trunc('day', NOW() - INTERVAL '30 days')
-   {% endif %}
-   ```
-
-2. **Add schema definition** in `models/uniswap/uniswap_schema.yml`:
-
-   ```yaml
-   version: 2
-
-   models:
-     - name: uniswap_v3_lp_positions
-       description: >
-         Daily metrics for Uniswap V3 LP positions including fees earned,
-         impermanent loss, and net profitability.
-       columns:
-         - name: day
-           description: The day for metrics
-           tests:
-             - not_null
-         - name: blockchain
-           description: The blockchain where the position exists
-           tests:
-             - not_null
-         - name: position_id
-           description: Unique identifier for the position NFT
-           tests:
-             - not_null
-         - name: daily_fees_usd
-           description: USD value of fees earned on this day
-         - name: daily_il_usd
-           description: USD value of impermanent loss on this day  
-         - name: daily_profit_usd
-           description: Net profit (fees minus IL) for the day
-         - name: cumulative_profit_usd
-           description: Running total of profit since position creation
-   ```
-
-3. **Test your model** locally:
-
-   ```bash
-   dbt run --select uniswap_v3_lp_positions
-   dbt test --select uniswap_v3_lp_positions
-   ```
-
----
-
-## 🚢 Contributing Your Model
-
-Once your model is working:
-
-1. **Create a branch**:
-   ```bash
-   git checkout -b feature/uniswap-v3-lp-positions
-   ```
-
-2. **Commit your changes**:
-   ```bash
-   git add models/uniswap/
-   git commit -m "Add Uniswap V3 LP profitability model"
-   ```
-
-3. **Push to your fork**:
-   ```bash
-   git push origin feature/uniswap-v3-lp-positions
-   ```
-
-4. **Open a pull request** to the main Spellbook repository
-   - Provide clear description of what your model does
-   - Reference any related issues or discussions
-   - Wait for CI tests to pass
-   - Respond to reviewer feedback
-
----
-
-## 🧠 Best Practices for Spellbook Models
-
-To create high-quality, maintainable models:
-
-1. **Follow the schema convention**:
-   - Base models -> Aggregations -> Unified views
-
-2. **Optimize for query performance**:
-   - Filter early in CTEs
-   - Use incremental materialization for large tables
-   - Include partition keys for time-based data
-
-3. **Document thoroughly**:
-   - Describe each column
-   - Add tests for critical fields
-   - Include sample queries in descriptions
-
-4. **Reuse existing models**:
-   - Check if components already exist before building
-   - Leverage \`ref()\` to create proper dependencies
-
-5. **Use consistent naming**:
-   - snake_case for tables and columns
-   - Include protocol and version in names
-
----
-
-## 💡 Ideas for Contributions
-
-The community needs Spellbook models for:
-
-- **Cross-chain bridges**: Unified bridge flow analytics
-- **NFT marketplace activity**: Standardized trades across platforms
-- **Wallet profiles**: User behavior classification
-- **Account abstraction (ERC-4337)**: UserOp standardization
-- **Protocol-specific metrics**: Revenue, users, engagement
-
-Start with models that solve your own analytics needs—chances are others need them too!
-
----
-
-## 🧙‍♀️ The Power of Community Models
-
-By contributing to Spellbook, you're not just solving your problem—you're enabling an entire ecosystem of insights.
-
-Models you contribute will:
-- Power community dashboards
-- Enable protocol teams to track metrics
-- Allow researchers to test hypotheses
-- Become building blocks for more complex analytics
-
-This is how we collectively build a more transparent, accessible blockchain data ecosystem.
-
----
-
-## 🔮 Conclusion: From SQL Scripts to Data Infrastructure
-
-Contributing to Spellbook represents a shift in mindset—from writing one-off queries to building reusable data infrastructure.
-
-By embedding your knowledge in these shared models, you create leverage for yourself and others. Each contribution makes the entire ecosystem more powerful and accessible.
-
-Start small, focus on quality, and help build the data foundation for the next generation of onchain analytics.
-
-**Next: 15. How to Build an Onchain App Using the Dune API**`
-  },
-  { 
-    number: 15, 
-    title: "How to Build an Onchain App Using the Dune API", 
-    pdfPath: "/Onchain Manifesto/15. How to Build an Onchain App Using the Dune API.pdf",
-    mdContent: `# 15. How to Build an Onchain App Using the Dune API
-
-Until now, we've focused on analyzing blockchain data for dashboards and insights. But what if you could harness this same data to power applications, not just visualizations?
-
-The **Dune API** opens up the world of onchain data to developers, letting you build applications that react to blockchain events, display real-time analytics, and create customized user experiences around blockchain data.
-
-This article will show you how to build apps powered by Dune's vast trove of decoded blockchain data.
-
----
-
-## 🧩 What Is the Dune API?
-
-The Dune API gives programmatic access to:
-
-- **Query execution**: Run existing queries with parameters
-- **Results retrieval**: Get data as JSON for app consumption
-- **Status checking**: Monitor execution progress
-- **Metadata access**: Get information about queries and dashboards
-
-This means you can now integrate the same powerful blockchain analytics you use for dashboards directly into:
-
-- Web applications
-- Mobile apps
-- Discord/Telegram bots
-- Research tools
-- Trading algorithms
-- And more!
-
----
-
-## 🛠️ Setting Up Your API Access
-
-To get started with the Dune API:
-
-1. **Sign up for an API plan** at [dune.com/pricing](https://dune.com/pricing)
-2. **Generate an API key** in your account settings
-3. **Install the client library** for your language:
-
-```bash
-# Python
-pip install dune-client
-
-# JavaScript
-npm install @duneanalytics/api
-```
-
-Or use the REST API directly:
-
-```bash
-curl -X POST https://api.dune.com/api/v1/query/123456/execute \
-  -H "x-dune-api-key: YOUR_API_KEY"
-```
-
----
-
-## 🚀 Example Project: Building a Protocol Health Monitor
-
-Let's build a simple web app that monitors the health of a DeFi protocol. We'll use:
-
-- **React** for the frontend
-- **Node.js** for the API layer
-- **Dune API** for the onchain data
-
-### Step 1: Create the backend API
-
-```javascript
-// server.js
-const express = require('express');
-const { DuneClient } = require('@duneanalytics/api');
-const cors = require('cors');
-
-const app = express();
-app.use(cors());
-
-// Initialize Dune client
-const dune = new DuneClient({ apiKey: process.env.DUNE_API_KEY });
-
-// Protocol health endpoint
-app.get('/api/protocol-health/:protocol', async (req, res) => {
-  try {
-    const { protocol } = req.params;
-    
-    // Execute TVL query
-    const tvlResult = await dune.execute({
-      queryId: 123456,  // Your saved query ID
-      parameters: { protocol: protocol }
-    });
-    
-    // Execute users query
-    const usersResult = await dune.execute({
-      queryId: 789012,  // Your saved query ID
-      parameters: { protocol: protocol }
-    });
-    
-    // Get protocol revenue
-    const revenueResult = await dune.execute({
-      queryId: 345678,  // Your saved query ID
-      parameters: { protocol: protocol }
-    });
-    
-    res.json({
-      tvl: tvlResult.rows,
-      users: usersResult.rows,
-      revenue: revenueResult.rows
-    });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ error: 'Failed to fetch protocol data' });
-  }
-});
-
-app.listen(3001, () => {
-  console.log('API server running on port 3001');
-});
-```
-
-### Step 2: Create the frontend app
-
-```jsx
-// App.jsx
-import React, { useState, useEffect } from 'react';
-import { LineChart, Line, XAxis, YAxis, Tooltip, Legend } from 'recharts';
-import './App.css';
-
-function App() {
-  const [protocolData, setProtocolData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [protocol, setProtocol] = useState('uniswap_v3');
-  
-  useEffect(() => {
-    const fetchData = async () => {
-      setLoading(true);
-      try {
-        const response = await fetch(`http://localhost:3001/api/protocol-health/${protocol}`);
-        const data = await response.json();
-        setProtocolData(data);
-      } catch (error) {
-        console.error('Error fetching data:', error);
-      } finally {
-        setLoading(false);
-      }
-    };
-    
-    fetchData();
-    // Set up polling every 5 minutes
-    const interval = setInterval(fetchData, 300000);
-    return () => clearInterval(interval);
-  }, [protocol]);
-  
-  if (loading) return <div className="loading">Loading protocol data...</div>;
-  
-  return (
-    <div className="app">
-      <h1>{protocol.toUpperCase()} Health Monitor</h1>
-      <select value={protocol} onChange={(e) => setProtocol(e.target.value)}>
-        <option value="uniswap_v3">Uniswap V3</option>
-        <option value="aave_v3">Aave V3</option>
-        <option value="compound_v3">Compound V3</option>
-      </select>
-      
-      <div className="metrics">
-        <div className="metric-card">
-          <h2>Total Value Locked</h2>
-          <LineChart width={500} height={300} data={protocolData.tvl}>
-            <XAxis dataKey="day" />
-            <YAxis />
-            <Tooltip />
-            <Line type="monotone" dataKey="tvl_usd" stroke="#8884d8" />
-          </LineChart>
-        </div>
-        
-        <div className="metric-card">
-          <h2>Daily Active Users</h2>
-          <LineChart width={500} height={300} data={protocolData.users}>
-            <XAxis dataKey="day" />
-            <YAxis />
-            <Tooltip />
-            <Line type="monotone" dataKey="users" stroke="#82ca9d" />
-          </LineChart>
-        </div>
-        
-        <div className="metric-card">
-          <h2>Daily Revenue</h2>
-          <LineChart width={500} height={300} data={protocolData.revenue}>
-            <XAxis dataKey="day" />
-            <YAxis />
-            <Tooltip />
-            <Line type="monotone" dataKey="revenue_usd" stroke="#ffc658" />
-          </LineChart>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-export default App;
-```
-
----
-
-## 📊 Creating Effective API Queries
-
-Not all Dune queries work well for APIs. Here are some best practices:
-
-1. **Keep them focused**
-   - Single purpose queries are more reusable
-   - Fetch only the data you need
-
-2. **Parameterize everything**
-   - Use query parameters for flexibility
-   - Example: `WHERE token_address = {{token_address}}`
-
-3. **Optimize for performance**
-   - Filter early in the query
-   - Limit time ranges when possible
-   - Aggregate where appropriate
-
-4. **Handle rate limits**
-   - Implement caching for frequent requests
-   - Use background jobs for large queries
-
-Example of a well-parameterized query:
-
-```sql
-SELECT 
-  date_trunc('{{time_period}}', block_time) AS period,
-  COUNT(DISTINCT user) AS users,
-  SUM(amount_usd) AS volume_usd
-FROM {{schema_name}}.{{table_name}}
-WHERE block_time > now() - interval '{{lookback_days}} days'
-  AND protocol = '{{protocol_name}}'
-GROUP BY 1
-ORDER BY 1
-```
-
----
-
-## 🧪 Advanced Use Cases
-
-The Dune API enables sophisticated applications:
-
-### 1. Wallet Profiler
-
-Build an app that analyzes any wallet address:
-- DeFi protocol usage
-- NFT trading patterns
-- DEX behaviors
-- Gas spending over time
-
-### 2. Trading Signal Generator
-
-Create algorithmic trading signals based on onchain metrics:
-- Exchange deposit/withdrawal ratios
-- Whale wallet movements
-- Smart money flow detection
-- Unusual contract interactions
-
-### 3. Risk Monitoring
-
-Develop an early warning system for DeFi protocols:
-- TVL outflows above thresholds
-- Collateral ratio deterioration
-- Utilization spikes
-- Governance token concentration
-
-### 4. Community Discord Bot
-
-Build a Discord bot that answers questions with onchain data:
-- "What's the Uniswap volume today?"
-- "Who are the top NFT buyers this week?"
-- "How much ETH moved to exchanges in the last 24 hours?"
-
----
-
-## 🚧 Common Challenges and Solutions
-
-### Handling Long-Running Queries
-
-For queries that take >30 seconds:
-
-```javascript
-const executeQuery = async (queryId, parameters) => {
-  // Start execution
-  const execution = await dune.execute({ queryId, parameters });
-  
-  // Poll until complete
-  while (execution.state !== 'QUERY_STATE_COMPLETED') {
-    if (execution.state === 'QUERY_STATE_FAILED') {
-      throw new Error('Query failed');
-    }
-    
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    execution = await dune.status(execution.execution_id);
-  }
-  
-  return execution.result;
-};
-```
-
-### Implementing Caching
-
-To reduce API costs and improve performance:
-
-```javascript
-const cache = {};
-
-const getCachedData = async (cacheKey, fetchFunction, ttlMinutes = 15) => {
-  const now = Date.now();
-  
-  if (cache[cacheKey] && cache[cacheKey].expiry > now) {
-    return cache[cacheKey].data;
-  }
-  
-  const data = await fetchFunction();
-  
-  cache[cacheKey] = {
-    data,
-    expiry: now + (ttlMinutes * 60 * 1000)
-  };
-  
-  return data;
-};
-```
-
----
-
-## 🧠 Best Practices for Production
-
-When deploying to production:
-
-1. **Secure your API key**
-   - Never expose it in client-side code
-   - Use environment variables or secrets management
-
-2. **Implement rate limiting**
-   - Stay within your plan's execution limits
-   - Add queue management for high-traffic apps
-
-3. **Add observability**
-   - Log query execution times
-   - Monitor API response times
-   - Set up alerts for failures
-
-4. **Build resilience**
-   - Handle API outages gracefully
-   - Implement retries with exponential backoff
-   - Have fallback data sources where possible
-
----
-
-## 🔮 The Future of Data-Powered Dapps
-
-The Dune API represents a shift from passive analytics to active applications:
-
-- **Real-time notifications** based on onchain events
-- **Personalized insights** for individual users
-- **Automated strategies** driven by blockchain data
-- **Community tools** that democratize access to insights
-
-By connecting blockchain data with traditional web applications, you can create experiences that help users make sense of the complex onchain world.
-
----
-
-## 🏁 Conclusion: From Analytics to Applications
-
-The Dune API bridges the gap between data analysis and application development. It allows you to harness the full power of blockchain data to create tools that help users navigate the crypto ecosystem.
-
-Whether you're building a simple dashboard that updates in real-time or a complex application that reacts to onchain events, the architecture is the same: find the right queries, expose them via API, and build a compelling interface.
-
-The most valuable onchain applications won't just display data—they'll help users interpret it and take action.
-
-**Next: 16. Account Abstraction — Why It Matters for Wallet UX and Analysts**`
-  },
-  { 
-    number: 16, 
-    title: "Account Abstraction — Why It Matters for Wallet UX and Analysts", 
-    pdfPath: "/Onchain Manifesto/16. Account Abstraction- Why It Matters for Wallet UX and Analysts.pdf",
-    mdContent: `# 16. Account Abstraction — Why It Matters for Wallet UX and Analysts
-
-Account Abstraction (AA) represents one of the most significant shifts in how users interact with blockchains since smart contracts themselves. For onchain analysts, it introduces a new paradigm for tracking user behavior, transaction patterns, and wallet activity.
-
-This article explores what Account Abstraction means for analysts, what data it generates, and how to track this evolution as it unfolds across the ecosystem.
-
----
-
-## 🧩 What Is Account Abstraction?
-
-At its core, Account Abstraction reimagines blockchain accounts, blurring the line between:
-
-- **EOAs (Externally Owned Accounts)**: Traditional user wallets controlled by private keys
-- **Contract Accounts**: Smart contracts with programmable logic
-
-With Account Abstraction (particularly ERC-4337), users interact with smart contract wallets that enable:
-
-- **Social recovery**: Multiple ways to recover access
-- **Batched transactions**: Multiple actions in one operation
-- **Programmable security**: Custom rules for transactions
-- **Sponsored gas**: Someone else can pay for transactions
-- **Automatic actions**: Recurring payments, conditional transfers
-
----
-
-## 📊 Why AA Matters for Analysts
-
-For data analysts, AA creates both challenges and opportunities:
-
-### Challenges
-
-- **User identity fragmentation**: One user may control multiple smart contract wallets
-- **Transaction attribution**: Who initiated an action vs. who executed it?
-- **Gas sponsorship**: Separating user activity from sponsor costs
-- **Logical vs. actual transactions**: UserOps vs. on-chain transactions
-
-### Opportunities
-
-- **Richer behavioral data**: Smart wallet configs reveal user preferences
-- **Adoption metrics**: Track AA penetration across demographics
-- **UX improvements**: Measure reduced friction in quantifiable ways
-- **Paymaster economics**: Analyze gas sponsorship models and sustainability
-
----
-
-## 🔍 Understanding the ERC-4337 Data Model
-
-ERC-4337 is the standard implementation of Account Abstraction. It introduces new concepts in the data:
-
-### Key Components
-
-- **UserOperation**: The "intent" a user wants to execute
-- **EntryPoint Contract**: A singleton that validates and executes UserOperations
-- **Bundler**: An entity that packages multiple UserOperations into transactions
-- **Paymaster**: An entity that can sponsor gas fees for UserOperations
-
-### Core Tables in Dune
-
-To analyze Account Abstraction activity, focus on these tables:
-
-| Table | Description |
-|-------|-------------|
-| `erc4337_<chain>.UserOperation` | All user operations submitted |
-| `erc4337_<chain>.AccountDeployed` | New smart account deployments |
-| `erc4337_<chain>.Deposited` | Funds added to EntryPoint for gas |
-| `erc4337_<chain>.StakeLocked` | Stake added by paymasters/factories |
-| `erc4337_<chain>.UserOperationRevertReason` | Failed operations |
-
----
-
-## 📈 Example AA Queries in SQL
-
-Let's explore some essential queries for analyzing Account Abstraction.
-
-### 1. Daily AA Activity by Chain
-
-```sql
-SELECT 
-  date_trunc('day', block_time) AS day,
-  blockchain,
-  COUNT(*) AS user_ops,
-  COUNT(DISTINCT sender) AS wallets
-FROM erc4337_ethereum.UserOperation
-WHERE block_time > now() - interval '30 days'
-GROUP BY 1, 2
-ORDER BY 1, 2
-```
-
-### 2. Paymaster Activity Analysis
-
-```sql
-SELECT 
-  paymaster,
-  COUNT(*) AS sponsored_ops,
-  COUNT(DISTINCT sender) AS unique_users,
-  SUM(actualGasCost) / 1e18 AS total_eth_spent,
-  AVG(actualGasCost) / 1e18 AS avg_gas_cost
-FROM erc4337_ethereum.UserOperation
-WHERE paymaster != '0x0000000000000000000000000000000000000000'
-  AND block_time > now() - interval '30 days'
-GROUP BY 1
-ORDER BY 3 DESC
-```
-
-### 3. Smart Wallet Factory Adoption
-
-```sql
-SELECT 
-  factory,
-  COUNT(*) AS wallets_created,
-  MIN(block_time) AS first_deployment,
-  MAX(block_time) AS latest_deployment
-FROM erc4337_ethereum.AccountDeployed
-GROUP BY 1
-ORDER BY 2 DESC
-```
-
-### 4. Gas Savings Analysis
-
-```sql
-SELECT 
-  date_trunc('day', block_time) AS day,
-  AVG(CASE 
-    WHEN paymaster = '0x0000000000000000000000000000000000000000' THEN actualGasCost 
-    ELSE 0 
-  END) / 1e18 AS avg_user_paid_gas,
-  AVG(CASE 
-    WHEN paymaster != '0x0000000000000000000000000000000000000000' THEN actualGasCost 
-    ELSE NULL 
-  END) / 1e18 AS avg_sponsored_gas,
-  COUNT(DISTINCT CASE WHEN paymaster != '0x0000000000000000000000000000000000000000' THEN sender END) / 
-    COUNT(DISTINCT sender) AS pct_users_with_sponsorship
-FROM erc4337_ethereum.UserOperation
-WHERE block_time > now() - interval '30 days'
-GROUP BY 1
-ORDER BY 1
-```
-
----
-
-## 🔎 Wallet Classification in the AA Era
-
-With Account Abstraction, wallet classification becomes more complex but more revealing:
-
-### Wallet Factory Analysis
-
-```sql
-WITH wallet_deployments AS (
-  SELECT 
-    sender AS wallet,
-    factory
-  FROM erc4337_ethereum.AccountDeployed
-)
-
-SELECT 
-  CASE 
-    WHEN factory LIKE '%safe%' THEN 'Safe'
-    WHEN factory LIKE '%biconomy%' THEN 'Biconomy'
-    WHEN factory LIKE '%zerodev%' THEN 'ZeroDev'
-    ELSE 'Other'
-  END AS wallet_provider,
-  COUNT(DISTINCT wallet) AS wallets
-FROM wallet_deployments
-GROUP BY 1
-ORDER BY 2 DESC
-```
-
-### User Behavior Patterns
-
-```sql
-WITH wallet_activity AS (
-  SELECT 
-    sender,
-    COUNT(*) AS op_count,
-    COUNT(DISTINCT date_trunc('day', block_time)) AS active_days,
-    MIN(block_time) AS first_op,
-    MAX(block_time) AS last_op,
-    SUM(CASE WHEN paymaster != '0x0000000000000000000000000000000000000000' THEN 1 ELSE 0 END) / 
-      COUNT(*) AS sponsored_op_ratio
-  FROM erc4337_ethereum.UserOperation
-  WHERE block_time > now() - interval '90 days'
-  GROUP BY 1
-)
-
-SELECT 
-  CASE 
-    WHEN op_count < 5 THEN 'Low activity'
-    WHEN op_count < 20 THEN 'Medium activity'
-    ELSE 'High activity'
-  END AS activity_tier,
-  CASE 
-    WHEN sponsored_op_ratio > 0.8 THEN 'Mostly sponsored'
-    WHEN sponsored_op_ratio > 0.2 THEN 'Mixed payment'
-    ELSE 'Self-paying'
-  END AS payment_pattern,
-  COUNT(*) AS wallet_count,
-  AVG(active_days) AS avg_active_days,
-  AVG(last_op - first_op) AS avg_lifetime_days
-FROM wallet_activity
-WHERE datediff('day', first_op, now()) >= 7
-GROUP BY 1, 2
-ORDER BY 3 DESC
-```
-
----
-
-## 🧠 Advanced AA Analytics: The Aggregated View
-
-To get a complete picture of AA activity across all chains, use Spellbook's unified tables:
-
-```sql
-SELECT 
-  blockchain,
-  COUNT(*) AS user_ops,
-  COUNT(DISTINCT sender) AS unique_wallets,
-  COUNT(DISTINCT block_date) AS active_days,
-  SUM(op_fee_usd) AS total_fees_usd
-FROM account_abstraction_erc4337.userops
-WHERE block_date > now() - interval '30 days'
-GROUP BY 1
-ORDER BY 2 DESC
-```
-
-This unified view helps you track:
-- Cross-chain AA adoption rates
-- Relative activity by blockchain
-- Standardized metrics regardless of blockchain
-
----
-
-## 📊 Building an AA Dashboard
-
-A comprehensive Account Abstraction dashboard should include:
-
-1. **Adoption Metrics**:
-   - Daily UserOps vs. traditional transactions
-   - New AA wallets created
-   - Percentage of transactions using AA
-
-2. **Wallet Provider Analysis**:
-   - Market share by factory
-   - Retention rates by wallet provider
-   - Features used by wallet type
-
-3. **Paymaster Economics**:
-   - Top paymasters by operations
-   - Paymaster costs and sustainability
-   - User acquisition costs via gas sponsorship
-
-4. **User Experience Metrics**:
-   - Transaction failure rates
-   - Gas savings compared to EOAs
-   - Complexity of operations (batched actions)
-
----
-
-## 🔮 The Future of Account Abstraction Analytics
-
-As AA adoption grows, analysts will need to evolve their approaches:
-
-- **Identity resolution**: Linking AA wallets to the same user
-- **Cross-chain activity tracking**: Following users across L2s
-- **Session keys analysis**: Temporary permissions and their usage
-- **Intent vs. execution gap**: Measuring the delta between user intent and onchain settlement
-
-Successful analysts in the AA era will:
-1. Understand the technical stack (EntryPoints, Bundlers, Paymasters)
-2. Track both low-level operations and high-level user intents
-3. Develop new metrics focused on UX improvements
-4. Create multi-dimensional user profiles based on wallet behavior
-
----
-
-## 🏁 Conclusion: The New Frontier of Wallet Analytics
-
-Account Abstraction represents a fundamental shift in how users interact with blockchains. For analysts, it's both a challenge and an opportunity—requiring new mental models, new queries, and new metrics.
-
-By understanding the AA data structure and building the right analytics, you can track the evolution of crypto UX in real-time. This isn't just about new tables or events—it's about a new paradigm for what a "wallet" means in Web3.
-
-As AA adoption grows, the analysts who master these new data patterns will have unprecedented insight into user behavior, business models, and the evolving blockchain UX landscape.
-
-**Next: 17. ERC-4337 Aggregated Tables Across EVM Chains: Unified Analytics at Scale**`
-  },
-  { 
-    number: 17, 
-    title: "ERC-4337 Aggregated Tables Across EVM Chains: Unified Analytics at Scale", 
-    pdfPath: "/Onchain Manifesto/17. ERC-4337 Aggregated Tables Across EVM Chains- Unified Analytics at Scale.pdf",
-    mdContent: `# 17. ERC-4337 Aggregated Tables Across EVM Chains: Unified Analytics at Scale
-
-The ERC-4337 Account Abstraction standard is being deployed across multiple EVM chains—from Ethereum to L2s like Arbitrum and Optimism to sidechains like Polygon. This creates a significant challenge for analysts: how do you track consistent metrics across this fragmented landscape?
-
-In this article, we'll explore how to use Dune's unified Account Abstraction tables to analyze smart wallet adoption, user behavior, and economic patterns across all EVM chains simultaneously. The future of wallet analytics is cross-chain, and these aggregated tables are your map to this new territory.
-
----
-
-## 🌐 The Challenge of Cross-Chain AA Analytics
-
-Smart wallets are inherently multi-chain, with users deploying contract wallets across different networks for different purposes:
-
-- Ethereum L1 for high-value transactions
-- Arbitrum or Optimism for regular DeFi activity
-- Polygon or Base for frequent, low-cost operations
-
-Before unified tables, this created significant analytical challenges:
-
-- Different table names across chains
-- Inconsistent field formats or units
-- Missing chains in your analysis
-- Manual aggregation requirements
-- No standardized metrics
-
----
-
-## 🧩 Enter the Unified ERC-4337 Tables
-
-Dune's Spellbook now includes aggregated tables that standardize Account Abstraction data across all supported EVM chains:
-
-```
-account_abstraction_erc4337.userops
-account_abstraction_erc4337.wallet_deployments
-account_abstraction_erc4337.bundler_activity
-account_abstraction_erc4337.paymaster_operations
-```
-
-These tables:
-- Maintain consistent column naming
-- Normalize values (like gas costs to USD)
-- Standardize wallet identification
-- Include a `blockchain` field for filtering
-- Cover all supported chains in one query
-
----
-
-## 📊 Cross-Chain Queries in Action
-
-Let's explore some powerful analytics enabled by these unified tables.
-
-### 1. Total ERC-4337 Activity by Chain
-
-```sql
-SELECT 
-  blockchain,
-  COUNT(*) AS userops,
-  COUNT(DISTINCT tx_hash) AS transactions,
-  COUNT(DISTINCT sender) AS wallets,
-  SUM(op_fee_usd) AS total_fees_usd
-FROM account_abstraction_erc4337.userops
-WHERE block_date > now() - interval '30 days'
-GROUP BY 1
-ORDER BY 2 DESC
-```
-
-This single query gives you a complete picture of where AA activity is concentrated, which would previously require multiple separate queries.
-
-### 2. Daily Adoption Trends Across Chains
-
-```sql
-SELECT 
-  block_date AS day,
-  blockchain,
-  COUNT(DISTINCT sender) AS active_wallets,
-  COUNT(*) AS userops
-FROM account_abstraction_erc4337.userops
-WHERE block_date > now() - interval '90 days'
-GROUP BY 1, 2
-ORDER BY 1, 2
-```
-
-Track the growth trajectory of AA adoption by chain over time to identify market shifts and emerging trends.
-
-### 3. Cross-Chain User Analysis
-
-```sql
+-- Chain migration patterns
 WITH wallet_chain_activity AS (
   SELECT
     sender,
-    COUNT(DISTINCT blockchain) AS chains_used
-  FROM account_abstraction_erc4337.userops
-  WHERE block_date > now() - interval '60 days'
-  GROUP BY 1
+    blockchain,
+    MIN(block_time) as first_activity,
+    MAX(block_time) as last_activity
+  FROM erc4337_unified.user_operations
+  GROUP BY 1, 2
+),
+
+wallet_activity_ordered AS (
+  SELECT
+    sender,
+    blockchain,
+    first_activity,
+    ROW_NUMBER() OVER (PARTITION BY sender ORDER BY first_activity) as chain_order
+  FROM wallet_chain_activity
 )
 
 SELECT
-  chains_used,
-  COUNT(DISTINCT sender) AS wallet_count,
-  COUNT(DISTINCT sender) / SUM(COUNT(DISTINCT sender)) OVER () AS percentage
-FROM wallet_chain_activity
-GROUP BY 1
-ORDER BY 1
-```
+  first_chain.blockchain as first_chain,
+  second_chain.blockchain as second_chain,
+  COUNT(*) as migration_count
+FROM wallet_activity_ordered first_chain
+JOIN wallet_activity_ordered second_chain 
+  ON first_chain.sender = second_chain.sender
+  AND first_chain.chain_order = 1
+  AND second_chain.chain_order = 2
+GROUP BY 1, 2
+ORDER BY 3 DESC
+\`\`\`
 
-This query reveals what percentage of AA users operate across multiple chains, giving insight into cross-chain behavior patterns.
+### 4. Paymaster Usage Across Chains
 
-### 4. Bundler Market Share Analysis
+Compare paymaster strategies across different chains:
 
-```sql
+\`\`\`sql
+-- Paymaster usage by chain
+SELECT
+  blockchain,
+  CASE 
+    WHEN paymaster IS NULL THEN 'No Paymaster'
+    ELSE 'With Paymaster'
+  END as paymaster_usage,
+  COUNT(*) as op_count,
+  COUNT(*) * 100.0 / SUM(COUNT(*)) OVER (PARTITION BY blockchain) as percentage
+FROM erc4337_unified.user_operations
+WHERE block_time > now() - interval '30 days'
+GROUP BY 1, 2
+ORDER BY 1, 3 DESC
+\`\`\`
+
+### 5. Bundler Market Share by Chain
+
+Analyze bundler dominance across different networks:
+
+\`\`\`sql
+-- Bundler market share by chain
+WITH bundler_activity AS (
+  SELECT
+    blockchain,
+    bundler,
+    COUNT(*) as ops_bundled,
+    100.0 * COUNT(*) / SUM(COUNT(*)) OVER (PARTITION BY blockchain) as market_share
+  FROM erc4337_unified.user_operations
+  WHERE block_time > now() - interval '30 days'
+  GROUP BY 1, 2
+)
+
 SELECT
   blockchain,
   bundler,
-  COUNT(*) AS userops_processed,
-  COUNT(DISTINCT sender) AS wallets_served,
-  SUM(op_fee_usd) AS total_fees_usd,
-  COUNT(*) / SUM(COUNT(*)) OVER (PARTITION BY blockchain) AS market_share
-FROM account_abstraction_erc4337.bundler_activity
-WHERE block_date > now() - interval '30 days'
-GROUP BY 1, 2
-ORDER BY 1, 6 DESC
-```
+  COALESCE(b.bundler_name, 'Unknown') as bundler_name,
+  ops_bundled,
+  market_share
+FROM bundler_activity a
+LEFT JOIN erc4337_unified.bundler_metadata b ON a.bundler = b.address
+WHERE market_share > 1.0  -- Only show bundlers with >1% share
+ORDER BY blockchain, market_share DESC
+\`\`\`
 
-Track which bundlers dominate which chains and how market concentration varies by network.
+## Advanced Cross-Chain Metrics
 
----
+### 1. Chain-Specific Gas Efficiency
 
-## 🔬 Advanced Cross-Chain Analytics
+Compare the gas efficiency of AA operations across chains:
 
-### 5. Wallet Deployment Trends by Factory
-
-```sql
-SELECT
-  block_date AS day,
-  CASE 
-    WHEN factory LIKE '%safe%' THEN 'Safe'
-    WHEN factory LIKE '%biconomy%' THEN 'Biconomy'
-    WHEN factory LIKE '%zerodev%' THEN 'ZeroDev'
-    ELSE 'Other'
-  END AS wallet_provider,
-  blockchain,
-  COUNT(*) AS wallets_deployed
-FROM account_abstraction_erc4337.wallet_deployments
-WHERE block_date > now() - interval '90 days'
-GROUP BY 1, 2, 3
-ORDER BY 1, 4 DESC
-```
-
-This reveals which wallet providers are winning on which chains, with potential insights into regional or use-case preferences.
-
-### 6. Gas Sponsorship Patterns
-
-```sql
+\`\`\`sql
+-- Gas efficiency by chain
 SELECT
   blockchain,
-  SUM(CASE WHEN paymaster != '0x0000000000000000000000000000000000000000' THEN 1 ELSE 0 END) AS sponsored_ops,
-  COUNT(*) AS total_ops,
-  SUM(CASE WHEN paymaster != '0x0000000000000000000000000000000000000000' THEN 1 ELSE 0 END) / 
-    COUNT(*)::float AS sponsored_ratio,
-  SUM(CASE WHEN paymaster != '0x0000000000000000000000000000000000000000' THEN op_fee_usd ELSE 0 END) AS sponsored_fees_usd
-FROM account_abstraction_erc4337.userops
-WHERE block_date > now() - interval '30 days'
+  AVG(gas_used) as avg_gas_used,
+  PERCENTILE_CONT(0.5) WITHIN GROUP (ORDER BY gas_used) as median_gas_used,
+  MIN(gas_used) as min_gas_used,
+  MAX(gas_used) as max_gas_used
+FROM erc4337_unified.user_operations
+WHERE block_time > now() - interval '30 days'
+  AND success = true
 GROUP BY 1
-ORDER BY 4 DESC
-```
+ORDER BY 2
+\`\`\`
 
-Different chains show different patterns of gas sponsorship, revealing where paymasters are most active.
+### 2. Implementation Popularity Across Chains
 
-### 7. Cross-Chain User Journey
+Identify which wallet implementations are most popular on each chain:
 
-```sql
-WITH user_first_chain AS (
+\`\`\`sql
+-- Wallet implementation popularity by chain
+WITH implementations AS (
   SELECT
-    sender,
-    first_value(blockchain) OVER (
-      PARTITION BY sender 
-      ORDER BY block_time 
-      ROWS BETWEEN UNBOUNDED PRECEDING AND UNBOUNDED FOLLOWING
-    ) AS first_chain
-  FROM account_abstraction_erc4337.userops
-),
-
-user_subsequent_chains AS (
-  SELECT
-    u.sender,
-    u.blockchain,
-    f.first_chain
-  FROM account_abstraction_erc4337.userops u
-  JOIN user_first_chain f ON u.sender = f.sender
-  WHERE u.blockchain != f.first_chain
-  GROUP BY 1, 2, 3
+    blockchain,
+    factory,
+    COUNT(DISTINCT sender) as wallet_count,
+    COUNT(*) as op_count
+  FROM erc4337_unified.user_operations
+  WHERE block_time > now() - interval '90 days'
+  GROUP BY 1, 2
 )
 
 SELECT
-  first_chain AS onboarding_chain,
-  blockchain AS expansion_chain,
-  COUNT(DISTINCT sender) AS users_expanded
-FROM user_subsequent_chains
-GROUP BY 1, 2
-ORDER BY 1, 3 DESC
-```
+  i.blockchain,
+  i.factory,
+  COALESCE(w.implementation_name, 'Unknown') as implementation_name,
+  i.wallet_count,
+  i.op_count,
+  100.0 * i.wallet_count / SUM(i.wallet_count) OVER (PARTITION BY i.blockchain) as wallet_share
+FROM implementations i
+LEFT JOIN erc4337_unified.wallet_implementations w 
+  ON i.factory = w.factory_address 
+  AND i.blockchain = w.blockchain
+ORDER BY i.blockchain, i.wallet_count DESC
+\`\`\`
 
-This complex query tracks which chains users start on and where they expand to, revealing onboarding and migration patterns.
+### 3. Cross-Chain vs Single-Chain User Behavior
 
----
+Compare behavior of users who operate on multiple chains versus those who stick to one:
 
-## 📈 Building a Comprehensive Cross-Chain AA Dashboard
+\`\`\`sql
+-- Cross-chain vs single-chain user behavior
+WITH wallet_chain_counts AS (
+  SELECT
+    sender,
+    COUNT(DISTINCT blockchain) as chain_count
+  FROM erc4337_unified.user_operations
+  WHERE block_time > now() - interval '60 days'
+  GROUP BY 1
+),
 
-A complete Account Abstraction dashboard using unified tables should include:
+wallet_activity AS (
+  SELECT
+    u.sender,
+    COUNT(*) as op_count,
+    AVG(CASE WHEN paymaster IS NOT NULL THEN 1 ELSE 0 END) as paymaster_usage_rate,
+    COUNT(DISTINCT date_trunc('day', block_time)) as active_days,
+    c.chain_count
+  FROM erc4337_unified.user_operations u
+  JOIN wallet_chain_counts c ON u.sender = c.sender
+  WHERE block_time > now() - interval '60 days'
+  GROUP BY 1, c.chain_count
+)
 
-1. **Chain Comparison Panel**
-   - Active wallets by chain
-   - UserOps per wallet by chain
-   - Fee distribution across chains
+SELECT
+  CASE
+    WHEN chain_count = 1 THEN 'Single-chain users'
+    ELSE 'Multi-chain users'
+  END as user_type,
+  COUNT(*) as wallet_count,
+  AVG(op_count) as avg_operations,
+  AVG(paymaster_usage_rate) as avg_paymaster_usage,
+  AVG(active_days) as avg_active_days
+FROM wallet_activity
+GROUP BY 1
+ORDER BY 1
+\`\`\`
 
-2. **User Migration Flows**
-   - First chain vs. most active chain
-   - Chain usage over time per cohort
-   - Shared vs. chain-specific wallet addresses
+## Building a Cross-Chain ERC-4337 Dashboard
 
-3. **Wallet Provider Analysis**
-   - Factory market share by chain
-   - Deployment costs across chains
-   - User retention by provider and chain
+Using these unified tables, we can create a comprehensive dashboard that shows:
 
-4. **Paymaster Economics**
-   - Sponsorship rates by chain
-   - Cost per acquired user
-   - Paymaster sustainability metrics
+1. **Adoption Overview**
+   - Daily UserOperations by chain
+   - Active smart accounts by chain
+   - New wallet deployments by chain
 
-5. **Meta Bundler Analytics**
-   - Market concentration by chain
-   - Pricing differences across chains
-   - UserOp success rates by bundler
+2. **Cross-Chain Activity**
+   - Multi-chain wallet percentage
+   - Chain preference changes over time
+   - First-chain vs. expansion-chain comparison
 
----
+3. **Implementation Analysis**
+   - Wallet implementation market share by chain
+   - Bundler market share by chain
+   - Paymaster usage patterns by chain
 
-## 🧪 Practical Applications of Cross-Chain AA Analytics
+4. **Performance Metrics**
+   - Gas efficiency comparison
+   - Transaction success rates
+   - Operation complexity across chains
 
-### For Wallet Providers
+## Challenges in Cross-Chain ERC-4337 Analytics
 
-- Identify which chains have the highest user retention
-- Optimize deployment costs across networks
-- Track feature usage by chain
+Several challenges arise when unifying ERC-4337 data across chains:
 
-### For Paymasters
+### 1. Address Consistency
 
-- Calculate user acquisition costs by chain
-- Identify optimal sponsorship strategies
-- Project runway based on current costs
+The same logical entity may have different addresses on different chains. To solve this:
 
-### For Dapp Developers
+\`\`\`sql
+-- Create a mapping table for logical entities across chains
+CREATE TABLE erc4337_unified.logical_entity_mapping (
+  logical_entity_id VARCHAR PRIMARY KEY,
+  entity_type VARCHAR NOT NULL,  -- 'bundler', 'paymaster', 'factory', etc.
+  ethereum_address BYTEA,
+  optimism_address BYTEA,
+  arbitrum_address BYTEA,
+  polygon_address BYTEA,
+  -- additional chains...
+  metadata JSONB  -- Additional metadata about the entity
+);
+\`\`\`
 
-- Understand which chains have the most engaged AA users
-- Analyze transaction complexity across networks
-- Identify integration opportunities based on wallet popularity
+### 2. Implementation Differences
 
-### For Investors
+Subtle implementation differences exist between chains:
 
-- Track nascent wallet providers gaining traction
-- Identify emerging patterns in user behavior
-- Evaluate market share shifts among infrastructure providers
+\`\`\`sql
+-- Track implementation differences
+CREATE TABLE erc4337_unified.implementation_differences (
+  blockchain VARCHAR NOT NULL,
+  entry_point BYTEA NOT NULL,
+  implementation_version VARCHAR NOT NULL,
+  differences_from_standard TEXT,
+  PRIMARY KEY (blockchain, entry_point)
+);
+\`\`\`
 
----
+### 3. Data Availability Latency
 
-## 🚀 Key Metrics to Track
+Different chains have different data availability guarantees. Address this by tracking:
 
-When building your cross-chain AA analytics framework, focus on these key metrics:
+\`\`\`sql
+-- Track data freshness
+SELECT
+  blockchain,
+  MAX(block_time) as latest_block_time,
+  now() - MAX(block_time) as data_lag
+FROM erc4337_unified.user_operations
+GROUP BY 1
+ORDER BY 3
+\`\`\`
 
-1. **Growth Metrics**
-   - New wallets deployed per day by chain
-   - UserOps per active wallet (engagement)
-   - Retention: wallets active after 7/30/90 days
+## The Future of Cross-Chain ERC-4337 Analytics
 
-2. **Economic Metrics**
-   - Average operation cost by chain
-   - Sponsored vs. self-paid operation ratio
-   - Cost savings compared to EOA transactions
+As account abstraction adoption grows, cross-chain analytics will evolve:
 
-3. **Technical Metrics**
-   - UserOp success rates by chain
-   - Operation complexity (calldata size, actions per op)
-   - Bundler performance and reliability
+1. **Unified Identity Tracking**: Following the same logical user across chains
+2. **Cross-Chain UX Comparison**: Measuring which chains provide better AA user experience
+3. **Ecosystem Competition Analysis**: How ecosystems compete for AA wallet share
+4. **Standardization Monitoring**: Tracking implementation convergence or divergence
+5. **Cross-Chain Paymaster Economics**: Comparing paymaster business models across chains
 
-4. **User Behavior Metrics**
-   - Multi-chain usage patterns
-   - Operation frequency distribution
-   - Wallet feature utilization
+## Conclusion
 
----
+ERC-4337 is inherently cross-chain compatible, and its adoption across multiple EVM chains creates rich opportunities for comparative analytics. By building unified, aggregated tables that normalize data across chains, analysts can gain deeper insights into:
 
-## 🧠 Future of Cross-Chain AA Analytics
+- How users migrate between chains
+- Which chains provide the best AA experience
+- How implementation strategies differ by ecosystem
+- Where innovation in AA features is happening fastest
 
-As ERC-4337 adoption grows, the analytics will evolve to include:
-
-- **Intent vs. Execution Analytics**: Measuring the gap between user instructions and onchain settlement
-- **Gas Market Dynamics**: How bundlers optimize across multiple chains
-- **Session Key Usage Patterns**: Analyzing delegation and permissions across chains
-- **Wallet Social Graphs**: Mapping connections between contract wallets and their controllers
-- **ZK-Enabled Privacy Features**: Balancing analytics with emerging privacy solutions
-
-The unified tables will continue to expand to include these new dimensions, allowing analysts to stay at the forefront of the Account Abstraction revolution.
-
----
-
-## 🏁 Conclusion: A New Era of Wallet Intelligence
-
-The unified ERC-4337 tables represent a quantum leap in our ability to understand smart wallet adoption and usage patterns. Instead of piecing together fragmented data across chains, analysts can now build comprehensive views of the entire ecosystem with single queries.
-
-This cross-chain visibility is essential for understanding the true impact of Account Abstraction, as users increasingly operate across multiple networks based on their specific needs.
-
-By mastering these unified tables, you'll develop insights that would be impossible to discover through chain-by-chain analysis, positioning yourself at the forefront of the next generation of blockchain intelligence.
-
-**Next: 18. Why the Future Belongs to Onchain Analysts**`
+As account abstraction becomes the dominant wallet paradigm, these cross-chain metrics will become essential for understanding user behavior in an increasingly multi-chain world.
+`,
   },
-  { 
-    number: 18, 
-    title: "Why the Future Belongs to Onchain Analysts", 
-    pdfPath: "/Onchain Manifesto/18. Why the Future Belongs to Onchain Analysts.pdf",
+  {
+    number: 18,
+    title: "Why the Future Belongs to Onchain Analysts",
     mdContent: `# 18. Why the Future Belongs to Onchain Analysts
 
-Throughout this series, we've explored the technical foundations, analytical approaches, and powerful tools of the onchain data ecosystem. But we've only scratched the surface of what's possible.
+## The Rise of Transparent Finance
+
+We are witnessing a pivotal shift in financial systems — from closed, proprietary infrastructures to open, transparent protocols. This transition is creating unprecedented opportunities for data analysts who can extract insights from blockchain data.
+
+### The Transparency Revolution
+
+Traditional finance operates behind closed doors:
+- Bank transactions are private
+- Trading activity is only partially reported
+- Lending terms are hidden in fine print
+- Settlement occurs days after trading
+
+In contrast, blockchain finance is radically transparent:
+- Every transaction is publicly visible
+- Trading occurs on public venues
+- Lending happens through open protocols
+- Settlement is instantaneous and verifiable
+
+This transparency creates an entirely new playing field where analysts with the right skills can gain unprecedented insights.
+
+## The Growing Demand for Onchain Analysis
+
+The market for blockchain analytics is experiencing rapid growth:
+
+\`\`\`sql
+-- Simulated growth of onchain data volume
+WITH data_growth AS (
+  SELECT
+    date_trunc('month', generate_series(
+      '2018-01-01'::timestamp,
+      '2025-12-01'::timestamp,
+      interval '1 month'
+    )) as month,
+    CASE
+      WHEN date_part('year', generate_series) < 2020 THEN
+        10000 * date_part('year', generate_series) - 20000000
+      WHEN date_part('year', generate_series) < 2022 THEN
+        50000 * date_part('year', generate_series) - 100000000
+      ELSE
+        100000 * date_part('year', generate_series) - 200000000
+    END as monthly_transactions
+)
+
+SELECT
+  month,
+  monthly_transactions,
+  SUM(monthly_transactions) OVER (ORDER BY month) as cumulative_transactions
+FROM data_growth
+WHERE month >= '2018-01-01'
+ORDER BY month
+\`\`\`
+
+Several factors are driving this growth:
+
+### 1. Institutional Adoption
+
+Major financial players are entering the blockchain space:
+- BlackRock launching Bitcoin ETFs
+- JPMorgan developing blockchain settlement systems
+- Major banks offering crypto custody
+- Traditional finance firms hiring blockchain analysts
+
+### 2. Regulatory Requirements
+
+Regulators worldwide are increasing scrutiny of blockchain activities:
+- AML compliance requirements
+- Transaction monitoring mandates
+- Risk assessment requirements
+- Forensic investigation needs
+
+### 3. Strategic Decision-Making
+
+Organizations need blockchain data for strategic decisions:
+- Protocol governance
+- Treasury management
+- Competitive analysis
+- Market opportunities
+
+### 4. Research and Development
+
+Blockchain data fuels innovation:
+- Academic research
+- Protocol design
+- Market structure analysis
+- Novel financial products
+
+## The Unique Skill Set of Onchain Analysts
+
+Onchain analysts combine several disciplines:
+
+1. **Database query skills**
+   - SQL mastery for data extraction
+   - Query optimization for large datasets
+   - Complex joins across multiple tables
+
+2. **Blockchain domain knowledge**
+   - Protocol mechanics understanding
+   - Smart contract architecture
+   - Tokenomics principles
+   - DeFi mechanism design
+
+3. **Financial analysis**
+   - Market structure analysis
+   - Liquidity assessment
+   - Risk modeling
+   - Valuation methodologies
+
+4. **Data visualization**
+   - Effective chart design
+   - Interactive dashboard creation
+   - Time-series visualization
+   - Network graph representation
 
-In this final chapter, we'll look ahead to the future of onchain analytics and why analysts who master this domain will play a pivotal role in shaping the next evolution of the decentralized economy.
+5. **Critical thinking**
+   - Separating signal from noise
+   - Identifying meaningful patterns
+   - Questioning assumptions
+   - Drawing measured conclusions
+
+## Career Opportunities for Onchain Analysts
 
----
+The job market for blockchain analysts is diversifying:
 
-## 🔮 The Broadening Data Horizon
+| Role | Organization Type | Key Responsibilities |
+|------|-------------------|----------------------|
+| Blockchain Data Analyst | Analytics Platforms | Building queries and dashboards for users |
+| Protocol Analyst | DAOs & Foundations | Analyzing protocol performance and health metrics |
+| DeFi Risk Analyst | Investment Firms | Assessing risk and opportunities in DeFi |
+| Onchain Market Analyst | Trading Firms | Tracking market microstructure and liquidity |
+| Blockchain Economist | Research Organizations | Studying tokenomics and economic patterns |
+| Compliance Analyst | Exchanges & Regulated Entities | Transaction monitoring and risk flagging |
+| Smart Contract Analyst | Security Firms | Auditing contract behavior and risk patterns |
+| NFT Market Analyst | NFT Platforms | Tracking collection performance and trends |
+| Gaming Economics Analyst | Web3 Gaming Companies | Analyzing in-game economies and behavior |
+| Treasury Manager | DAOs & Corporations | Managing protocol or corporate treasury |
 
-The scope of onchain data is expanding exponentially:
+## The Future Landscape
+
+Several emerging trends will further expand opportunities for onchain analysts:
 
-### Multi-Chain Reality
+### 1. AI-Enhanced Analytics
 
-From EVM chains to Cosmos, Solana, and emerging L2 ecosystems, analysts now need to track activity across an increasingly fragmented landscape.
+Machine learning combined with blockchain data will:
+- Identify anomalous transactions
+- Predict market movements
+- Automatically surface insights
+- Scale analysis capabilities
 
-### Real-World Assets
+### 2. Real-World Asset Tokenization
 
-As real estate, securities, carbon credits, and other traditional assets move onchain, the data becomes more valuable beyond crypto-native applications.
+As traditional assets move onchain:
+- Real estate analytics
+- Securities analysis
+- Supply chain tracking
+- Carbon credit verification
 
-### Identity and Reputation
+### 3. Cross-Chain Analytics
 
-Zero-knowledge proofs, verifiable credentials, and on-chain identity solutions create new dimensions of data to analyze.
+The multi-chain ecosystem demands:
+- Unified data models
+- Cross-chain capital flow tracking
+- Comparative protocol analysis
+- Fragmented liquidity assessment
 
-### AI Integration
+### 4. Layer 2 and Data Availability Layers
 
-Large language models and machine learning are beginning to parse blockchain data, enabling natural language interfaces to complex analytics.
+New scaling solutions create:
+- Multi-layered data analysis
+- Rollup behavior tracking
+- DA sampling validation
+- Bridged asset monitoring
 
----
+### 5. Privacy Solutions
 
-## 💡 Emerging Analytics Use Cases
+Privacy technologies will require:
+- Statistical approaches to analysis
+- Zero-knowledge proof validation
+- Privacy pool monitoring
+- Compliance solutions for private transactions
 
-The applications of onchain analytics are evolving far beyond trading:
+## Building Your Career as an Onchain Analyst
 
-### 1. Governance Intelligence
+To succeed in this field:
 
-As DAOs and protocols mature, there's growing demand for:
-- Voter participation and delegate analysis
-- Proposal impact simulation
-- Treasury management optimization
-- Stakeholder alignment metrics
+### 1. Develop Technical Proficiency
 
-### 2. Risk Management
+Master the fundamental skills:
+- Learn SQL thoroughly (including window functions, CTEs, etc.)
+- Understand blockchain structure and event logs
+- Build visualization skills (Dune, Flipside, Footprint, etc.)
+- Basic programming in Python or R for data analysis
 
-Traditional finance is integrating crypto exposure, requiring:
-- Cross-collateral risk modeling
-- Counterparty exposure analytics
-- Contagion pathway mapping
-- Compliance and transaction monitoring
+### 2. Build a Public Portfolio
 
-### 3. Market Structure Analysis
+Showcase your skills through:
+- Public dashboards on analytics platforms
+- GitHub repositories with analysis scripts
+- Blog posts explaining methodologies
+- Twitter threads highlighting insights
 
-Understanding the evolving dynamics of decentralized markets:
-- Liquidation cascades and system stress testing
-- MEV impact on price formation
-- Liquidity fragmentation measurement
-- Cross-chain arbitrage efficiency
+### 3. Join the Analytics Community
 
-### 4. Real-World Integration
+Connect with peers:
+- Participate in Discord communities (Dune, Nansen, etc.)
+- Attend blockchain analytics meetups and conferences
+- Contribute to open-source analytics projects
+- Join data-focused DAOs and working groups
 
-As blockchain technology bridges to traditional systems:
-- Supply chain verification analytics
-- Carbon credit retirement validation
-- Securities settlement optimization
-- Payment flows and remittance tracking
+### 4. Specialize Strategically
 
----
+Develop expertise in areas with growing demand:
+- Cross-chain analytics
+- DeFi risk assessment
+- MEV and market structure
+- RWA tokenization metrics
+- Privacy-preserving analytics
 
-## 🛠️ The Evolving Toolkit
+## Conclusion
 
-The analyst's toolkit continues to expand:
+The blockchain revolution is still in its early stages, but the analytical foundations being laid today will shape how we understand this new financial system for decades to come.
 
-### From SQL to AI Agents
+As an onchain analyst, you have a unique opportunity to:
 
-- Natural language interfaces to blockchain data
-- AI-assisted anomaly detection
-- Automated pattern recognition
-- Query generation from conversational prompts
+1. **Help shape a new financial paradigm**
+   - Contribute to the design of more efficient, fair markets
+   - Enable transparent governance and accountability
+   - Create metrics that define success in the space
 
-### Decentralized Computation
+2. **Develop high-demand, transferable skills**
+   - Database querying at scale
+   - Financial data analysis
+   - Critical evaluation of complex systems
+   - Technical communication
 
-- Zero-knowledge proofs for private analytics
-- Decentralized data warehousing
-- Trustless validation of analytical results
-- Cross-chain indexing protocols
+3. **Work at the frontier of innovation**
+   - Analyze mechanisms never before possible
+   - Study novel economic and social arrangements
+   - Contribute to groundbreaking research
 
-### Standardization Efforts
+The transparent economy created by blockchain technology demands skilled analysts who can convert raw data into actionable insights. By developing your skills in this area, you position yourself at the forefront of the most significant transformation in financial systems since the digital revolution.
 
-- Universal data schemas across chains
-- Common metrics definitions
-- Interoperable dashboard frameworks
-- Cross-platform identity resolution
+As blockchains continue to evolve and adoption accelerates, the demand for skilled onchain analysts will only grow. The future of finance is transparent, and those who can navigate and interpret this transparency will play a crucial role in shaping that future.
+`,
+  },
+];
 
----
-
-## 🧩 From Analyst to Builder
-
-The line between analyst and builder is blurring:
-
-### Analytics as Infrastructure
-
-- Query APIs powering applications
-- Real-time monitoring systems
-- Algorithmic governance systems
-- Data DAOs and decentralized analytics
-
-### Democratized Insights
-
-- On-chain dashboards as public goods
-- Education-focused visualization
-- Community-maintained data models
-- Open analytics challenges and bounties
-
----
-
-## 🔭 Career Opportunities in Onchain Analytics
-
-The demand for skilled analysts continues to grow across sectors:
-
-### Protocol Teams
-
-- Core metrics definition and monitoring
-- User behavior analysis
-- Economic parameter optimization
-- Competitor and market analysis
-
-### Investment Firms
-
-- Due diligence automation
-- Alpha generation from on-chain signals
-- Portfolio monitoring and risk management
-- Thematic research and trend identification
-
-### DAOs and Communities
-
-- Treasury management dashboards
-- Contributor activity tracking
-- Voting power and delegation analysis
-- Community health metrics
-
-### Traditional Enterprises
-
-- Blockchain integration analytics
-- Compliance and risk monitoring
-- Customer behavior insights
-- Supply chain verification
-
----
-
-## 📋 Skills of the Future Onchain Analyst
-
-To thrive in this evolving landscape, focus on developing:
-
-### Technical Foundations
-
-- Multi-chain data structures
-- Advanced SQL and data modeling
-- Statistical analysis and data science
-- API integration and automation
-
-### Domain Expertise
-
-- Economic mechanism design
-- DeFi protocol architecture
-- Governance systems
-- Zero-knowledge cryptography
-
-### Communication Skills
-
-- Data storytelling and visualization
-- Technical writing and documentation
-- Community engagement
-- Educational content creation
-
-### Ethical Understanding
-
-- Privacy considerations
-- Responsible disclosure
-- Sybil attack detection
-- Market manipulation awareness
-
----
-
-## 🔍 The Path Forward
-
-For analysts looking to advance in this field:
-
-### 1. Build in Public
-
-- Publish dashboards on Dune or Flipside
-- Share insights on Twitter/X and research platforms
-- Contribute to Spellbook and open data models
-- Participate in analytics DAOs and communities
-
-### 2. Specialize Strategically
-
-- Focus on emerging areas like Account Abstraction
-- Develop cross-chain analysis frameworks
-- Pioneer new metrics for nascent protocols
-- Bridge traditional finance analytics to DeFi
-
-### 3. Teach Others
-
-- Write tutorials and educational content
-- Host workshops and study groups
-- Mentor newcomers to the space
-- Translate complex concepts for broader audiences
-
-### 4. Collaborate Across Disciplines
-
-- Partner with smart contract developers
-- Work with economists on mechanism design
-- Consult with governance specialists
-- Engage with privacy researchers
-
----
-
-## 🧠 Final Thoughts: The Renaissance Analyst
-
-The onchain analyst isn't just a technical role—it's a renaissance position at the intersection of technology, economics, governance, and community.
-
-In a world where trusted third parties have traditionally been the arbiters of truth in financial systems, onchain analysts are pioneering a new approach: trust through transparency.
-
-By surfacing insights from public ledgers, creating standardized metrics, and building open tools, these analysts are establishing a new paradigm for how we understand economic activity.
-
-The most impactful work in this field won't just be about tracking numbers—it will be about making the complex accessible, the opaque transparent, and the technical practical.
-
-The future belongs to onchain analysts not because they can query databases, but because they can translate the raw reality of blockchain data into actionable intelligence that helps shape the direction of the decentralized economy.
-
----
-
-## 📚 Where to Go Next
-
-As you continue your journey:
-
-- **Join communities** like Dune's Discord or MetricsDAO
-- **Follow thought leaders** in blockchain analytics
-- **Contribute to open source** data models and tools
-- **Apply your skills** to real-world problems
-- **Share what you learn** with others entering the field
-
----
-
-The transparent economy is still in its earliest days. The queries you write, the metrics you standardize, and the insights you surface will help shape its evolution.
-
-This isn't just about analyzing a new kind of data—it's about developing a new way of seeing the world.
-
-The ledger is open. The data is waiting. The future is transparent.
-
-Now go build it.
-
-**End of Series**`
-  }
-]
