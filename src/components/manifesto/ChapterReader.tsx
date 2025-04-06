@@ -5,6 +5,7 @@ import { ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
 import { ManifestoChapter } from '@/data/manifestoChapters';
 import MarkdownRenderer from './MarkdownRenderer';
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { useIsMobile } from '@/hooks/use-mobile';
 
 interface ChapterReaderProps {
   currentChapter: number;
@@ -24,6 +25,7 @@ const ChapterReader: React.FC<ChapterReaderProps> = ({
   const chapter = chapters[currentChapter];
   const showMarkdown = chapter && mdContent; // Always prefer markdown if available
   const isLastChapter = currentChapter >= chapters.length - 1;
+  const isMobile = useIsMobile();
   
   // Get info about the next chapter for the call-to-action link
   const nextChapter = !isLastChapter ? chapters[currentChapter + 1] : null;
@@ -71,7 +73,11 @@ const ChapterReader: React.FC<ChapterReaderProps> = ({
                   onClick={onNextChapter}
                   className="group flex items-center gap-2 text-indigo-700 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 text-lg"
                 >
-                  <span>Next: {nextChapterTitle}</span>
+                  {isMobile ? (
+                    <span>Next Chapter</span>
+                  ) : (
+                    <span>Next: {nextChapterTitle}</span>
+                  )}
                   <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
                 </Button>
               </div>
