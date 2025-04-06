@@ -54,29 +54,26 @@ const TextProcessor: React.FC<TextProcessorProps> = ({ text }) => {
     return parts.length > 0 ? parts : input;
   };
   
-  // Clean all standalone ** characters and properly format bold text
+  // Process bold text after handling links
   const processBoldText = (textNode: string | React.ReactNode): React.ReactNode => {
     if (typeof textNode !== 'string') {
       return textNode;
     }
     
-    // First, remove any standalone ** that aren't part of proper bold formatting
-    let cleanedText = textNode;
+    // Remove standalone ** characters that don't properly form bold text
+    const cleanedText = textNode.replace(/\*\*(?!\s)(?!.*\*\*)/g, '').replace(/(?<!\*\*.*)\*\*/g, '');
     
-    // Replace any remaining standalone ** that aren't properly paired
-    cleanedText = cleanedText.replace(/\*\*(?!\s)(?![^*]*\*\*)/g, ''); // Leading **
-    cleanedText = cleanedText.replace(/(?<!\*\*[^*]*)\*\*/g, '');     // Trailing **
-    
-    // Now process properly paired ** for bold text
-    const boldRegex = /\*\*([^*]+)\*\*/g;
-    const segments = cleanedText.split(boldRegex);
+    // Process actual bold text (text between ** markers)
+    const segments = cleanedText.split(/(\*\*[^*]+\*\*)/g);
     
     return segments.map((segment, idx) => {
-      // For odd indices, these are the captures from the regex (the content between **)
-      if (idx % 2 === 1) {
-        return <strong key={idx} className="text-blue-700 dark:text-blue-400">{segment}</strong>;
+      // Check if this segment is bold (surrounded by **)
+      if (segment.startsWith('**') && segment.endsWith('**')) {
+        // Remove the ** and render as bold
+        const cleanText = segment.substring(2, segment.length - 2);
+        return <strong key={idx} className="text-blue-700 dark:text-blue-400">{cleanText}</strong>;
       }
-      // For even indices, these are the regular text segments
+      // Regular text
       return <React.Fragment key={idx}>{segment}</React.Fragment>;
     });
   };
