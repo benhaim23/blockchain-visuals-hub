@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { BookOpen, FileText, Sparkles } from "lucide-react";
@@ -33,6 +34,24 @@ const OnchainManifesto: React.FC = () => {
     setCurrentChapter(chapterIndex);
     setActiveTab("reader");
   };
+
+  // Listen for custom selectChapter events
+  useEffect(() => {
+    const handleChapterSelect = (e: CustomEvent) => {
+      const chapterNum = e.detail;
+      const chapterIndex = manifestoChapters.findIndex(ch => ch.number === chapterNum);
+      if (chapterIndex !== -1) {
+        setCurrentChapter(chapterIndex);
+        setActiveTab("reader");
+      }
+    };
+
+    window.addEventListener('selectChapter', handleChapterSelect as EventListener);
+    
+    return () => {
+      window.removeEventListener('selectChapter', handleChapterSelect as EventListener);
+    };
+  }, []);
 
   useEffect(() => {
     const loadContent = async () => {
