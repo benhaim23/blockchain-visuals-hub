@@ -10,6 +10,7 @@ import TableOfContents from '@/components/manifesto/TableOfContents';
 import ChapterReader from '@/components/manifesto/ChapterReader';
 import { toast } from '@/components/ui/use-toast';
 import { MatrixText } from '@/components/ui/matrix-text';
+import { GlowingBox } from '@/components/ui/glowing-box';
 
 const OnchainManifesto: React.FC = () => {
   const [activeTab, setActiveTab] = useState("toc");
@@ -108,41 +109,43 @@ const OnchainManifesto: React.FC = () => {
             and how to derive meaningful insights from blockchain networks.
           </p>
 
-          <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="w-full mb-6">
-              <TabsTrigger value="toc" className="flex-1">
-                <FileText className="mr-2 h-4 w-4" />
-                Table of Contents
-              </TabsTrigger>
-              <TabsTrigger value="reader" className="flex-1">
-                <BookOpen className="mr-2 h-4 w-4" />
-                Reader
-              </TabsTrigger>
-            </TabsList>
+          <GlowingBox className="mb-6">
+            <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+              <TabsList className="w-full mb-6">
+                <TabsTrigger value="toc" className="flex-1">
+                  <FileText className="mr-2 h-4 w-4" />
+                  Table of Contents
+                </TabsTrigger>
+                <TabsTrigger value="reader" className="flex-1">
+                  <BookOpen className="mr-2 h-4 w-4" />
+                  Reader
+                </TabsTrigger>
+              </TabsList>
 
-            <TabsContent value="toc" className="mt-0">
-              <TableOfContents 
-                chapters={manifestoChapters} 
-                onSelectChapter={handleSelectChapter} 
-              />
-            </TabsContent>
-
-            <TabsContent value="reader" className="mt-0">
-              {isLoading ? (
-                <div className="bg-card/80 backdrop-blur-sm rounded-lg border border-border min-h-[600px] flex items-center justify-center">
-                  <p>Loading chapter content...</p>
-                </div>
-              ) : (
-                <ChapterReader 
-                  currentChapter={currentChapter}
-                  chapters={manifestoChapters}
-                  mdContent={mdContent}
-                  onPreviousChapter={goToPreviousChapter}
-                  onNextChapter={goToNextChapter}
+              <TabsContent value="toc" className="mt-0">
+                <TableOfContents 
+                  chapters={manifestoChapters} 
+                  onSelectChapter={handleSelectChapter} 
                 />
-              )}
-            </TabsContent>
-          </Tabs>
+              </TabsContent>
+
+              <TabsContent value="reader" className="mt-0">
+                {isLoading ? (
+                  <div className="bg-card/80 backdrop-blur-sm rounded-lg border border-border min-h-[600px] flex items-center justify-center">
+                    <p>Loading chapter content...</p>
+                  </div>
+                ) : (
+                  <ChapterReader 
+                    currentChapter={currentChapter}
+                    chapters={manifestoChapters}
+                    mdContent={mdContent}
+                    onPreviousChapter={goToPreviousChapter}
+                    onNextChapter={goToNextChapter}
+                  />
+                )}
+              </TabsContent>
+            </Tabs>
+          </GlowingBox>
         </div>
       </div>
       <MusicPlayer />
