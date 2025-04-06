@@ -1,11 +1,12 @@
 
 import React, { useState, useEffect } from 'react';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, ExternalLink } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Skeleton } from '@/components/ui/skeleton';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 import type { Project } from '@/data/projects';
 
@@ -17,6 +18,7 @@ interface ProjectCardProps {
 const ProjectCard: React.FC<ProjectCardProps> = ({ project, index }) => {
   const [imageLoaded, setImageLoaded] = useState(false);
   const [imageError, setImageError] = useState(false);
+  const [isHovering, setIsHovering] = useState(false);
 
   // Handle image loading errors
   const handleImageError = () => {
@@ -78,15 +80,52 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, index }) => {
           </div>
         </CardContent>
         {project.link && (
-          <CardFooter>
+          <CardFooter className="pt-2 pb-5">
             <Button 
-              variant="ghost" 
-              className="text-primary px-0 flex items-center gap-1 hover:gap-2 transition-all"
+              variant="default" 
+              size="sm"
+              className={cn(
+                "text-foreground/90 rounded-full pl-4 pr-3 bg-primary/80 hover:bg-primary shadow-sm",
+                "flex items-center gap-2 group transition-all duration-300 hover:shadow-md",
+                "relative overflow-hidden border-none"
+              )}
               onClick={() => window.open(project.link, '_blank')}
+              onMouseEnter={() => setIsHovering(true)}
+              onMouseLeave={() => setIsHovering(false)}
             >
-              <span>View Details</span>
-              <ArrowRight className="h-4 w-4" />
+              <span className="relative z-10 font-medium">View Details</span>
+              <ExternalLink 
+                className={cn(
+                  "h-4 w-4 relative z-10 transition-transform duration-300 ease-out",
+                  isHovering ? "translate-x-1" : ""
+                )} 
+              />
+              <div className={cn(
+                "absolute inset-0 bg-primary/50 rounded-full transition-all duration-300 ease-in-out",
+                isHovering ? "opacity-100" : "opacity-0"
+              )} />
             </Button>
+            <TooltipProvider>
+              <Tooltip>
+                <TooltipTrigger asChild>
+                  <Button
+                    variant="ghost" 
+                    size="icon"
+                    className="ml-auto h-8 w-8 rounded-full hover:bg-accent/20"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      window.open(project.link, '_blank');
+                    }}
+                  >
+                    <ExternalLink className="h-4 w-4" />
+                    <span className="sr-only">Open in new tab</span>
+                  </Button>
+                </TooltipTrigger>
+                <TooltipContent>
+                  <p>Open in new tab</p>
+                </TooltipContent>
+              </Tooltip>
+            </TooltipProvider>
           </CardFooter>
         )}
       </Card>
