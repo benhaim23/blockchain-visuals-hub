@@ -9,7 +9,6 @@ import Contact from '@/components/Contact';
 import Footer from '@/components/Footer';
 import ParticleBackground from '@/components/ParticleBackground';
 import MusicPlayer from '@/components/MusicPlayer';
-import { ThemeProvider } from '@/context/ThemeContext';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 const Index: React.FC = () => {
@@ -46,7 +45,7 @@ const Index: React.FC = () => {
   }, [isMobile]);
 
   return (
-    <ThemeProvider>
+    <>
       <div className="relative min-h-screen overflow-x-hidden">
         <ParticleBackground />
         <Header />
@@ -62,7 +61,7 @@ const Index: React.FC = () => {
         <Footer />
         <MusicPlayer />
       </div>
-    </ThemeProvider>
+    </>
   );
 };
 

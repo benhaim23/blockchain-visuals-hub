@@ -7,6 +7,7 @@ import { ChevronLeft, ChevronRight, BookOpen, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Header from '@/components/Header';
 import MusicPlayer from '@/components/MusicPlayer';
+import { ThemeProvider } from '@/context/ThemeContext';
 
 const manifestoChapters = [
   { 
@@ -144,7 +145,7 @@ const OnchainManifesto: React.FC = () => {
   };
 
   return (
-    <>
+    <ThemeProvider>
       <Header />
       <div className="min-h-screen pt-24 pb-16">
         <div className="container mx-auto px-4 max-w-5xl">
@@ -264,7 +265,7 @@ const OnchainManifesto: React.FC = () => {
         </div>
       </div>
       <MusicPlayer />
-    </>
+    </ThemeProvider>
   );
 };
 
