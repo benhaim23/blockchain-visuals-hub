@@ -9,7 +9,7 @@ const TextProcessor: React.FC<TextProcessorProps> = ({ text }) => {
   // Remove the "Next: XX. Chapter Title" line if it's the last line of the content
   // This is now handled by the ChapterReader component's CTA button
   const processNextChapterText = (input: string) => {
-    return input.replace(/\n\*\*Next:.*?\*\*\s*$/, '');
+    return input.replace(/\n?\*\*Next:.*?\*\*\s*$/, '');
   };
 
   // Process the text to remove redundant next chapter text first

@@ -28,7 +28,7 @@ const ChapterReader: React.FC<ChapterReaderProps> = ({
   // Get info about the next chapter for the call-to-action link
   const nextChapter = !isLastChapter ? chapters[currentChapter + 1] : null;
   const nextChapterTitle = nextChapter ? 
-    `${currentChapter + 1 === 0 ? 'Executive Summary' : `Chapter ${currentChapter + 1}`}: ${nextChapter.title}` : '';
+    `${nextChapter.number}. ${nextChapter.title}` : '';
   
   return (
     <div className="bg-white/90 dark:bg-card/80 backdrop-blur-sm rounded-lg border-2 border-blue-200 dark:border-slate-700 min-h-[600px] flex flex-col shadow-lg transition-all duration-300 hover:shadow-xl dark:hover:border-primary/40 hover:border-blue-300">
