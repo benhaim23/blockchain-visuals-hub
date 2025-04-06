@@ -1,216 +1,212 @@
 
-import React, { useEffect, useState, useMemo } from 'react';
-import { useAnimatedText } from '@/hooks/useAnimatedText';
+import React from 'react';
+import ReactMarkdown from 'react-markdown';
+import { PrismLight as SyntaxHighlighter } from 'react-syntax-highlighter';
+import { vscDarkPlus } from 'react-syntax-highlighter/dist/esm/styles/prism';
+import remarkGfm from 'remark-gfm';
+import CodeBlock from './renderers/CodeBlock';
 import SqlCodeBlock from './renderers/SqlCodeBlock';
 import TextProcessor from './renderers/TextProcessor';
-import CodeBlock from './renderers/CodeBlock';
 import TableRow from './renderers/TableRow';
-import { 
-  isWithinCodeBlock, 
-  isSqlCodeBlock, 
-  extractCodeBlock, 
-  cleanHeaderText,
-  isStandaloneQuery,
-  extractSqlQueries
-} from './utils/markdownUtils';
 
 interface MarkdownRendererProps {
   content: string;
 }
 
 const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
-  const [isVisible, setIsVisible] = useState(false);
-  const animatedContent = useAnimatedText(content, "\n");
-  
-  useEffect(() => {
-    setIsVisible(true);
-  }, [content]);
+  // Register language for syntax highlighting
+  const registerLanguage = () => {
+    // This is intentionally empty as we're using PrismLight which loads languages dynamically
+  };
 
-  // Reset visibility when content changes
-  useEffect(() => {
-    setIsVisible(false);
-    const timer = setTimeout(() => setIsVisible(true), 100);
-    return () => clearTimeout(timer);
-  }, [content]);
+  const processMarkdownHeadings = (markdown: string): string => {
+    // Regex to find h1 headers (# Header)
+    const h1Regex = /^# (.*?)$/gm;
+    
+    // Replace h1 headers with styled versions, ensuring they have the indigo color
+    return markdown.replace(h1Regex, (match, headerText) => {
+      // Check if header already contains **
+      if (headerText.includes('**')) {
+        return `# ${headerText}`;
+      }
+      // Add ** around the header text to make it bold and thus styled by TextProcessor
+      return `# **${headerText.trim()}**`;
+    });
+  };
 
-  // Convert markdown content to HTML - Memoize this expensive operation
-  const renderedContent = useMemo(() => {
-    const allLines = animatedContent.split('\n');
-    const renderedLines = [];
-    
-    for (let i = 0; i < allLines.length; i++) {
-      const line = allLines[i];
-      
-      // Skip horizontal rules (------) completely
-      if (line.trim() === '------') {
-        continue;
-      }
-      
-      // Code blocks starting
-      if (line.trim().startsWith('```')) {
-        // Check if this is an SQL code block
-        if (isSqlCodeBlock(allLines, i)) {
-          // Extract the complete code block
-          const { content: codeContent, endIndex } = extractCodeBlock(allLines, i);
-          const blockIndex = renderedLines.length;
-          
-          renderedLines.push(
-            <div key={`code-${i}`}>
-              <SqlCodeBlock content={codeContent} blockIndex={blockIndex} />
-            </div>
-          );
-          
-          // Skip to the end of the code block
-          i = endIndex;
-          continue;
-        }
-        
-        // Handle regular code blocks (non-SQL)
-        const { content: codeContent, endIndex } = extractCodeBlock(allLines, i);
-        
-        // Determine the language from the opening line
-        let language = "sql"; // Default
-        const langMatch = line.trim().match(/^```(\w+)/);
-        if (langMatch && langMatch[1]) {
-          language = langMatch[1];
-        }
-        
-        renderedLines.push(
-          <CodeBlock key={`code-${i}`} content={codeContent} language={language} />
-        );
-        
-        // Skip to the end of the code block
-        i = endIndex;
-        continue;
-      }
-      
-      // Headers
-      if (line.startsWith('# ')) {
-        renderedLines.push(
-          <h1 key={i} className="text-3xl font-bold mt-6 mb-4 text-indigo-900 dark:text-indigo-300">
-            {cleanHeaderText(line.substring(2))}
-          </h1>
-        );
-      } else if (line.startsWith('## ')) {
-        renderedLines.push(
-          <h2 key={i} className="text-2xl font-bold mt-5 mb-3 text-indigo-800 dark:text-indigo-400">
-            {cleanHeaderText(line.substring(3))}
-          </h2>
-        );
-      } else if (line.startsWith('### ')) {
-        renderedLines.push(
-          <h3 key={i} className="text-xl font-bold mt-4 mb-2 text-indigo-700 dark:text-indigo-400">
-            {cleanHeaderText(line.substring(4))}
-          </h3>
-        );
-      } else if (line.startsWith('#### ')) {
-        renderedLines.push(
-          <h4 key={i} className="text-lg font-bold mt-3 mb-2 text-indigo-700 dark:text-indigo-400">
-            {cleanHeaderText(line.substring(5))}
-          </h4>
-        );
-      }
-      
-      // Lists
-      else if (line.startsWith('- ')) {
-        renderedLines.push(
-          <li key={i} className="ml-6 mb-1 text-slate-700 dark:text-slate-300">
-            <TextProcessor text={line.substring(2)} />
-          </li>
-        );
-      } 
-      
-      // Bold text or regular text with ** formatting
-      else if (line.includes('**')) {
-        renderedLines.push(
-          <p key={i} className="mb-4 text-slate-700 dark:text-slate-300">
-            <TextProcessor text={line} />
-          </p>
-        );
-      }
-      
-      // Blockquotes
-      else if (line.startsWith('> ')) {
-        renderedLines.push(
-          <blockquote key={i} className="border-l-4 border-blue-400 dark:border-blue-500 bg-blue-50 dark:bg-blue-900/20 pl-4 py-2 italic my-4 text-slate-600 dark:text-slate-300 rounded-r">
-            <TextProcessor text={line.substring(2)} />
-          </blockquote>
-        );
-      }
-      
-      // Tables
-      else if (line.startsWith('| ')) {
-        // This is a table separator row, skip rendering but don't return null
-        if (line.includes('---')) {
-          renderedLines.push(<div key={i} className="hidden"></div>);
-          continue;
-        }
-        
-        const cells = line.split('|').filter(cell => cell.trim() !== '');
-        
-        // Detect if this is a header row (typically the first row in a table)
-        const isHeaderRow = i < allLines.length - 1 && 
-                         allLines[i + 1]?.includes('---') &&
-                         allLines[i + 1]?.startsWith('|');
-        
-        const isFirstRow = i === allLines.findIndex(l => l.startsWith('| '));
-        
-        renderedLines.push(
-          <TableRow 
-            key={i} 
-            cells={cells} 
-            isHeaderRow={isHeaderRow} 
-            isFirstRow={isFirstRow}
-            rowIndex={i}
-          />
-        );
-      }
-      
-      // Horizontal rule
-      else if (line === '---') {
-        renderedLines.push(<hr key={i} className="my-6 border-t-2 border-blue-100 dark:border-slate-700" />);
-      }
-      
-      // Empty line
-      else if (line.trim() === '') {
-        renderedLines.push(<div key={i} className="h-4"></div>);
-      }
-      
-      // Check for standalone SQL queries and render them as SQL blocks
-      else if (isStandaloneQuery(line) && line.includes(' ')) {
-        // Collect all following lines that look like they're part of the same query
-        const { content: queryContent, endIndex } = extractSqlQueries(allLines, i);
-        const blockIndex = renderedLines.length;
-        
-        renderedLines.push(
-          <div key={`sql-query-${i}`}>
-            <SqlCodeBlock content={queryContent} blockIndex={blockIndex} />
-          </div>
-        );
-        
-        // Skip to after the query
-        i = endIndex;
-        continue;
-      }
-      
-      // Regular paragraph
-      else {
-        // Process inline formatting 
-        renderedLines.push(
-          <p key={i} className="mb-4 text-slate-700 dark:text-slate-300">
-            <TextProcessor text={line} />
-          </p>
-        );
-      }
-    }
-    
-    return renderedLines;
-  }, [animatedContent]);
+  // Process the content before rendering
+  const processedContent = processMarkdownHeadings(content);
 
   return (
-    <div className={`prose dark:prose-invert max-w-none prose-slate prose-headings:text-indigo-900 dark:prose-headings:text-indigo-300 prose-a:text-blue-600 dark:prose-a:text-blue-400 transition-opacity duration-500 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
-      {renderedContent}
-    </div>
+    <ReactMarkdown
+      remarkPlugins={[remarkGfm]}
+      components={{
+        // Handle code blocks
+        code({ node, inline, className, children, ...props }) {
+          const match = /language-(\w+)/.exec(className || '');
+          const language = match && match[1];
+
+          if (!inline && language) {
+            if (language === 'sql') {
+              return (
+                <SqlCodeBlock language={language}>
+                  {String(children).replace(/\n$/, '')}
+                </SqlCodeBlock>
+              );
+            }
+
+            return (
+              <CodeBlock language={language}>
+                {String(children).replace(/\n$/, '')}
+              </CodeBlock>
+            );
+          }
+
+          return (
+            <code className="bg-slate-100 dark:bg-slate-800 px-1 py-0.5 rounded text-sm font-mono text-rose-600 dark:text-rose-400" {...props}>
+              {children}
+            </code>
+          );
+        },
+        
+        // Handle paragraph with TextProcessor
+        p(props) {
+          return (
+            <p className="mb-4 text-slate-700 dark:text-slate-300 leading-relaxed">
+              <TextProcessor text={props.children as string} />
+            </p>
+          );
+        },
+
+        // Style headings
+        h1(props) {
+          return (
+            <h1 className="text-3xl font-bold mb-6 mt-8 text-indigo-700 dark:text-indigo-300">
+              <TextProcessor text={props.children as string} />
+            </h1>
+          );
+        },
+
+        h2(props) {
+          return (
+            <h2 className="text-2xl font-bold mb-4 mt-6 text-indigo-700 dark:text-indigo-300">
+              <TextProcessor text={props.children as string} />
+            </h2>
+          );
+        },
+
+        h3(props) {
+          return (
+            <h3 className="text-xl font-bold mb-3 mt-5 text-indigo-700 dark:text-indigo-300">
+              <TextProcessor text={props.children as string} />
+            </h3>
+          );
+        },
+
+        // Handle blockquotes
+        blockquote(props) {
+          return (
+            <blockquote className="border-l-4 border-blue-400 dark:border-blue-600 pl-4 italic my-6 text-slate-600 dark:text-slate-400">
+              {props.children}
+            </blockquote>
+          );
+        },
+
+        // Handle lists
+        ul(props) {
+          return <ul className="list-disc pl-6 mb-4 space-y-2 text-slate-700 dark:text-slate-300">{props.children}</ul>;
+        },
+
+        ol(props) {
+          return <ol className="list-decimal pl-6 mb-4 space-y-2 text-slate-700 dark:text-slate-300">{props.children}</ol>;
+        },
+
+        // Handle tables
+        table(props) {
+          return (
+            <div className="mb-6 mt-6 overflow-hidden w-full rounded-lg border border-blue-200 dark:border-slate-700">
+              {props.children}
+            </div>
+          );
+        },
+
+        tbody(props) {
+          return <div className="divide-y divide-blue-200 dark:divide-slate-700">{props.children}</div>;
+        },
+
+        thead(props) {
+          return <div>{props.children}</div>;
+        },
+
+        tr(props) {
+          const rowIndex = props.node?.position?.start?.line || 0;
+          const isHeader = props.node?.position?.start?.column === 1;
+          const isFirstRow = rowIndex === (props.node?.parent?.position?.start?.line || 0);
+          
+          // Extract cells from the component's children
+          const cells: string[] = React.Children.toArray(props.children)
+            .filter((child): child is React.ReactElement => React.isValidElement(child))
+            .map(child => {
+              // Extract the text content from the cell
+              const cellContent = React.Children.toArray(child.props.children)
+                .map(grandchild => {
+                  if (typeof grandchild === 'string') return grandchild;
+                  if (React.isValidElement(grandchild)) {
+                    return React.Children.toArray(grandchild.props.children).join('');
+                  }
+                  return '';
+                })
+                .join('');
+              
+              return cellContent;
+            });
+
+          return <TableRow 
+            cells={cells} 
+            isHeaderRow={isHeader} 
+            isFirstRow={isFirstRow} 
+            rowIndex={rowIndex} 
+          />;
+        },
+
+        th() {
+          // These are handled by TableRow
+          return null;
+        },
+
+        td() {
+          // These are handled by TableRow
+          return null;
+        },
+
+        // Handle links
+        a(props) {
+          return (
+            <a 
+              href={props.href} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:underline transition-colors"
+            >
+              {props.children}
+            </a>
+          );
+        },
+
+        // Handle images
+        img(props) {
+          return (
+            <img 
+              src={props.src} 
+              alt={props.alt || 'Image'} 
+              className="max-w-full h-auto my-4 rounded-lg shadow-md"
+            />
+          );
+        },
+      }}
+    >
+      {processedContent}
+    </ReactMarkdown>
   );
 };
 

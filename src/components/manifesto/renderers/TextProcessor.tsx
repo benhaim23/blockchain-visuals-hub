@@ -16,7 +16,7 @@ const TextProcessor: React.FC<TextProcessorProps> = ({ text }) => {
         if (segment.startsWith('**') && segment.endsWith('**')) {
           // Remove the ** and render as bold
           const cleanText = segment.substring(2, segment.length - 2);
-          return <strong key={idx} className="text-blue-700 dark:text-blue-400">{cleanText}</strong>;
+          return <strong key={idx} className="text-indigo-700 dark:text-indigo-300">{cleanText}</strong>;
         }
         // Regular text
         return <React.Fragment key={idx}>{segment}</React.Fragment>;

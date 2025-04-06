@@ -2,7 +2,7 @@
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
-import { ManifestoChapter } from '@/data/manifestoChapters';
+import { ManifestoChapter } from '@/data/manifestoChapters_updated';
 import MarkdownRenderer from './MarkdownRenderer';
 import { ScrollArea } from "@/components/ui/scroll-area";
 
