@@ -974,4 +974,5 @@ SELECT
 FROM nft_ethereum.mints
 WHERE block_time > now() - interval '7 days'
 GROUP BY 1
-ORDER BY 2
+ORDER BY 2 DESC
+LIMIT
