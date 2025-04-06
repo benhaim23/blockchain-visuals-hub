@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { BarChart, PieChart, AreaChart, Users, Megaphone, Briefcase, Code, Database, Network, Shield, Search, FlaskConical, Award, GraduationCap, CheckCircle, Bookmark, Medal, FileCheck } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -21,25 +22,37 @@ const SkillCategory: React.FC<SkillCategoryProps> = ({
   skills,
   className,
 }) => (
-  <Card className={cn("glass-card h-full", className)}>
+  <Card className={cn("glass-card h-full group transition-all duration-300 hover:shadow-lg", className)}>
     <CardHeader className="flex flex-row items-start space-x-4 pb-2">
-      <div className="p-2 rounded-md bg-primary/10">{icon}</div>
-      <div className="space-y-1">
-        <CardTitle>{title}</CardTitle>
+      <div className="p-2.5 rounded-md bg-primary/10 transition-all duration-300 group-hover:bg-primary/20">{icon}</div>
+      <div className="space-y-1.5">
+        <CardTitle className="group-hover:text-primary transition-colors duration-300">{title}</CardTitle>
         <CardDescription>{description}</CardDescription>
       </div>
     </CardHeader>
     <CardContent>
       <div className="space-y-4">
-        {skills.map((skill) => (
-          <div key={skill.name} className="space-y-2">
-            <div className="flex flex-wrap gap-1.5">
-              <Badge variant="outline" className="font-medium text-primary">{skill.name}</Badge>
+        {skills.map((skill, index) => (
+          <motion.div 
+            key={skill.name} 
+            className="space-y-2"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: index * 0.1, duration: 0.3 }}
+          >
+            <div className="flex flex-wrap gap-2">
+              <Badge variant="outline" className="font-medium text-primary py-1.5">{skill.name}</Badge>
               {skill.keywords?.map((keyword, idx) => (
-                <Badge key={idx} variant="secondary" className="text-xs">{keyword}</Badge>
+                <Badge 
+                  key={idx} 
+                  variant="secondary" 
+                  className="text-xs opacity-80 hover:opacity-100 transition-opacity duration-200"
+                >
+                  {keyword}
+                </Badge>
               ))}
             </div>
-          </div>
+          </motion.div>
         ))}
       </div>
     </CardContent>
@@ -193,22 +206,50 @@ const Skills: React.FC = () => {
   };
 
   return (
-    <section id="skills" className="section-container">
-      <div className="max-w-4xl mx-auto text-center mb-12">
-        <div className="badge badge-primary inline-block mb-2">My Expertise</div>
-        <h2 className="section-title">Skills & Proficiencies</h2>
-        <p className="section-subtitle">
+    <section id="skills" className="section-container py-20">
+      <div className="max-w-4xl mx-auto text-center mb-16">
+        <motion.div 
+          className="badge badge-primary inline-block mb-3 px-4 py-1.5 rounded-full bg-primary/10 text-primary font-medium"
+          initial={{ opacity: 0, y: -20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5 }}
+        >
+          My Expertise
+        </motion.div>
+        <motion.h2 
+          className="section-title text-4xl font-bold mb-4"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.2 }}
+        >
+          Skills & Proficiencies
+        </motion.h2>
+        <motion.p 
+          className="section-subtitle text-muted-foreground max-w-3xl mx-auto"
+          initial={{ opacity: 0 }}
+          whileInView={{ opacity: 1 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.5, delay: 0.3 }}
+        >
           With a diverse skill set spanning operations, product development, research, and data analytics,
           I bring specialized expertise to navigate the complexities of the crypto ecosystem and NFT space.
-        </p>
+        </motion.p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <motion.div 
+        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-16"
+        variants={container}
+        initial="hidden"
+        whileInView="show"
+        viewport={{ once: true }}
+      >
         {skillCategories.map((category, index) => (
-          <div
+          <motion.div
             key={index}
-            className="animate-fade-in-up"
-            style={{ animationDelay: `${index * 0.1}s` }}
+            variants={item}
+            className="h-full"
           >
             <SkillCategory
               title={category.title}
@@ -216,36 +257,46 @@ const Skills: React.FC = () => {
               icon={category.icon}
               skills={category.skills}
             />
-          </div>
+          </motion.div>
         ))}
-      </div>
+      </motion.div>
 
-      <div className="mt-12 animate-fade-in-up" style={{ animationDelay: '0.9s' }}>
-        <h3 className="text-xl font-semibold mb-6 text-center inline-flex items-center gap-2">
-          <Award className="h-5 w-5 text-primary" />
-          Certifications & Education
-        </h3>
+      <motion.div 
+        className="mt-20"
+        initial={{ opacity: 0, y: 40 }}
+        whileInView={{ opacity: 1, y: 0 }}
+        viewport={{ once: true }}
+        transition={{ duration: 0.7 }}
+      >
+        <div className="flex items-center justify-center gap-3 mb-10">
+          <div className="h-px w-12 bg-primary/30"></div>
+          <h3 className="text-2xl font-semibold text-center inline-flex items-center gap-2">
+            <Award className="h-6 w-6 text-primary" />
+            Certifications & Education
+          </h3>
+          <div className="h-px w-12 bg-primary/30"></div>
+        </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           {/* Certifications Card */}
           <motion.div
-            className="glass-card rounded-xl overflow-hidden border-2 border-primary/10 hover:border-primary/30 transition-all duration-300"
+            className="glass-card rounded-xl overflow-hidden border-2 border-primary/10 hover:border-primary/30 transition-all duration-300 h-full"
             whileHover={{ y: -5 }}
           >
-            <div className="p-5 bg-gradient-to-r from-primary/5 to-transparent">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="p-2.5 rounded-lg bg-primary/10 backdrop-blur-md">
+            <div className="p-6 bg-gradient-to-r from-primary/5 to-transparent">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="p-3 rounded-lg bg-primary/10 backdrop-blur-md">
                   <FileCheck className="h-6 w-6 text-primary" />
                 </div>
                 <div>
-                  <h4 className="text-xl font-semibold">Certifications</h4>
+                  <h4 className="text-2xl font-semibold">Certifications</h4>
                   <p className="text-muted-foreground text-sm">Professional qualifications</p>
                 </div>
               </div>
             </div>
-            <div className="p-5">
+            <div className="p-6">
               <motion.ul 
-                className="space-y-3"
+                className="space-y-4"
                 variants={container}
                 initial="hidden"
                 whileInView="show"
@@ -255,7 +306,7 @@ const Skills: React.FC = () => {
                   <motion.li 
                     key={cert.id} 
                     className={cn(
-                      "flex items-center gap-3 p-2.5 rounded-lg group transition-all duration-300",
+                      "flex items-center gap-4 p-3 rounded-lg group transition-all duration-300",
                       theme === 'dark' 
                         ? "hover:bg-primary/10" 
                         : "hover:bg-primary/5"
@@ -263,7 +314,7 @@ const Skills: React.FC = () => {
                     variants={item}
                   >
                     <div className={cn(
-                      "w-8 h-8 rounded-full flex items-center justify-center text-white font-medium transition-all duration-300",
+                      "w-10 h-10 rounded-full flex items-center justify-center text-white font-medium transition-all duration-300",
                       theme === 'dark' 
                         ? "bg-primary/30 group-hover:bg-primary/50" 
                         : "bg-primary/20 group-hover:bg-primary/40"
@@ -282,23 +333,23 @@ const Skills: React.FC = () => {
           
           {/* Education Card */}
           <motion.div 
-            className="glass-card rounded-xl overflow-hidden border-2 border-primary/10 hover:border-primary/30 transition-all duration-300"
+            className="glass-card rounded-xl overflow-hidden border-2 border-primary/10 hover:border-primary/30 transition-all duration-300 h-full"
             whileHover={{ y: -5 }}
           >
-            <div className="p-5 bg-gradient-to-r from-primary/5 to-transparent">
-              <div className="flex items-center gap-3 mb-3">
-                <div className="p-2.5 rounded-lg bg-primary/10 backdrop-blur-md">
+            <div className="p-6 bg-gradient-to-r from-primary/5 to-transparent">
+              <div className="flex items-center gap-4 mb-4">
+                <div className="p-3 rounded-lg bg-primary/10 backdrop-blur-md">
                   <GraduationCap className="h-6 w-6 text-primary" />
                 </div>
                 <div>
-                  <h4 className="text-xl font-semibold">Education</h4>
+                  <h4 className="text-2xl font-semibold">Education</h4>
                   <p className="text-muted-foreground text-sm">Academic background</p>
                 </div>
               </div>
             </div>
-            <div className="p-5">
+            <div className="p-6">
               <motion.ul 
-                className="space-y-6"
+                className="space-y-8"
                 variants={container}
                 initial="hidden"
                 whileInView="show"
@@ -310,16 +361,16 @@ const Skills: React.FC = () => {
                     variants={item}
                     className="relative pl-6 border-l-2 border-primary/30 hover:border-primary transition-colors duration-300 py-1"
                   >
-                    <div className="space-y-1">
-                      <div className="font-semibold text-lg">{edu.degree}</div>
+                    <div className="space-y-1.5">
+                      <div className="font-semibold text-xl">{edu.degree}</div>
                       <div className="text-muted-foreground">{edu.school}</div>
-                      <div className="text-sm text-muted-foreground flex items-center gap-2">
-                        <Badge variant="outline" className="bg-primary/5">
+                      <div className="text-sm text-muted-foreground flex items-center gap-2 mt-1">
+                        <Badge variant="outline" className="bg-primary/5 py-1">
                           {edu.period}
                         </Badge>
                       </div>
                       {edu.honors && (
-                        <div className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
+                        <div className="text-xs text-muted-foreground flex items-center gap-1.5 mt-2">
                           <Medal className="h-3.5 w-3.5 text-amber-400" />
                           <span>{edu.honors}</span>
                         </div>
@@ -331,7 +382,7 @@ const Skills: React.FC = () => {
             </div>
           </motion.div>
         </div>
-      </div>
+      </motion.div>
     </section>
   );
 };
