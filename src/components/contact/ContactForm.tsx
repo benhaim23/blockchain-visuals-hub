@@ -1,295 +1,107 @@
+import React from 'react';
+import { Button } from "@/components/ui/button";
+import { ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
+import { ManifestoChapter } from '@/data/manifestoChapters';
+import MarkdownRenderer from './MarkdownRenderer';
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { useIsMobile } from '@/hooks/use-mobile';
 
-import React, { useState } from 'react';
-import { MessageSquare, Send, File, X } from 'lucide-react';
-import { Input } from '@/components/ui/input';
-import { Textarea } from '@/components/ui/textarea';
-import { Button } from '@/components/ui/button';
-import { useToast } from '@/hooks/use-toast';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from '@/components/ui/form';
-import { z } from 'zod';
-import { zodResolver } from '@hookform/resolvers/zod';
-import { useForm } from 'react-hook-form';
+interface ChapterReaderProps {
+  currentChapter: number;
+  chapters: ManifestoChapter[];
+  mdContent: string;
+  onPreviousChapter: () => void;
+  onNextChapter: () => void;
+}
 
-const MAX_FILE_SIZE = 5 * 1024 * 1024; // 5MB
-const ACCEPTED_FILE_TYPES = [
-  "application/pdf",
-  "application/msword", 
-  "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-  "image/jpeg",
-  "image/png",
-  "image/gif"
-];
-
-const formSchema = z.object({
-  name: z.string().min(2, { message: "Name must be at least 2 characters" }),
-  email: z.string().email({ message: "Please enter a valid email address" }),
-  subject: z.string().min(3, { message: "Subject must be at least 3 characters" }),
-  message: z.string().min(10, { message: "Message must be at least 10 characters" }),
-  attachments: z.array(
-    z.instanceof(File)
-      .refine(file => file.size <= MAX_FILE_SIZE, `Max file size is 5MB`)
-      .refine(
-        file => ACCEPTED_FILE_TYPES.includes(file.type),
-        "Only PDF, DOC, DOCX, JPG, PNG, and GIF files are accepted"
-      )
-  ).optional()
-});
-
-type FormValues = z.infer<typeof formSchema>;
-
-const ContactForm: React.FC = () => {
-  const { toast } = useToast();
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
-
-  const form = useForm<FormValues>({
-    resolver: zodResolver(formSchema),
-    defaultValues: {
-      name: '',
-      email: '',
-      subject: '',
-      message: '',
-      attachments: []
-    },
-  });
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const files = e.target.files;
-    if (files) {
-      const fileArray = Array.from(files);
-      
-      const validFiles = fileArray.filter(file => {
-        const isValidSize = file.size <= MAX_FILE_SIZE;
-        const isValidType = ACCEPTED_FILE_TYPES.includes(file.type);
-        
-        if (!isValidSize) {
-          toast({
-            title: "File too large",
-            description: `${file.name} exceeds the 5MB limit`,
-            variant: "destructive",
-          });
-        }
-        
-        if (!isValidType) {
-          toast({
-            title: "Invalid file type",
-            description: `${file.name} is not an accepted file type`,
-            variant: "destructive",
-          });
-        }
-        
-        return isValidSize && isValidType;
-      });
-      
-      setSelectedFiles(prev => [...prev, ...validFiles]);
-      form.setValue('attachments', [...selectedFiles, ...validFiles]);
-    }
-  };
-
-  const removeFile = (index: number) => {
-    const updatedFiles = [...selectedFiles];
-    updatedFiles.splice(index, 1);
-    setSelectedFiles(updatedFiles);
-    form.setValue('attachments', updatedFiles);
-  };
-
-  const onSubmit = async (data: FormValues) => {
-    setIsSubmitting(true);
-    
-    try {
-      const formData = new FormData();
-      formData.append('name', data.name);
-      formData.append('email', data.email);
-      formData.append('subject', data.subject);
-      formData.append('message', data.message);
-      
-      selectedFiles.forEach(file => {
-        formData.append('attachments', file);
-      });
-      
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      toast({
-        title: "Message sent successfully!",
-        description: "Thank you for your message. I'll get back to you soon.",
-      });
-      
-      form.reset();
-      setSelectedFiles([]);
-      
-    } catch (error) {
-      console.error("Error sending message:", error);
-      toast({
-        title: "Error sending message",
-        description: "Please try again or contact directly via email.",
-        variant: "destructive",
-      });
-    } finally {
-      setIsSubmitting(false);
-    }
-  };
-
+const ChapterReader: React.FC<ChapterReaderProps> = ({ 
+  currentChapter, 
+  chapters, 
+  mdContent, 
+  onPreviousChapter, 
+  onNextChapter 
+}) => {
+  const chapter = chapters[currentChapter];
+  const showMarkdown = chapter && mdContent; // Always prefer markdown if available
+  const isLastChapter = currentChapter >= chapters.length - 1;
+  const isMobile = useIsMobile();
+  
+  // Get info about the next chapter for the call-to-action link
+  const nextChapter = !isLastChapter ? chapters[currentChapter + 1] : null;
+  const nextChapterTitle = nextChapter ? 
+    `${nextChapter.number}. ${nextChapter.title}` : '';
+  
   return (
-    <Card className="glass-card shadow-lg animate-fade-in-up h-full">
-      <CardHeader className="bg-primary/5 border-b border-primary/10">
-        <CardTitle className="flex items-center gap-2">
-          <MessageSquare className="h-5 w-5 text-primary" />
-          Send a Message
-        </CardTitle>
-        <CardDescription>
-          Fill out the form below to get in touch with me
-        </CardDescription>
-      </CardHeader>
-      <CardContent className="p-6">
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-6">
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-6">
-              <FormField
-                control={form.control}
-                name="name"
-                render={({ field }) => (
-                  <FormItem className="space-y-2">
-                    <FormLabel>Your Name</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        placeholder="Enter your name"
-                        className="bg-background/50 border-border/50 focus-visible:ring-primary/40"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-              <FormField
-                control={form.control}
-                name="email"
-                render={({ field }) => (
-                  <FormItem className="space-y-2">
-                    <FormLabel>Email Address</FormLabel>
-                    <FormControl>
-                      <Input
-                        {...field}
-                        type="email"
-                        placeholder="Enter your email"
-                        className="bg-background/50 border-border/50 focus-visible:ring-primary/40"
-                      />
-                    </FormControl>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
-            </div>
-            <FormField
-              control={form.control}
-              name="subject"
-              render={({ field }) => (
-                <FormItem className="space-y-2">
-                  <FormLabel>Subject</FormLabel>
-                  <FormControl>
-                    <Input
-                      {...field}
-                      placeholder="Enter subject"
-                      className="bg-background/50 border-border/50 focus-visible:ring-primary/40"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="message"
-              render={({ field }) => (
-                <FormItem className="space-y-2">
-                  <FormLabel>Message</FormLabel>
-                  <FormControl>
-                    <Textarea
-                      {...field}
-                      placeholder="Enter your message"
-                      className="min-h-[150px] bg-background/50 border-border/50 focus-visible:ring-primary/40"
-                    />
-                  </FormControl>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+    <div className="bg-white/90 dark:bg-card/80 backdrop-blur-sm rounded-lg border-2 border-blue-200 dark:border-slate-700 min-h-[600px] flex flex-col shadow-lg transition-all duration-300 hover:shadow-xl dark:hover:border-primary/40 hover:border-blue-300">
+      <div className={`p-3 md:p-4 border-b-2 border-blue-100 dark:border-slate-700 flex items-center justify-between bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-slate-800 dark:to-slate-800 rounded-t-lg ${isMobile ? 'flex-wrap gap-1' : ''}`}>
+        <Button 
+          variant="ghost" 
+          onClick={onPreviousChapter}
+          disabled={currentChapter <= 0}
+          className="gap-1 md:gap-2 text-sm md:text-base text-blue-600 hover:text-blue-700 hover:bg-blue-100/50 transition-all duration-300 hover:scale-105 dark:text-blue-400 dark:hover:text-blue-300 dark:hover:bg-blue-900/20"
+          size={isMobile ? "sm" : "default"}
+        >
+          <ChevronLeft className="h-4 w-4" />
+          <span>Previous</span>
+        </Button>
+
+        <span className={`font-medium text-indigo-700 dark:text-indigo-300 text-center ${isMobile ? 'text-sm w-full order-first mb-1' : ''}`}>
+          {currentChapter === 0 ? 'Executive Summary' : `Chapter ${currentChapter}`}: {chapter?.title}
+        </span>
+
+        <Button 
+          variant="ghost" 
+          onClick={onNextChapter}
+          disabled={currentChapter >= chapters.length - 1}
+          className="gap-1 md:gap-2 text-sm md:text-base text-blue-600 hover:text-blue-700 hover:bg-blue-100/50 transition-all duration-300 hover:scale-105 dark:text-blue-400 dark:hover:text-blue-300 dark:hover:bg-blue-900/20"
+          size={isMobile ? "sm" : "default"}
+        >
+          <span>Next</span>
+          <ChevronRight className="h-4 w-4" />
+        </Button>
+      </div>
+
+      <div className="flex-1 p-4 md:p-6">
+        {showMarkdown ? (
+          <ScrollArea className="h-[600px] pr-2 md:pr-4">
+            <MarkdownRenderer content={mdContent} />
             
-            <div className="space-y-3">
-              <div className="flex items-center justify-between">
-                <FormLabel>Attachments</FormLabel>
-                <p className="text-xs text-muted-foreground">Max size: 5MB per file</p>
-              </div>
-              
-              <div className="flex items-center gap-3">
-                <label 
-                  htmlFor="file-upload" 
-                  className="cursor-pointer flex items-center gap-2 px-4 py-2 rounded-md bg-secondary text-secondary-foreground hover:bg-secondary/80 transition-colors"
+            {/* Call-to-action link at the end of each chapter except the last one */}
+            {!isLastChapter && (
+              <div className="mt-8 pb-4 flex justify-center">
+                <Button 
+                  variant="link" 
+                  onClick={onNextChapter}
+                  className="group flex items-center gap-2 text-indigo-700 dark:text-indigo-400 hover:text-indigo-900 dark:hover:text-indigo-300 text-lg"
                 >
-                  <File className="h-4 w-4" />
-                  <span>Select Files</span>
-                  <input
-                    id="file-upload"
-                    type="file"
-                    multiple
-                    onChange={handleFileChange}
-                    className="hidden"
-                    accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,.gif"
-                  />
-                </label>
-                
-                <p className="text-sm text-muted-foreground">
-                  PDF, DOC, DOCX, JPG, PNG, GIF
-                </p>
+                  {isMobile ? (
+                    <span>Next Chapter</span>
+                  ) : (
+                    <span>Next: {nextChapterTitle}</span>
+                  )}
+                  <ArrowRight className="h-4 w-4 transition-transform group-hover:translate-x-1" />
+                </Button>
               </div>
-              
-              {selectedFiles.length > 0 && (
-                <div className="space-y-2">
-                  <p className="text-sm font-medium">Files to upload ({selectedFiles.length})</p>
-                  <div className="flex flex-wrap gap-2">
-                    {selectedFiles.map((file, index) => (
-                      <div 
-                        key={`${file.name}-${index}`}
-                        className="flex items-center gap-2 bg-secondary/50 rounded-md px-3 py-1.5 text-sm"
-                      >
-                        <span className="truncate max-w-[180px]">{file.name}</span>
-                        <button
-                          type="button"
-                          onClick={() => removeFile(index)}
-                          className="text-muted-foreground hover:text-destructive"
-                        >
-                          <X className="h-3 w-3" />
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              )}
-            </div>
-            
-            <Button 
-              type="submit" 
-              className="w-full button-glow transition-all duration-300"
-              disabled={isSubmitting}
-            >
-              {isSubmitting ? (
-                <>
-                  <MessageSquare className="mr-2 h-4 w-4 animate-pulse" />
-                  Sending...
-                </>
-              ) : (
-                <>
-                  <Send className="mr-2 h-4 w-4" />
-                  Send Message
-                </>
-              )}
-            </Button>
-          </form>
-        </Form>
-      </CardContent>
-    </Card>
+            )}
+          </ScrollArea>
+        ) : (
+          <div className="h-[600px] w-full flex items-center justify-center">
+            <p className="text-slate-600 dark:text-muted-foreground">
+              This chapter is only available as a PDF. 
+              <a 
+                href={chapter?.pdfPath} 
+                target="_blank" 
+                rel="noopener noreferrer"
+                className="ml-2 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:underline transition-all duration-300"
+              >
+                Open PDF
+              </a>
+            </p>
+          </div>
+        )}
+      </div>
+    </div>
   );
 };
 
-export default ContactForm;
+export default ChapterReader;
