@@ -1,4 +1,3 @@
-
 import React, { useEffect, useState } from 'react';
 import { useAnimatedText } from '@/hooks/useAnimatedText';
 import { Copy, Check } from 'lucide-react';
@@ -67,6 +66,15 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
       content: codeLines.join('\n'),
       endIndex
     };
+  };
+
+  // Function to remove surrounding asterisks from headers
+  const cleanHeaderText = (headerText: string): string => {
+    // Remove surrounding ** if present
+    if (headerText.startsWith('**') && headerText.endsWith('**')) {
+      return headerText.substring(2, headerText.length - 2);
+    }
+    return headerText;
   };
 
   // Convert markdown content to HTML
@@ -139,15 +147,15 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
       }
     }
     
-    // Headers
+    // Headers - applying the cleanHeaderText function to remove surrounding asterisks
     if (line.startsWith('# ')) {
-      renderedContent.push(<h1 key={i} className="text-3xl font-bold mt-6 mb-4 text-indigo-900 dark:text-indigo-300">{line.substring(2)}</h1>);
+      renderedContent.push(<h1 key={i} className="text-3xl font-bold mt-6 mb-4 text-indigo-900 dark:text-indigo-300">{cleanHeaderText(line.substring(2))}</h1>);
     } else if (line.startsWith('## ')) {
-      renderedContent.push(<h2 key={i} className="text-2xl font-bold mt-5 mb-3 text-indigo-800 dark:text-indigo-400">{line.substring(3)}</h2>);
+      renderedContent.push(<h2 key={i} className="text-2xl font-bold mt-5 mb-3 text-indigo-800 dark:text-indigo-400">{cleanHeaderText(line.substring(3))}</h2>);
     } else if (line.startsWith('### ')) {
-      renderedContent.push(<h3 key={i} className="text-xl font-bold mt-4 mb-2 text-indigo-700 dark:text-indigo-400">{line.substring(4)}</h3>);
+      renderedContent.push(<h3 key={i} className="text-xl font-bold mt-4 mb-2 text-indigo-700 dark:text-indigo-400">{cleanHeaderText(line.substring(4))}</h3>);
     } else if (line.startsWith('#### ')) {
-      renderedContent.push(<h4 key={i} className="text-lg font-bold mt-3 mb-2 text-indigo-700 dark:text-indigo-400">{line.substring(5)}</h4>);
+      renderedContent.push(<h4 key={i} className="text-lg font-bold mt-3 mb-2 text-indigo-700 dark:text-indigo-400">{cleanHeaderText(line.substring(5))}</h4>);
     }
     
     // Lists
