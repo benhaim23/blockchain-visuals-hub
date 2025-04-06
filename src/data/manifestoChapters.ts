@@ -1,3 +1,4 @@
+
 export interface ManifestoChapter {
   number: number;
   title: string;
@@ -1853,5 +1854,11 @@ For onchain analysts, MEV represents one of the most technically fascinating are
     title: "Uniswap Multichain Analytics — Comparing Deployments Across Chains", 
     pdfPath: "/Onchain Manifesto/11. Uniswap Multichain Analytics — Comparing Deployments Across Chains.pdf",
     mdPath: "/Onchain Manifesto/11. Uniswap Multichain Analytics — Comparing Deployments Across Chains.md"
+  },
+  { 
+    number: 12, 
+    title: "Useful Metrics Every Analyst Should Track", 
+    pdfPath: "/Onchain Manifesto/12. Useful Metrics Every Analyst Should Track.pdf",
+    mdPath: "/Onchain Manifesto/12. Useful Metrics Every Analyst Should Track.md" 
   }
 ]
