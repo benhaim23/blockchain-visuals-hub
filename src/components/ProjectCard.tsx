@@ -1,12 +1,11 @@
 
 import React, { useState, useEffect } from 'react';
-import { ArrowRight, ExternalLink } from 'lucide-react';
+import { ExternalLink } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { AspectRatio } from '@/components/ui/aspect-ratio';
 import { Skeleton } from '@/components/ui/skeleton';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import { cn } from '@/lib/utils';
 import type { Project } from '@/data/projects';
 
@@ -86,8 +85,8 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, index }) => {
               size="sm"
               className={cn(
                 "text-foreground/90 rounded-full pl-4 pr-3 bg-primary/80 hover:bg-primary shadow-sm",
-                "flex items-center gap-2 group transition-all duration-300 hover:shadow-md",
-                "relative overflow-hidden border-none"
+                "flex items-center gap-2 transition-all duration-300 hover:shadow-md",
+                "relative overflow-hidden border-none w-auto"
               )}
               onClick={() => window.open(project.link, '_blank')}
               onMouseEnter={() => setIsHovering(true)}
@@ -105,27 +104,6 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, index }) => {
                 isHovering ? "opacity-100" : "opacity-0"
               )} />
             </Button>
-            <TooltipProvider>
-              <Tooltip>
-                <TooltipTrigger asChild>
-                  <Button
-                    variant="ghost" 
-                    size="icon"
-                    className="ml-auto h-8 w-8 rounded-full hover:bg-accent/20"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      window.open(project.link, '_blank');
-                    }}
-                  >
-                    <ExternalLink className="h-4 w-4" />
-                    <span className="sr-only">Open in new tab</span>
-                  </Button>
-                </TooltipTrigger>
-                <TooltipContent>
-                  <p>Open in new tab</p>
-                </TooltipContent>
-              </Tooltip>
-            </TooltipProvider>
           </CardFooter>
         )}
       </Card>
