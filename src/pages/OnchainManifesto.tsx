@@ -133,7 +133,12 @@ const OnchainManifesto: React.FC = () => {
 
             <TabsContent value="toc" className="mt-0">
               <TableOfContents 
-                chapters={manifestoChapters} 
+                chapters={manifestoChapters.map(chapter => ({
+                  ...chapter,
+                  description: chapter.title.includes('—') 
+                    ? chapter.title.split('—')[1].trim() 
+                    : ''
+                }))} 
                 onSelectChapter={handleSelectChapter} 
               />
             </TabsContent>
