@@ -302,7 +302,7 @@ const Skills: React.FC = () => {
             </div>
             <div className="p-5">
               <motion.ul 
-                className="space-y-8"
+                className="space-y-6"
                 variants={container}
                 initial="hidden"
                 whileInView="show"
@@ -312,32 +312,24 @@ const Skills: React.FC = () => {
                   <motion.li 
                     key={index} 
                     variants={item}
-                    className="relative pl-10 pb-2"
+                    className="relative pl-6 border-l-2 border-primary/30 hover:border-primary transition-colors duration-300 py-1"
                   >
-                    {/* Timeline line */}
-                    {index < educationList.length - 1 && (
-                      <div className="absolute left-[19px] top-[38px] h-[calc(100%-12px)] w-0.5 bg-primary/30"></div>
-                    )}
-                    
-                    {/* Timeline icon */}
-                    <div className="absolute left-0 top-0">
-                      <div className="relative z-10 rounded-full p-2.5 bg-background border-2 border-primary">
+                    <div className="absolute -left-[9px] top-1.5">
+                      <div className="rounded-full p-1 bg-background border-2 border-primary">
                         {edu.icon}
                       </div>
                     </div>
-                    
-                    {/* Content */}
-                    <div className="space-y-2">
+                    <div className="space-y-1">
                       <div className="font-semibold text-lg">{edu.degree}</div>
                       <div className="text-muted-foreground">{edu.school}</div>
-                      <div className="text-sm text-muted-foreground flex items-center gap-2 mt-1">
+                      <div className="text-sm text-muted-foreground flex items-center gap-2">
                         <Badge variant="outline" className="bg-primary/5">
                           {edu.period}
                         </Badge>
                       </div>
                       {edu.honors && (
-                        <div className="text-xs text-muted-foreground flex items-center gap-2 mt-1">
-                          <Medal className="h-3.5 w-3.5 text-amber-400 flex-shrink-0" />
+                        <div className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
+                          <Medal className="h-3.5 w-3.5 text-amber-400" />
                           <span>{edu.honors}</span>
                         </div>
                       )}
