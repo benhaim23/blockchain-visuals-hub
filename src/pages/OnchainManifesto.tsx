@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { ScrollArea } from "@/components/ui/scroll-area";
@@ -23,12 +22,12 @@ const manifestoChapters = [
   },
   { 
     number: 2, 
-    title: "The Onchain Stack- SQL, Spellbook, and Decoding UTXOs", 
+    title: "The Onchain Stack — SQL, Spellbook, and Decoding UTXOs", 
     pdfPath: "/Onchain Manifesto/02. The Onchain Stack- SQL, Spellbook, and Decoding UTXOs.pdf" 
   },
   { 
     number: 3, 
-    title: "The Dune Platform- A Gateway to Onchain Transparencyconomy", 
+    title: "The Dune Platform — A Gateway to Onchain Transparency", 
     pdfPath: "/Onchain Manifesto/03. The Dune Platform- A Gateway to Onchain Transparencyconomy.pdf" 
   },
   { 
@@ -93,12 +92,12 @@ const manifestoChapters = [
   },
   { 
     number: 16, 
-    title: "Account Abstraction- Why It Matters for Wallet UX and Analysts", 
+    title: "Account Abstraction — Why It Matters for Wallet UX and Analysts", 
     pdfPath: "/Onchain Manifesto/16. Account Abstraction- Why It Matters for Wallet UX and Analysts.pdf" 
   },
   { 
     number: 17, 
-    title: "ERC-4337 Aggregated Tables Across EVM Chains- Unified Analytics at Scale", 
+    title: "ERC-4337 Aggregated Tables Across EVM Chains — Unified Analytics at Scale", 
     pdfPath: "/Onchain Manifesto/17. ERC-4337 Aggregated Tables Across EVM Chains- Unified Analytics at Scale.pdf" 
   },
   { 
@@ -127,7 +126,6 @@ const OnchainManifesto: React.FC = () => {
     }
   };
 
-  // Load markdown content for the first chapter (executive summary)
   useEffect(() => {
     if (currentChapter === 0) {
       fetch('/Onchain Manifesto/The Onchain Analyst Decoding the Transparent Economy.md')
@@ -139,7 +137,6 @@ const OnchainManifesto: React.FC = () => {
     }
   }, [currentChapter]);
 
-  // Display the correct chapter number in TOC
   const getDisplayNumber = (chapter: typeof manifestoChapters[0]) => {
     return chapter.number === 0 ? "Executive Summary" : `${chapter.number}.`;
   };
@@ -148,7 +145,6 @@ const OnchainManifesto: React.FC = () => {
     <>
       <Header />
       <div className="min-h-screen pt-24 pb-16 relative">
-        {/* Background squares */}
         <div className="absolute inset-0 z-0 overflow-hidden">
           <Squares 
             direction="diagonal"
@@ -205,7 +201,6 @@ const OnchainManifesto: React.FC = () => {
 
             <TabsContent value="reader" className="mt-0">
               <div className="bg-card/80 backdrop-blur-sm rounded-lg border border-border min-h-[600px] flex flex-col">
-                {/* Navigation controls */}
                 <div className="p-4 border-b border-border flex items-center justify-between">
                   <Button 
                     variant="ghost" 
@@ -232,14 +227,11 @@ const OnchainManifesto: React.FC = () => {
                   </Button>
                 </div>
 
-                {/* Content area */}
                 <div className="flex-1 p-4">
                   {currentChapter === 0 ? (
-                    // For the markdown file (executive summary)
                     <ScrollArea className="h-[600px] w-full pr-4">
                       <div className="prose dark:prose-invert max-w-none">
                         {mdContent.split('\n').map((line, index) => {
-                          // Simple markdown parsing
                           if (line.startsWith('# ')) {
                             return <h1 key={index} className="text-2xl font-bold mt-6 mb-4">{line.substring(2)}</h1>;
                           } else if (line.startsWith('## ')) {
@@ -261,7 +253,6 @@ const OnchainManifesto: React.FC = () => {
                       </div>
                     </ScrollArea>
                   ) : (
-                    // For PDF files
                     <div className="h-[600px] w-full">
                       <iframe
                         src={manifestoChapters[currentChapter]?.pdfPath}
