@@ -24,7 +24,7 @@ const TextProcessor: React.FC<TextProcessorProps> = ({ text }) => {
         return (
           <span className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 cursor-pointer transition-colors">
             <Link to="/manifesto" onClick={() => window.dispatchEvent(new CustomEvent('selectChapter', { detail: nextChapterNum }))}>
-              {text}
+              {text.replace(/\*\*/g, '')}
             </Link>
           </span>
         );
