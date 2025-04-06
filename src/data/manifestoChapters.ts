@@ -1,4 +1,3 @@
-
 export interface ManifestoChapter {
   number: number;
   title: string;
@@ -75,7 +74,8 @@ Whether you're a data analyst entering crypto or a crypto native learning data, 
 
 **This is your invitation to join the forefront of decentralized intelligence.**
 
-Let's begin.`
+Let's begin.
+`
   },
   { 
     number: 1, 
@@ -192,7 +192,8 @@ In Web3, data isn't just something you analyze.
 
 In the next article, we'll explore the foundational data stack of the onchain analyst—from understanding blockchain data models to decoding what makes a Dune query tick.
 
-**Next: The Onchain Stack — SQL, Spellbook, and Decoding UTXOs**`
+**Next: The Onchain Stack — SQL, Spellbook, and Decoding UTXOs**
+`
   },
   { 
     number: 2, 
@@ -324,7 +325,8 @@ Now that we've covered the foundational models and infrastructure, it's time to 
 
 In the next article, we'll walk you through the Dune platform itself—how to write queries, use table explorers, and start building your first onchain dashboard.
 
-**Next: The Dune Platform — A Gateway to Onchain Transparency**`
+**Next: The Dune Platform — A Gateway to Onchain Transparency**
+`
   },
   { 
     number: 3, 
@@ -489,7 +491,8 @@ But like any tool, it's only as good as the person using it.
 
 In the next article, we'll dig deeper into the structure of blockchain tables—how to read them, understand them, and link them together to tell meaningful stories.
 
-**Next: Understanding Tables — Ethereum, Bitcoin, NFTs, ERC4337, and More**`
+**Next: Understanding Tables — Ethereum, Bitcoin, NFTs, ERC4337, and More**
+`
   },
   { 
     number: 4, 
@@ -772,7 +775,7 @@ You can also use functions inside \`SELECT\`, such as:
 
 - \`COUNT(*)\` – total rows
 - \`SUM(value)\` – total value transferred
-- \`AVG(gas_price)\` – average gas price
+- \`AVG(gas_price)\` – average gas fee
 
 ------
 
@@ -1274,7 +1277,7 @@ You can answer all of this with queries across \`nft.trades\`, \`nft.transfers\`
 
 ------
 
-## 📈 Real Dashboards You Can Fork
+## 📊 Real Dashboards You Can Fork
 
 - Blur Trading Dashboard
 - Mint & Flip Monitor
@@ -1459,5 +1462,396 @@ And always ask: **What story is the money telling?**
 ------
 
 **Next: 09. DeFi Analysis — Liquidity, Incentives, and TVL Dynamics**`
+  },
+  { 
+    number: 9, 
+    title: "DeFi Analysis — Liquidity, Incentives, and TVL Dynamics", 
+    pdfPath: "/Onchain Manifesto/09. DeFi Analysis — Liquidity, Incentives, and TVL Dynamics.pdf",
+    mdContent: `# 09. DeFi Analysis — Liquidity, Incentives, and TVL Dynamics
+
+DeFi unlocked a new paradigm: transparent financial infrastructure. Every swap, deposit, and liquidation happens in plain sight, leaving behind a trail of data.
+
+As an onchain analyst, you're uniquely positioned to study what everyone else can only guess at: actual usage patterns, liquidity flows, and value capture in financial protocols.
+
+This article explores how to analyze DeFi's core metrics, from TVL to incentive efficiency.
+
+---
+
+## 🧠 Understanding DeFi's Key Metrics
+
+TVL (Total Value Locked) might be DeFi's most famous metric, but it's just the beginning.
+
+Let's break down the key data points you'll track when analyzing a protocol:
+
+### 🔒 TVL (Total Value Locked)
+
+TVL measures how much value users have deposited into a protocol.
+
+\`\`\`sql
+SELECT 
+  date_trunc('day', block_time) AS day,
+  SUM(amount_usd) AS tvl
+FROM dex_protocol.deposits
+WHERE block_time > now() - interval '90 days'
+GROUP BY 1
+ORDER BY 1
+\`\`\`
+
+But raw TVL is just a starting point. You need to ask:
+
+- TVL per chain (bridged vs. native deposits)
+- TVL by token (stablecoins vs. volatile assets)
+- TVL per user tier (whales vs. retail deposits)
+
+---
+
+### 💧 Liquidity Depth
+
+Liquidity isn't just about total deposits—it's about **where** and **how** that liquidity is deployed.
+
+For AMMs like Uniswap, analyze:
+
+- Tick distribution (for concentrated liquidity)
+- Slippage for standard trade sizes
+- Range efficiency (% time spent in active tick range)
+
+\`\`\`sql
+SELECT 
+  pool,
+  tick_lower,
+  tick_upper,
+  SUM(amount_usd) AS liquidity_usd,
+  AVG(time_in_range_pct) AS efficiency
+FROM uniswap_v3.positions
+WHERE block_time > now() - interval '30 days'
+GROUP BY 1, 2, 3
+ORDER BY 4 DESC
+\`\`\`
+
+---
+
+### 📊 Volume vs. TVL Ratio
+
+A high volume/TVL ratio indicates capital efficiency—how much trading volume a protocol generates per dollar of liquidity.
+
+\`\`\`sql
+SELECT 
+  date_trunc('day', day) AS day,
+  trading_volume / tvl AS capital_efficiency
+FROM (
+  SELECT 
+    date_trunc('day', block_time) AS day,
+    SUM(amount_usd) AS trading_volume 
+  FROM dex.trades 
+  GROUP BY 1
+) t1
+JOIN (
+  SELECT 
+    date_trunc('day', block_time) AS day,
+    AVG(tvl) AS tvl 
+  FROM dex.tvl 
+  GROUP BY 1
+) t2 USING (day)
+\`\`\`
+
+---
+
+### 🧪 Incentive Analysis
+
+Many protocols incentivize TVL with token rewards. But are these incentives effective or wasteful?
+
+Calculate the **cost per dollar of TVL**:
+
+\`\`\`sql
+SELECT 
+  date_trunc('day', block_time) AS day,
+  SUM(incentive_amount_usd) / AVG(tvl) AS cost_per_dollar_tvl
+FROM protocol.incentives
+JOIN protocol.tvl USING (day)
+GROUP BY 1
+ORDER BY 1
+\`\`\`
+
+---
+
+## 🔍 DeFi Anti-Patterns to Watch For
+
+Healthy DeFi protocols show some common patterns:
+
+- **Balanced user distribution** (not whale-dominated)
+- **Sustainable yield curves** (not entirely from token emissions)
+- **Rational TVL growth** (not purely incentive-chasing)
+
+Here's how to spot potential issues:
+
+### Whale Concentration
+
+\`\`\`sql
+SELECT 
+  COUNT(DISTINCT address) AS wallets,
+  SUM(CASE WHEN balance_usd > 100000 THEN balance_usd ELSE 0 END) / SUM(balance_usd) AS whale_concentration
+FROM protocol.balances
+WHERE block_time = '2023-06-01'
+\`\`\`
+
+### TVL/Market Cap Ratio
+
+\`\`\`sql
+SELECT 
+  date_trunc('day', day) AS day,
+  TVL / token_marketcap AS tvl_mcap_ratio
+FROM protocol_metrics
+WHERE day > now() - interval '90 days'
+\`\`\`
+
+A TVL/MCAP ratio below 1 often indicates overvaluation or unsustainable incentives.
+
+---
+
+## 🧰 Building DeFi Dashboards in Dune
+
+Effective DeFi dashboards should show:
+
+1. **Protocol Totals**: TVL, unique users, protocol revenue
+2. **User Segments**: Retail vs. whales, new vs. existing
+3. **Incentive Analysis**: Reward distribution, cost of acquisition
+4. **Comparative View**: Performance vs. competitors
+
+Remember to include:
+
+- **Daily, weekly, monthly trends**
+- **USD normalization** for all token values
+- **Divergence indicators** for correlated metrics
+
+---
+
+## 📚 Examples to Learn From
+
+- Curve Gauge Voting Analytics
+- Uniswap LP Profitability Dashboard
+- Aave Liquidation Monitor
+- Lido Staking Concentration Analysis
+
+---
+
+## 🧠 Final Thoughts
+
+DeFi analytics gives you superpowers. While TradFi operates behind closed doors, DeFi exposes its inner workings.
+
+This transparency enables you to spot opportunities and risks that would be completely hidden in traditional finance.
+
+Whether you're analyzing a new yield farming protocol, tracking liquidity shifts across DEXs, or evaluating governance decisions—the data is there, waiting to be queried.
+
+---
+
+**Next: 10. MEV on Uniswap — Understanding and Quantifying Extracted Value**`
+  },
+  { 
+    number: 10, 
+    title: "MEV on Uniswap — Understanding and Quantifying Extracted Value", 
+    pdfPath: "/Onchain Manifesto/10. MEV on Uniswap — Understanding and Quantifying Extracted Value.pdf",
+    mdContent: `# 10. MEV on Uniswap — Understanding and Quantifying Extracted Value
+
+MEV—Maximal Extractable Value (formerly Miner Extractable Value)—is the invisible tax of the DeFi ecosystem. It represents the profit that can be extracted from users by controlling transaction ordering.
+
+For analysts, MEV offers a fascinating window into market microstructure, efficiency, and the actual cost of trading in decentralized markets.
+
+This article explores how to measure, track, and analyze MEV activity on Uniswap.
+
+---
+
+## 🧩 What Is MEV?
+
+MEV occurs when a block producer or trader can profit by controlling transaction ordering. Common MEV strategies include:
+
+- **Sandwich attacks**: Frontrunning and backrunning user trades
+- **Arbitrage**: Profiting from price differences between pools
+- **Liquidations**: Racing to liquidate undercollateralized positions
+- **Just-in-time liquidity**: Adding and removing liquidity around large trades
+
+While some MEV is natural market efficiency (like arbitrage), other forms directly extract value from users.
+
+---
+
+## 📊 Measuring Sandwich Attacks on Uniswap
+
+Sandwich attacks are the most common form of MEV on Uniswap. Here's how to detect them:
+
+\`\`\`sql
+WITH swaps AS (
+  SELECT
+    tx_hash,
+    block_number,
+    index,
+    sender,
+    amount0_in,
+    amount1_in,
+    amount0_out,
+    amount1_out,
+    pool
+  FROM uniswap_v3.swaps
+  WHERE block_time > now() - interval '7 days'
+)
+
+SELECT
+  victim.tx_hash AS victim_tx,
+  frontrun.tx_hash AS frontrun_tx,
+  backrun.tx_hash AS backrun_tx,
+  (backrun.amount1_out - frontrun.amount1_in) AS profit_token1,
+  (backrun.amount0_out - frontrun.amount0_in) AS profit_token0
+FROM swaps victim
+JOIN swaps frontrun ON 
+  victim.block_number = frontrun.block_number AND
+  victim.index > frontrun.index AND
+  victim.pool = frontrun.pool
+JOIN swaps backrun ON 
+  victim.block_number = backrun.block_number AND
+  victim.index < backrun.index AND
+  victim.pool = backrun.pool
+WHERE 
+  frontrun.sender = backrun.sender AND
+  victim.sender != frontrun.sender
+\`\`\`
+
+This query identifies patterns where the same address:
+1. Makes a swap (frontrun)
+2. Is followed by another user's transaction 
+3. Makes another swap in the opposite direction (backrun)
+
+---
+
+## 📉 Quantifying User Value Extraction
+
+How much are users losing to MEV? Here's a calculation:
+
+\`\`\`sql
+SELECT 
+  date_trunc('day', block_time) AS day,
+  COUNT(*) AS sandwiched_txs,
+  COUNT(*) / COUNT(DISTINCT tx_hash) AS sandwich_rate,
+  SUM(mev_extracted_usd) AS total_mev_usd
+FROM mev.sandwiches
+WHERE block_time > now() - interval '30 days'
+GROUP BY 1
+ORDER BY 1
+\`\`\`
+
+Key metrics to track:
+- **Total MEV extracted** (in USD)
+- **MEV as % of trading volume**
+- **% of trades affected**
+- **Average extraction per trade**
+
+---
+
+## 🧠 Advanced: Cross-chain MEV Comparison
+
+Different chains have different block times, validator sets, and MEV markets. Compare MEV intensity:
+
+\`\`\`sql
+SELECT 
+  blockchain,
+  COUNT(*) AS total_swaps,
+  COUNT(DISTINCT CASE WHEN is_sandwiched THEN tx_hash END) AS sandwiched_swaps,
+  AVG(CASE WHEN is_sandwiched THEN price_impact_pct ELSE NULL END) AS avg_sandwich_impact,
+  SUM(CASE WHEN is_sandwiched THEN mev_extracted_usd ELSE 0 END) / SUM(volume_usd) AS mev_tax_rate
+FROM dex.trades
+WHERE block_time > now() - interval '14 days'
+  AND project = 'uniswap'
+GROUP BY 1
+ORDER BY 5 DESC
+\`\`\`
+
+Insights to surface:
+- Ethereum vs. L2s MEV rates
+- Impact of different sequencers/validators
+- Effectiveness of MEV protection mechanisms
+
+---
+
+## 📋 MEV Mitigation and Dashboards
+
+MEV can be mitigated through:
+
+- **MEV-Share and MEV-Boost**: More equitable distribution of MEV
+- **Private RPC endpoints**: Like Flashbots Protect
+- **Design improvements**: Like fair sequencing and timing games
+
+Your MEV dashboard should include:
+
+1. **MEV volume over time**
+2. **% of trades affected**
+3. **Top MEV extractors** (addresses)
+4. **Pool-specific MEV activity**
+5. **User cost analysis**
+
+---
+
+## 🧩 Beyond Sandwiches: Time-Based Analysis
+
+MEV patterns often cluster around specific market conditions. Analyze:
+
+- Block builder concentration
+- Gas price spikes during MEV opportunities
+- Correlation between volatility and MEV activity
+
+\`\`\`sql
+SELECT 
+  date_trunc('hour', block_time) AS hour,
+  COUNT(*) AS mev_txs,
+  AVG(gas_price) AS avg_gas_price,
+  SUM(mev_profit_usd) AS total_profit,
+  AVG(token_price_volatility) AS avg_volatility
+FROM mev.transactions
+JOIN market_stats USING (hour)
+WHERE block_time > now() - interval '30 days'
+GROUP BY 1
+ORDER BY 1
+\`\`\`
+
+---
+
+## 🧰 Technical Challenges in MEV Analysis
+
+Accurate MEV analysis requires:
+
+- **Transaction trace data** (not just successful swaps)
+- **Gas price and fee analysis**
+- **Pool reserves at specific blocks**
+- **Knowledge of MEV-specific patterns**
+
+---
+
+## 🔮 The Future of MEV Analytics
+
+As MEV evolves, analysts will need to track:
+
+- **Cross-domain MEV** (spanning multiple DEXs or chains)
+- **L2-specific extraction patterns**
+- **Regulatory and economic impacts**
+- **Builder and searcher competition dynamics**
+
+---
+
+## 🧠 Conclusion: Why MEV Matters
+
+MEV is a direct window into blockchain market efficiency. By quantifying it, you can:
+
+- Evaluate the actual cost of trading on different protocols
+- Assess builder and validator competition
+- Measure the effectiveness of MEV mitigation strategies
+- Understand the true economics of DeFi
+
+For onchain analysts, MEV represents one of the most technically fascinating areas of study—where game theory, market microstructure, and blockchain mechanics intersect.
+
+---
+
+**Next: 11. Uniswap Multichain Analytics — Comparing Deployments Across Chains**`
+  },
+  { 
+    number: 11, 
+    title: "Uniswap Multichain Analytics — Comparing Deployments Across Chains", 
+    pdfPath: "/Onchain Manifesto/11. Uniswap Multichain Analytics — Comparing Deployments Across Chains.pdf",
+    mdPath: "/Onchain Manifesto/11. Uniswap Multichain Analytics — Comparing Deployments Across Chains.md"
   }
 ]
