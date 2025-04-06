@@ -1,3 +1,4 @@
+
 export interface ManifestoChapter {
   number: number;
   title: string;
@@ -962,4 +963,501 @@ SELECT
   date_trunc('day', block_time) AS day,
   COUNT(*) AS transfer_count,
   SUM(amount / 1e18) AS token_volume
-FROM erc20.token
+FROM erc20.token_transfers
+WHERE token_address = LOWER('0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48') -- USDC
+  AND block_time > now() - interval '30 days'
+GROUP BY 1
+ORDER BY 1
+\`\`\`
+
+🧠 Tip: Use \`LOWER()\` for all token/wallet addresses to ensure case-insensitive matching.
+
+------
+
+## 🧼 NFT Wash Trading Detection
+
+**Goal**: Spot suspicious NFT sales to self or known alt wallets.
+
+**Table**: \`nft.trades\`
+
+\`\`\`sql
+SELECT 
+  buyer,
+  seller,
+  COUNT(*) AS trades,
+  SUM(price_usd) AS volume
+FROM nft.trades
+WHERE buyer = seller
+  AND block_time > now() - interval '30 days'
+GROUP BY 1, 2
+ORDER BY 4 DESC
+\`\`\`
+
+🧠 Tip: Filter trades where buyer = seller or use wallet clustering to flag sybil behavior.
+
+------
+
+## 🏦 DAO Treasury Monitoring
+
+**Goal**: Track stablecoin inflows/outflows to a DAO-controlled multisig.
+
+**Table**: \`erc20.token_transfers\`
+
+\`\`\`sql
+SELECT 
+  date_trunc('day', block_time) AS day,
+  SUM(CASE WHEN to_address = LOWER('0xDAOwallet') THEN amount / 1e6 ELSE 0 END) AS inflow,
+  SUM(CASE WHEN from_address = LOWER('0xDAOwallet') THEN amount / 1e6 ELSE 0 END) AS outflow
+FROM erc20.token_transfers
+WHERE token_address = LOWER('0xdAC17F958D2ee523a2206206994597C13D831ec7') -- USDT
+  AND block_time > now() - interval '60 days'
+GROUP BY 1
+ORDER BY 1
+\`\`\`
+
+------
+
+## 🧠 Whale Watching
+
+**Goal**: Identify the top ERC20 recipients in the past week.
+
+**Table**: \`erc20.token_transfers\`
+
+\`\`\`sql
+SELECT 
+  to_address, 
+  COUNT(*) AS tx_count,
+  SUM(amount / 1e18) AS received_tokens
+FROM erc20.token_transfers
+WHERE block_time > now() - interval '7 days'
+GROUP BY 1
+ORDER BY 3 DESC
+LIMIT 10
+\`\`\`
+
+🧠 Tip: Use this with labels or merge with wallet tag datasets to identify CEXs, whales, or teams.
+
+------
+
+## 📈 DEX Swap Volume by Token
+
+**Goal**: Analyze swap volume for a specific token on Uniswap V3.
+
+**Table**: \`uniswap_v3.uniswap_v3_swaps\`
+
+\`\`\`sql
+SELECT 
+  date_trunc('day', block_time) AS day,
+  SUM(amount_usd) AS daily_volume
+FROM uniswap_v3.uniswap_v3_swaps
+WHERE (token_in = LOWER('0x...') OR token_out = LOWER('0x...')) -- Insert token
+  AND block_time > now() - interval '14 days'
+GROUP BY 1
+ORDER BY 1
+\`\`\`
+
+------
+
+## 💸 Protocol Fee Revenue
+
+**Goal**: Measure revenue accrued by protocols with fee switches enabled.
+
+**Table**: protocol-specific (e.g., \`uniswap_v3.fees\`, \`aave.liquidations\`, etc.)
+
+\`\`\`sql
+SELECT 
+  date_trunc('day', block_time) AS day,
+  SUM(fee_amount_usd) AS revenue
+FROM uniswap_v3.fees
+WHERE block_time > now() - interval '30 days'
+GROUP BY 1
+ORDER BY 1
+\`\`\`
+
+🧠 Tip: Use \`prices.usd\` to normalize gas or token fees to USD for consistency.
+
+------
+
+## 🛠️ Cross-Chain Activity (Spellbook)
+
+If you're using Spellbook models from DuneSQL, try this unified userop query:
+
+\`\`\`sql
+SELECT 
+  blockchain,
+  COUNT(*) AS ops,
+  SUM(op_fee_usd) AS total_fees
+FROM account_abstraction_erc4337.userops
+WHERE block_time > now() - interval '14 days'
+GROUP BY 1
+ORDER BY 3 DESC
+\`\`\`
+
+------
+
+## 📊 Dashboard Building Patterns
+
+- Use \`date_trunc()\` for time series
+- Normalize to USD when comparing tokens
+- Always use \`LIMIT\` when exploring large tables
+- Comment your code for future you (and others!)
+- Combine queries with CTEs to keep logic clean
+
+------
+
+## 🧭 Where to Find More Queries
+
+- Browse the [Dune Discover page](https://dune.com/browse/dashboards)
+- Explore the [Spellbook GitHub repo](https://github.com/duneanalytics/spellbook)
+- Fork dashboards from top analysts (and reverse-engineer!)
+- Join Telegram/Discord communities and ask questions
+
+------
+
+## Your Onchain Toolbox Grows
+
+As you start saving useful queries, you'll build your own **playbook** of blockchain insights.
+
+Eventually, you'll recognize patterns before writing code:
+
+- Airdrop season? Check claim activity and sybil patterns.
+- New NFT mint? Track mint velocity and secondary flips.
+- Yield spike? Trace source of new liquidity and associated risk.
+
+**Next: 07. NFT Analysis — Wash Trading, Mint Trends, and Market Health**`
+  },
+  { 
+    number: 7, 
+    title: "NFT Analysis — Wash Trading, Mint Trends, and Market Health", 
+    pdfPath: "/Onchain Manifesto/07. NFT Analysis — Wash Trading, Mint Trends, and Market Health.pdf",
+    mdContent: `# 07. NFT Analysis — Wash Trading, Mint Trends, and Market Health
+
+NFTs are more than jpegs. They're programmable assets, social signals, financial instruments—and, occasionally, tools for manipulation.
+
+As an onchain analyst, your job is to cut through the hype and uncover what's actually happening.
+
+In this article, we'll explore how to analyze NFT ecosystems: track mint activity, spot wash trading, and measure collector behavior across marketplaces.
+
+---
+
+## 🧱 NFT Data Structure
+
+NFT interactions primarily involve:
+
+- **Minting** (creation of new tokens)
+- **Transfers** (wallet-to-wallet moves)
+- **Trades** (buy/sell on a marketplace)
+
+On Dune, the main tables are:
+
+- \`nft.mints\`
+- \`nft.trades\`
+- \`nft.transfers\`
+
+These tables are normalized across chains (Ethereum, Polygon, etc.) and marketplaces (OpenSea, Blur, LooksRare, etc.).
+
+---
+
+## 🎨 Analyzing Mint Trends
+
+**Goal**: Understand how a new collection is being minted.
+
+\`\`\`sql
+SELECT 
+  date_trunc('hour', block_time) AS hour,
+  COUNT(*) AS mints,
+  COUNT(DISTINCT minter) AS unique_minters
+FROM nft.mints
+WHERE nft_contract_address = LOWER('0x...')
+  AND block_time > now() - interval '3 days'
+GROUP BY 1
+ORDER BY 1
+\`\`\`
+
+🧠 Tip: Early spikes in mints with low unique minters = possible botting.
+
+You can also add a \`ROW_NUMBER()\` window to see **who minted the most**, or join with \`nft.transfers\` to see how quickly minted NFTs are flipped.
+
+------
+
+## 🔁 Spotting Wash Trading
+
+Wash trading occurs when a user sells NFTs back and forth between wallets they control to simulate volume.
+
+**Simple heuristic**: \`buyer = seller\` or sales between two wallets repeatedly.
+
+\`\`\`sql
+SELECT 
+  buyer,
+  seller,
+  COUNT(*) AS trades,
+  SUM(price_usd) AS volume
+FROM nft.trades
+WHERE buyer = seller
+  AND block_time > now() - interval '30 days'
+GROUP BY 1, 2
+ORDER BY 4 DESC
+\`\`\`
+
+🧠 Advanced tip: Use clustering logic or wallet label datasets to catch repeat interactions across wallets.
+
+------
+
+## 💰 Marketplace Comparison
+
+Want to know where volume is happening?
+
+\`\`\`sql
+SELECT 
+  marketplace,
+  COUNT(*) AS trades,
+  SUM(price_usd) AS volume
+FROM nft.trades
+WHERE block_time > now() - interval '7 days'
+GROUP BY 1
+ORDER BY 3 DESC
+\`\`\`
+
+This tells you who's dominating: Blur, OpenSea, X2Y2, etc.
+
+You can go deeper by analyzing:
+
+- Blur bid pool activity
+- OpenSea royalties paid
+- Unique wallets per platform
+
+------
+
+## 📊 Holder Behavior & Distribution
+
+Use \`nft.transfers\` to build a simple holder distribution analysis:
+
+\`\`\`sql
+SELECT 
+  to_address,
+  COUNT(*) AS holdings
+FROM nft.transfers
+WHERE nft_contract_address = LOWER('0x...')
+  AND block_time <= now()
+GROUP BY 1
+ORDER BY 2 DESC
+LIMIT 50
+\`\`\`
+
+🧠 Tip: Long-tail holders = healthier community. High concentration = whale risk.
+
+To get **time-based snapshots** (e.g. holders at mint vs. now), you'll need to filter by block height or use snapshots from historical transfer state.
+
+------
+
+## 🧠 Common Questions NFT Analysts Ask
+
+- Who minted the collection and how quickly?
+- What's the average holding time before flipping?
+- Are royalties being enforced (or bypassed)?
+- Which whales are entering or exiting positions?
+- Are there signs of inorganic volume or manipulation?
+
+You can answer all of this with queries across \`nft.trades\`, \`nft.transfers\`, and \`nft.mints\`.
+
+------
+
+## 📚 Bonus: NFT Marketplace Tables in Dune
+
+| Table                           | Description                                          |
+| ------------------------------- | ---------------------------------------------------- |
+| \`nft.trades\`                    | Unified view of NFT sales across marketplaces        |
+| \`nft.mints\`                     | NFT minting activity (e.g. who minted what and when) |
+| \`nft.transfers\`                 | Raw transfer logs, great for holder analysis         |
+| \`blur.trades\`, \`opensea.trades\` | Marketplace-specific sales                           |
+| \`nft.aggregators\`               | Activity via Gem, Genie, Blur                        |
+
+------
+
+## 📈 Real Dashboards You Can Fork
+
+- Blur Trading Dashboard
+- Mint & Flip Monitor
+- NFT Royalty Tracker
+- Holder Distribution Charts
+
+------
+
+## 🧠 Mindset Shift
+
+NFTs are not just art—they're behavioral data. Mint speed, holding duration, marketplace choice, wallet overlap—this is alpha.
+
+Good NFT analysts aren't just collectors. They're pattern readers.
+
+They detect sybils before the airdrop. They flag suspicious volume before a pump. They watch when big wallets exit.
+
+------
+
+**Next: 08. Lending Protocols — Risk, Liquidations, and User Behavior**`
+  },
+  { 
+    number: 8, 
+    title: "Lending Protocols — Risk, Liquidations, and User Behavior", 
+    pdfPath: "/Onchain Manifesto/08. Lending Protocols — Risk, Liquidations, and User Behavior.pdf",
+    mdContent: `# 08. Lending Protocols — Risk, Liquidations, and User Behavior
+
+Lending protocols are the beating heart of DeFi. Billions in crypto assets are locked in platforms like Aave, Compound, and Morpho. Users borrow, lend, stake, and sometimes get liquidated—all onchain.
+
+As an analyst, your job is to understand that flow: Where is risk accumulating? Who's overleveraged? What assets are being used as collateral, and how do positions evolve?
+
+This article will walk through how to analyze lending markets using onchain data.
+
+---
+
+## 🧠 Core Concepts in Onchain Lending
+
+Before we query anything, let's review the key primitives:
+
+- **Deposit**: User supplies an asset to earn interest.
+- **Borrow**: User takes a loan against their collateral.
+- **Repay**: Borrower pays back a loan.
+- **Withdraw**: Lender takes back their supplied assets.
+- **Liquidation**: A borrower's position is forcibly closed if it becomes too risky.
+
+Each of these actions emits an onchain event and is captured in Dune tables like:
+
+- \`aave_v2.ethereum.Borrow\`, \`Repay\`, \`Deposit\`, \`Withdraw\`, \`LiquidationCall\`
+- \`compound_v2.ethereum.market_event_*\`
+- \`morpho_*\` for peer-to-peer lending
+
+---
+
+## 💸 Tracking Borrowing Activity
+
+Let's start simple: How much is being borrowed over time?
+
+\`\`\`sql
+SELECT 
+  DATE_TRUNC('day', evt_block_time) AS day,
+  SUM(amount / 1e18) AS borrowed_eth
+FROM aave_v2_ethereum.Borrow
+WHERE evt_block_time > NOW() - INTERVAL '30 days'
+GROUP BY 1
+ORDER BY 1
+\`\`\`
+
+🧠 Tip: Always adjust for token decimals (1e18 is common for ETH-based tokens).
+
+You can group by \`reserve\` to break it down by asset: WETH, USDC, DAI, etc.
+
+------
+
+## 🏦 Who Is Borrowing What?
+
+\`\`\`sql
+SELECT 
+  borrower,
+  reserve,
+  COUNT(*) AS borrow_count,
+  SUM(amount / 1e6) AS total_borrowed_usdc
+FROM aave_v2_ethereum.Borrow
+WHERE reserve = 'USDC'
+  AND evt_block_time > NOW() - INTERVAL '7 days'
+GROUP BY 1, 2
+ORDER BY 4 DESC
+\`\`\`
+
+Use this to identify whales, frequent borrowers, or degens looping stablecoins.
+
+------
+
+## 🔥 Liquidation Analysis
+
+Liquidations are where risk turns into action. Who is getting liquidated—and for how much?
+
+\`\`\`sql
+SELECT 
+  DATE_TRUNC('day', evt_block_time) AS day,
+  COUNT(*) AS liquidation_count,
+  SUM(liquidated_amount / 1e18) AS total_liquidated
+FROM aave_v2_ethereum.LiquidationCall
+WHERE evt_block_time > NOW() - INTERVAL '30 days'
+GROUP BY 1
+ORDER BY 1
+\`\`\`
+
+Want to see **top liquidated wallets**?
+
+\`\`\`sql
+SELECT 
+  user,
+  SUM(liquidated_amount / 1e18) AS total_liquidated
+FROM aave_v2_ethereum.LiquidationCall
+GROUP BY 1
+ORDER BY 2 DESC
+LIMIT 20
+\`\`\`
+
+------
+
+## 📉 Risk Monitoring
+
+To analyze **at-risk positions**, you'll often want to join:
+
+- Deposits
+- Borrows
+- Current token prices
+
+Unfortunately, these aren't always stored as "position snapshots"—you must **reconstruct them** from event history or query protocols with onchain read functions (via APIs or decoded contracts).
+
+🧠 Pro tip: Some dashboards or Dune Spellbook models pre-aggregate these views.
+
+------
+
+## 📊 Useful Metrics
+
+| Metric                   | Why It Matters                                     |
+| ------------------------ | -------------------------------------------------- |
+| Borrow Utilization       | How much of supplied assets are currently borrowed |
+| Collateral Ratio         | Used to identify at-risk positions                 |
+| Liquidation Volume       | Proxy for market volatility or stress              |
+| Borrowed Asset Breakdown | Stable vs volatile borrow demand                   |
+| Borrower Distribution    | Whale-dominated vs retail-driven lending pool      |
+
+------
+
+## 🔍 Lending vs Protocol Types
+
+| Protocol             | Model          | Notes                                           |
+| -------------------- | -------------- | ----------------------------------------------- |
+| Aave / Compound      | Pool-based     | Interest rates are dynamic based on utilization |
+| Morpho               | Peer-to-peer   | Matches borrowers/lenders for optimized rates   |
+| Euler (now inactive) | Isolated pools | Experimental features like risk tranching       |
+
+The structure of their data will vary. Morpho, for example, will use tables like:
+
+- \`morpho_aavev2_ethereum.supply\`
+- \`morpho_aavev2_ethereum.borrow\`
+- \`morpho_aavev2_ethereum.liquidate\`
+
+------
+
+## 📚 Dashboards to Learn From
+
+- Aave V2 Risk Overview
+- Morpho Lending Analytics
+- Lending Liquidations Monitor
+- Compound Market Overview
+
+------
+
+## 🧠 Final Thoughts
+
+Lending data is a goldmine of behavioral and risk insight. You can track leverage entering or exiting the market, spot cascading liquidations during volatility, or monitor shifts in asset usage across time.
+
+But lending protocols are complex. They have intricate state transitions, economic mechanisms, and edge cases.
+
+So go slow. Read protocol docs. Look at event logs. Trace borrower lifecycles.
+
+And always ask: **What story is the money telling?**
+
+------
+
+**Next: 09. DeFi Analysis — Liquidity, Incentives, and TVL Dynamics**`
+  }
+]
