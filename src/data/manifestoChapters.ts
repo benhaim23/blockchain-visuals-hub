@@ -12,31 +12,31 @@ export interface ManifestoChapter {
 export const manifestoChapters: ManifestoChapter[] = [
   { 
     number: 0,
-    title: "The Onchain Analyst: Decoding the Transparent Economy",
+    title: "Executive Summary",
     pdfPath: "/Onchain Manifesto/00. Executive Summary.pdf",
     mdPath: "/Onchain Manifesto/The Onchain Analyst Decoding the Transparent Economy.md"
   },
   { 
     number: 1,
-    title: "What Does an Onchain Data Analyst Do?",
+    title: "Why Onchain Data Matters",
     pdfPath: "/Onchain Manifesto/01. Why Onchain Data Matters.pdf",
     mdPath: "/Onchain Manifesto/01. What Does an Onchain Data Analyst Do.md"
   },
   { 
     number: 2,
-    title: "The Onchain Stack SQL, Spellbook, and Decoding UTXOs",
+    title: "Dune Analytics 101",
     pdfPath: "/Onchain Manifesto/02. Dune Analytics 101.pdf",
     mdPath: "/Onchain Manifesto/02. The Onchain Stack SQL, Spellbook, and Decoding UTXOs.md"
   },
   { 
     number: 3,
-    title: "The Dune Platform A Gateway to Onchain Transparency",
+    title: "DuneSQL and Spellbook",
     pdfPath: "/Onchain Manifesto/03. DuneSQL and Spellbook.pdf",
     mdPath: "/Onchain Manifesto/03. The Dune Platform A Gateway to Onchain Transparency.md"
   },
   { 
     number: 4,
-    title: "Understanding Tables — Ethereum, Bitcoin, NFTs, ERC4337, and More",
+    title: "Onchain Data Structure",
     pdfPath: "/Onchain Manifesto/04. Onchain Data Structure.pdf",
     mdPath: "/Onchain Manifesto/04. Understanding Tables — Ethereum, Bitcoin, NFTs, ERC4337, and More.md"
   },
@@ -108,13 +108,13 @@ export const manifestoChapters: ManifestoChapter[] = [
   },
   { 
     number: 16,
-    title: "Account Abstraction: Why It Matters for Wallet UX and Analysts",
+    title: "Account Abstraction Why It Matters for Wallet UX and Analysts",
     pdfPath: "/Onchain Manifesto/16. Account Abstraction Why It Matters for Wallet UX and Analysts.pdf",
     mdPath: "/Onchain Manifesto/16. Account Abstraction Why It Matters for Wallet UX and Analysts.md"
   },
   { 
     number: 17,
-    title: "ERC-4337 Aggregated Tables Across EVM Chains: Unified Analytics at Scale",
+    title: "ERC-4337 Aggregated Tables Across EVM Chains Unified Analytics at Scale",
     pdfPath: "/Onchain Manifesto/17. ERC-4337 Aggregated Tables Across EVM Chains Unified Analytics at Scale.pdf",
     mdPath: "/Onchain Manifesto/17. ERC-4337 Aggregated Tables Across EVM Chains Unified Analytics at Scale.md"
   },
