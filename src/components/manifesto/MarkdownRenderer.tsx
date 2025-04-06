@@ -29,6 +29,67 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
     return previousFences.length % 2 !== 0;
   };
 
+  // Function to check if we're in a SQL code block
+  const isWithinSqlCodeBlock = (lines: string[], currentIndex: number): boolean => {
+    if (!isWithinCodeBlock(lines, currentIndex)) return false;
+    
+    // Find the last opening code fence
+    const lastOpeningFenceIndex = lines.slice(0, currentIndex)
+      .map((line, i) => ({ line, i }))
+      .filter(item => item.line.trim().startsWith('```'))
+      .reduce((lastIndex, current) => {
+        // If we have an odd number of fences up to this point, this is an opening fence
+        const fencesBeforeCurrent = lines.slice(0, current.i).filter(l => l.trim().startsWith('```')).length;
+        return fencesBeforeCurrent % 2 === 0 ? current.i : lastIndex;
+      }, -1);
+    
+    if (lastOpeningFenceIndex === -1) return false;
+    
+    // Check if this code block is marked as SQL
+    const openingLine = lines[lastOpeningFenceIndex].trim().toLowerCase();
+    return openingLine === '```sql' || openingLine.includes('sql');
+  };
+
+  // SQL syntax highlighting
+  const formatSqlSyntax = (line: string): React.ReactNode => {
+    // Define regex patterns for SQL syntax elements
+    const keywordPattern = /\b(SELECT|FROM|WHERE|GROUP BY|ORDER BY|HAVING|JOIN|LIMIT|OFFSET|INNER|OUTER|LEFT|RIGHT|FULL|UNION|INSERT|UPDATE|DELETE|CREATE|ALTER|DROP|AS|ON|AND|OR|IN|NOT|COUNT|SUM|AVG|MIN|MAX|CASE|WHEN|THEN|ELSE|END|date_trunc|interval|now)\b/gi;
+    const stringPattern = /'([^']*)'/g;
+    const numberPattern = /\b\d+\b/g;
+    const functionPattern = /\b(\w+)\s*\(/g;
+    const parameterPattern = /\b([a-zA-Z0-9_]+)\s*\=/g;
+    
+    // Apply highlighting
+    let formattedLine = line;
+    
+    // Replace strings - must do this first to avoid conflicts
+    formattedLine = formattedLine.replace(stringPattern, (match) => 
+      `<span class="text-red-400 dark:text-red-300">${match}</span>`
+    );
+    
+    // Replace numbers
+    formattedLine = formattedLine.replace(numberPattern, (match) => 
+      `<span class="text-amber-500 dark:text-amber-300">${match}</span>`
+    );
+    
+    // Replace keywords
+    formattedLine = formattedLine.replace(keywordPattern, (match) => 
+      `<span class="text-purple-500 dark:text-purple-400 font-semibold">${match}</span>`
+    );
+    
+    // Replace function calls
+    formattedLine = formattedLine.replace(functionPattern, (match, functionName) => 
+      `<span class="text-blue-500 dark:text-blue-400">${functionName}</span>(`
+    );
+    
+    // Replace parameters
+    formattedLine = formattedLine.replace(parameterPattern, (match, paramName) => 
+      `<span class="text-teal-500 dark:text-teal-400">${paramName}</span>=`
+    );
+    
+    return <span dangerouslySetInnerHTML={{ __html: formattedLine }} />;
+  };
+
   // Convert markdown content to HTML
   return (
     <div className={`prose dark:prose-invert max-w-none prose-slate prose-headings:text-indigo-900 dark:prose-headings:text-indigo-300 prose-a:text-blue-600 dark:prose-a:text-blue-400 transition-opacity duration-500 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
@@ -89,8 +150,8 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
           
           // Detect if this is a header row (typically the first row in a table)
           const isHeaderRow = index < allLines.length - 1 && 
-                             allLines[index + 1]?.includes('---') &&
-                             allLines[index + 1]?.startsWith('|');
+                              allLines[index + 1]?.includes('---') &&
+                              allLines[index + 1]?.startsWith('|');
           
           return (
             <div key={index} className={`flex w-full ${isHeaderRow ? 'bg-blue-100 dark:bg-slate-700 font-medium rounded-t-lg' : 'bg-white/80 dark:bg-slate-800/80 hover:bg-blue-50 dark:hover:bg-slate-700/80'} ${index === allLines.findIndex(l => l.startsWith('| ')) ? 'rounded-t-lg' : ''}`}>
@@ -118,8 +179,17 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
         
         // Code blocks
         else if (line.startsWith('```')) {
-          // Skip the opening and closing code block markers
-          return <div key={index} className="my-4"></div>;
+          // Extract the language if specified
+          const language = line.substring(3).trim().toLowerCase();
+          return (
+            <div key={index} className="my-4 rounded-t-lg">
+              {language && (
+                <div className="inline-block px-3 py-1 text-xs font-medium bg-gray-800 text-gray-300 rounded-t-lg">
+                  {language}
+                </div>
+              )}
+            </div>
+          );
         }
         
         // Skip language indicators in code blocks
@@ -129,9 +199,17 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
         
         // Handle code content - detect if this line is within a code block
         else if (isWithinCodeBlock(allLines, index)) {
+          // Check if it's SQL code
+          const isSqlCode = isWithinSqlCodeBlock(allLines, index);
+          
           return (
-            <div key={index} className="font-mono text-sm bg-slate-100 dark:bg-slate-800 p-1.5 rounded-none first:rounded-t last:rounded-b text-indigo-600 dark:text-indigo-400 border-l-4 border-indigo-300 dark:border-indigo-700 whitespace-pre-wrap">
-              {line}
+            <div 
+              key={index} 
+              className={`font-mono text-sm ${isSqlCode ? 'bg-gray-900' : 'bg-slate-100 dark:bg-slate-800'} p-1.5 rounded-none first:rounded-t last:rounded-b 
+                ${isSqlCode ? 'text-gray-200' : 'text-indigo-600 dark:text-indigo-400'} 
+                border-l-4 ${isSqlCode ? 'border-purple-500' : 'border-indigo-300 dark:border-indigo-700'} whitespace-pre-wrap`}
+            >
+              {isSqlCode ? formatSqlSyntax(line) : line}
             </div>
           );
         }
