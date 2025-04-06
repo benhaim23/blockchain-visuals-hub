@@ -1,6 +1,6 @@
 
 import React from 'react';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/context/ThemeContext';
@@ -59,7 +59,7 @@ const Hero: React.FC = () => {
           <div className="flex flex-col sm:flex-row items-center justify-center gap-5 pt-10 animate-fade-in-up">
             <Button 
               className={cn(
-                "rounded-full px-8 py-6 w-full sm:w-auto button-glow",
+                "rounded-full px-8 py-6 w-full sm:w-auto bg-primary hover:bg-primary/90",
                 theme === 'dark' ? 'bg-primary/90 hover:bg-primary/80' : 'bg-primary hover:bg-primary/90'
               )}
               onClick={() => {
@@ -74,7 +74,7 @@ const Hero: React.FC = () => {
             <Button 
               variant="outline" 
               className={cn(
-                "rounded-full px-8 py-6 w-full sm:w-auto border-2",
+                "rounded-full px-8 py-6 w-full sm:w-auto border-2 flex items-center justify-center gap-2",
                 theme === 'dark' ? 'border-primary/40 hover:border-primary/60 hover:bg-primary/10' : 'border-primary/30 hover:border-primary/50 hover:bg-primary/5'
               )}
               onClick={() => {
@@ -84,7 +84,7 @@ const Hero: React.FC = () => {
                 }
               }}
             >
-              View Projects
+              <CheckCircle2 className="h-5 w-5" /> View Projects
             </Button>
           </div>
         </div>
