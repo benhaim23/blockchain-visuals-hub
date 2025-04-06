@@ -11,7 +11,7 @@ interface TableRowProps {
 
 const TableRow: React.FC<TableRowProps> = ({ cells, isHeaderRow, isFirstRow, rowIndex }) => {
   return (
-    <div className={`flex w-full ${isHeaderRow ? 'bg-blue-100 dark:bg-slate-700 font-medium rounded-t-lg' : 'bg-white/80 dark:bg-slate-800/80 hover:bg-blue-50 dark:hover:bg-slate-700/80'} ${isFirstRow && !isHeaderRow ? 'rounded-t-lg' : ''}`}>
+    <div className={`flex w-full ${isHeaderRow ? 'bg-blue-100 dark:bg-slate-700 font-medium rounded-t-lg' : 'bg-white/80 dark:bg-slate-800/80 hover:bg-blue-50 dark:hover:bg-slate-700/80'} ${isFirstRow ? 'rounded-t-lg' : ''}`}>
       {cells.map((cell, cellIndex) => (
         <div 
           key={cellIndex} 
