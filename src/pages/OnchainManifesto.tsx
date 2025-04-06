@@ -1,7 +1,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { BookOpen, FileText } from "lucide-react";
+import { BookOpen, FileText, Sparkles } from "lucide-react";
 import Header from '@/components/Header';
 import { Squares } from "@/components/ui/squares-background";
 import { manifestoChapters } from '@/data/manifestoChapters';
@@ -120,6 +120,7 @@ const OnchainManifesto: React.FC = () => {
               >
                 <BookOpen className="mr-2 h-4 w-4 text-blue-600 dark:text-blue-400" />
                 <span className="text-blue-800 dark:text-blue-300">Reader</span>
+                <Sparkles className="ml-2 h-3 w-3 text-amber-500 animate-pulse" />
               </TabsTrigger>
             </TabsList>
 
