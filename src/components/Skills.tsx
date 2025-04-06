@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { BarChart, PieChart, AreaChart, Users, Megaphone, Briefcase, Code, Database, Network, Shield, Search, FlaskConical, Award, GraduationCap, CheckCircle, Bookmark, Medal, FileCheck } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -163,21 +162,18 @@ const Skills: React.FC = () => {
     {
       degree: "Master's in Applied Data Science",
       school: "University of Michigan",
-      period: "2023 - Present",
-      icon: <Database className="h-5 w-5 text-sky-400" />
+      period: "2023 - Present"
     },
     {
       degree: "Master's in Blockchain & Digital Currency",
       school: "University of Nicosia",
-      period: "2018 - 2019",
-      icon: <Network className="h-5 w-5 text-indigo-400" />
+      period: "2018 - 2019"
     },
     {
       degree: "Bachelor of Commerce (Accounting)",
       school: "Concordia University, John Molson School of Business",
       period: "2015 - 2018",
-      honors: "Ernst & Young Scholarship, Beta Gamma Sigma, Dean's Honor List",
-      icon: <Briefcase className="h-5 w-5 text-amber-400" />
+      honors: "Ernst & Young Scholarship, Beta Gamma Sigma, Dean's Honor List"
     }
   ];
 
@@ -314,11 +310,6 @@ const Skills: React.FC = () => {
                     variants={item}
                     className="relative pl-6 border-l-2 border-primary/30 hover:border-primary transition-colors duration-300 py-1"
                   >
-                    <div className="absolute -left-[9px] top-1.5">
-                      <div className="rounded-full p-1 bg-background border-2 border-primary">
-                        {edu.icon}
-                      </div>
-                    </div>
                     <div className="space-y-1">
                       <div className="font-semibold text-lg">{edu.degree}</div>
                       <div className="text-muted-foreground">{edu.school}</div>
