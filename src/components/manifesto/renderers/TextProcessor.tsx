@@ -1,32 +1,29 @@
 
-import React from 'react';
+import React, { useMemo } from 'react';
 
 interface TextProcessorProps {
   text: string;
 }
 
 const TextProcessor: React.FC<TextProcessorProps> = ({ text }) => {
-  // Remove the "Next: XX. Chapter Title" line if it's the last line of the content
-  // This is now handled by the ChapterReader component's CTA button
-  const processNextChapterText = (input: string) => {
-    return input.replace(/\n?\*\*Next:.*?\*\*\s*$/, '');
-  };
-
   // Process the text to remove redundant next chapter text first
-  const processedText = processNextChapterText(text);
+  const processedText = useMemo(() => {
+    // Remove the "Next: XX. Chapter Title" line if it's the last line of the content
+    return text.replace(/\n?\*\*Next:.*?\*\*\s*$/, '');
+  }, [text]);
   
-  // First handle Markdown-style links: [text](url)
-  const processLinks = (input: string) => {
+  // Process links with memoization
+  const linkProcessed = useMemo(() => {
     const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
     const parts: React.ReactNode[] = [];
     
     let lastIndex = 0;
     let match;
     
-    while ((match = linkRegex.exec(input)) !== null) {
+    while ((match = linkRegex.exec(processedText)) !== null) {
       // Add text before the link
       if (match.index > lastIndex) {
-        parts.push(input.substring(lastIndex, match.index));
+        parts.push(processedText.substring(lastIndex, match.index));
       }
       
       // Add the link
@@ -47,57 +44,57 @@ const TextProcessor: React.FC<TextProcessorProps> = ({ text }) => {
     }
     
     // Add remaining text
-    if (lastIndex < input.length) {
-      parts.push(input.substring(lastIndex));
+    if (lastIndex < processedText.length) {
+      parts.push(processedText.substring(lastIndex));
     }
     
-    return parts.length > 0 ? parts : input;
-  };
+    return parts.length > 0 ? parts : processedText;
+  }, [processedText]);
   
-  // Process bold text after handling links
-  const processBoldText = (textNode: string | React.ReactNode): React.ReactNode => {
-    if (typeof textNode !== 'string') {
-      return textNode;
-    }
-    
-    // Improved regex to handle bold text with proper boundary checking
-    // This pattern matches ** followed by text (that doesn't start or end with spaces) followed by **
-    const boldRegex = /\*\*([^*]+?)\*\*/g;
-    
-    const segments = textNode.split(boldRegex);
-    
-    return segments.map((segment, idx) => {
-      // Even indices are normal text, odd indices are the contents of bold tags
-      if (idx % 2 === 1) {
-        // This is bold text (was between ** **)
-        return <strong key={idx} className="text-blue-700 dark:text-blue-400">{segment.trim()}</strong>;
+  // Process bold text with memoization
+  const processBoldText = useMemo(() => {
+    return (textNode: string | React.ReactNode): React.ReactNode => {
+      if (typeof textNode !== 'string') {
+        return textNode;
       }
       
-      // Regular text - check if there are any standalone asterisks to clean up
-      // This removes single asterisks that might be visible but aren't part of proper formatting
-      const cleanedText = segment.replace(/\s\*\s/g, ' ');
+      // Improved regex to handle bold text with proper boundary checking
+      const boldRegex = /\*\*([^*]+?)\*\*/g;
       
-      return <React.Fragment key={idx}>{cleanedText}</React.Fragment>;
-    });
-  };
+      const segments = textNode.split(boldRegex);
+      
+      return segments.map((segment, idx) => {
+        // Even indices are normal text, odd indices are the contents of bold tags
+        if (idx % 2 === 1) {
+          // This is bold text (was between ** **)
+          return <strong key={idx} className="text-blue-700 dark:text-blue-400">{segment.trim()}</strong>;
+        }
+        
+        // Regular text - clean up any standalone asterisks
+        const cleanedText = segment.replace(/\s\*\s/g, ' ');
+        
+        return <React.Fragment key={idx}>{cleanedText}</React.Fragment>;
+      });
+    };
+  }, []);
   
-  // Process links first, then handle bold text within the result
-  const linkProcessed = processLinks(processedText);
-  
-  if (Array.isArray(linkProcessed)) {
-    return (
-      <>
-        {linkProcessed.map((part, index) => 
-          typeof part === 'string' 
-            ? <React.Fragment key={index}>{processBoldText(part)}</React.Fragment>
-            : part
-        )}
-      </>
-    );
-  }
-  
-  // If no links were found, just process bold text
-  return <>{processBoldText(processedText)}</>;
+  // Final render with memoization
+  return useMemo(() => {
+    if (Array.isArray(linkProcessed)) {
+      return (
+        <>
+          {linkProcessed.map((part, index) => 
+            typeof part === 'string' 
+              ? <React.Fragment key={index}>{processBoldText(part)}</React.Fragment>
+              : part
+          )}
+        </>
+      );
+    }
+    
+    // If no links were found, just process bold text
+    return <>{processBoldText(processedText)}</>;
+  }, [linkProcessed, processBoldText, processedText]);
 };
 
-export default TextProcessor;
+export default React.memo(TextProcessor);

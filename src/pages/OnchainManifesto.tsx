@@ -1,14 +1,19 @@
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, Suspense, lazy } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { BookOpen, FileText, Sparkles } from "lucide-react";
 import Header from '@/components/Header';
 import { Squares } from "@/components/ui/squares-background";
 import { manifestoChapters } from '@/data/manifestoChapters_updated';
 import TableOfContents from '@/components/manifesto/TableOfContents';
-import ChapterReader from '@/components/manifesto/ChapterReader';
 import { toast } from '@/components/ui/use-toast';
 import { MatrixText } from '@/components/ui/matrix-text';
+
+// Lazy load the heavy ChapterReader component
+const ChapterReader = lazy(() => import('@/components/manifesto/ChapterReader'));
+
+// Create a cache for markdown content
+const markdownCache = new Map<string, string>();
 
 const OnchainManifesto: React.FC = () => {
   const [activeTab, setActiveTab] = useState("toc");
@@ -16,73 +21,99 @@ const OnchainManifesto: React.FC = () => {
   const [mdContent, setMdContent] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
 
-  const goToNextChapter = () => {
+  // Memoize the current chapter data
+  const currentChapterData = useMemo(() => 
+    manifestoChapters[currentChapter], 
+    [currentChapter]
+  );
+
+  // Callbacks for navigation
+  const goToNextChapter = useCallback(() => {
     if (currentChapter < manifestoChapters.length - 1) {
       setCurrentChapter(currentChapter + 1);
       setActiveTab("reader");
     }
-  };
+  }, [currentChapter]);
 
-  const goToPreviousChapter = () => {
+  const goToPreviousChapter = useCallback(() => {
     if (currentChapter > 0) {
       setCurrentChapter(currentChapter - 1);
       setActiveTab("reader");
     }
-  };
+  }, [currentChapter]);
 
-  const handleSelectChapter = (chapterIndex: number) => {
+  const handleSelectChapter = useCallback((chapterIndex: number) => {
     setCurrentChapter(chapterIndex);
     setActiveTab("reader");
-  };
+  }, []);
 
+  // Load content with caching
+  const loadContent = useCallback(async () => {
+    setIsLoading(true);
+    const chapter = currentChapterData;
+
+    if (!chapter) {
+      setIsLoading(false);
+      return;
+    }
+
+    if (chapter.mdContent) {
+      setMdContent(chapter.mdContent);
+      setIsLoading(false);
+      return;
+    }
+    
+    if (chapter.mdPath) {
+      try {
+        // Check cache first
+        if (markdownCache.has(chapter.mdPath)) {
+          setMdContent(markdownCache.get(chapter.mdPath) || "");
+          setIsLoading(false);
+          return;
+        }
+
+        const response = await fetch(chapter.mdPath);
+        
+        if (!response.ok) {
+          throw new Error(`Failed to load markdown: ${response.status}`);
+        }
+        
+        const text = await response.text();
+        
+        // Cache the fetched content
+        markdownCache.set(chapter.mdPath, text);
+        setMdContent(text);
+      } catch (error) {
+        console.error('Error loading markdown:', error);
+        toast({
+          title: "Failed to load content",
+          description: "There was an error loading the chapter content. Please try again.",
+          variant: "destructive"
+        });
+        setMdContent("");
+      }
+    } else {
+      setMdContent("");
+    }
+    
+    setIsLoading(false);
+  }, [currentChapterData]);
+
+  // Update title and load content when chapter changes
   useEffect(() => {
     // Update the document title based on the current page/chapter
     if (activeTab === "toc") {
       document.title = "The Onchain Manifesto | Mark Benhaim";
-    } else if (activeTab === "reader" && manifestoChapters[currentChapter]) {
-      document.title = `${manifestoChapters[currentChapter].title} | The Onchain Manifesto`;
+    } else if (activeTab === "reader" && currentChapterData) {
+      document.title = `${currentChapterData.title} | The Onchain Manifesto`;
     }
     
-    const loadContent = async () => {
-      setIsLoading(true);
-      const chapter = manifestoChapters[currentChapter];
-
-      if (chapter?.mdContent) {
-        setMdContent(chapter.mdContent);
-        setIsLoading(false);
-        return;
-      }
-      
-      if (chapter?.mdPath) {
-        try {
-          const response = await fetch(chapter.mdPath);
-          
-          if (!response.ok) {
-            throw new Error(`Failed to load markdown: ${response.status}`);
-          }
-          
-          const text = await response.text();
-          setMdContent(text);
-        } catch (error) {
-          console.error('Error loading markdown:', error);
-          toast({
-            title: "Failed to load content",
-            description: "There was an error loading the chapter content. Please try again.",
-            variant: "destructive"
-          });
-          setMdContent("");
-        }
-      } else {
-        setMdContent("");
-      }
-      
-      setIsLoading(false);
-    };
-
+    // Load content for the current chapter
     loadContent();
-  }, [currentChapter, activeTab]);
+  }, [currentChapter, activeTab, currentChapterData, loadContent]);
 
-  return (
+  // Memoize the page content to prevent unnecessary re-renders
+  const pageContent = useMemo(() => (
     <>
       <Header />
       <div className="min-h-screen pt-24 pb-16 relative bg-gradient-to-b from-sky-50 to-white dark:from-gray-900 dark:to-gray-950">
@@ -144,20 +175,28 @@ const OnchainManifesto: React.FC = () => {
                   <p className="text-blue-600 dark:text-blue-400 animate-pulse">Loading chapter content...</p>
                 </div>
               ) : (
-                <ChapterReader 
-                  currentChapter={currentChapter}
-                  chapters={manifestoChapters}
-                  mdContent={mdContent}
-                  onPreviousChapter={goToPreviousChapter}
-                  onNextChapter={goToNextChapter}
-                />
+                <Suspense fallback={
+                  <div className="bg-white/90 dark:bg-card/80 backdrop-blur-sm rounded-lg border-2 border-blue-200 dark:border-slate-700 min-h-[600px] flex items-center justify-center shadow-lg">
+                    <p className="text-blue-600 dark:text-blue-400 animate-pulse">Loading reader...</p>
+                  </div>
+                }>
+                  <ChapterReader 
+                    currentChapter={currentChapter}
+                    chapters={manifestoChapters}
+                    mdContent={mdContent}
+                    onPreviousChapter={goToPreviousChapter}
+                    onNextChapter={goToNextChapter}
+                  />
+                </Suspense>
               )}
             </TabsContent>
           </Tabs>
         </div>
       </div>
     </>
-  );
+  ), [activeTab, currentChapter, goToNextChapter, goToPreviousChapter, handleSelectChapter, isLoading, mdContent]);
+
+  return pageContent;
 };
 
-export default OnchainManifesto;
+export default React.memo(OnchainManifesto);
