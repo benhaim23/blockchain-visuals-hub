@@ -117,6 +117,10 @@ export default {
           '50%': { transform: 'translate(0, 20px)' },
           '75%': { transform: 'translate(-10px, 10px)' },
           '100%': { transform: 'translate(0, 0)' }
+        },
+        'shine': {
+          '0%': { transform: 'translateX(-100%)' },
+          '100%': { transform: 'translateX(100%)' }
         }
 			},
 			animation: {
@@ -130,7 +134,8 @@ export default {
 				'fade-in-right': 'fade-in-right 0.7s ease-out',
 				pulse: 'pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
 				'gradient-shift': 'gradient-shift 8s ease infinite',
-        'particle-move': 'particle-move 8s ease-in-out infinite'
+        'particle-move': 'particle-move 8s ease-in-out infinite',
+        'shine': 'shine 1.5s ease-in-out infinite'
 			},
 			fontFamily: {
 				sans: ['Inter', 'sans-serif'],
