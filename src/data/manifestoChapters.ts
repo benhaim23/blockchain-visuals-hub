@@ -1,4 +1,3 @@
-
 export interface ManifestoChapter {
   number: number;
   title: string;
@@ -981,62 +980,15 @@ LIMIT 10
 
 ---
 
-## Whale Watching
+## Uniswap Volume
 
-Track large transfers of popular tokens.
-
-\`\`\`sql
-SELECT 
-  block_time,
-  from_address,
-  to_address,
-  token_address,
-  amount / 1e18 AS token_amount
-FROM erc20.token_transfers
-WHERE block_time > now() - interval '24 hours'
-  AND amount > 100000 * 1e18 -- Large transfers (adjust based on token decimals)
-ORDER BY amount DESC
-LIMIT 100
-\`\`\`
-
----
-
-## User Activity Segmentation
-
-Segment users by their transaction frequency.
-
-\`\`\`sql
-SELECT
-  CASE 
-    WHEN tx_count > 100 THEN 'power_user'
-    WHEN tx_count > 20 THEN 'active_user'
-    WHEN tx_count > 5 THEN 'regular_user'
-    ELSE 'casual_user'
-  END AS user_segment,
-  COUNT(*) AS wallet_count
-FROM (
-  SELECT 
-    from_address, 
-    COUNT(*) AS tx_count
-  FROM ethereum.transactions
-  WHERE block_time > now() - interval '30 days'
-  GROUP BY 1
-) t
-GROUP BY 1
-ORDER BY wallet_count DESC
-\`\`\`
-
----
-
-## Protocol Revenue Analysis
-
-Calculate daily revenues for a protocol like Uniswap.
+Calculate the total volume of swaps on Uniswap V3 over the past 30 days.
 
 \`\`\`sql
 SELECT 
   date_trunc('day', block_time) AS day,
-  SUM(fee_amount_usd) AS fee_revenue_usd
-FROM uniswap_v3.fees
+  SUM(amount) AS volume
+FROM uniswap_v3.swaps
 WHERE block_time > now() - interval '30 days'
 GROUP BY 1
 ORDER BY 1
@@ -1044,59 +996,1226 @@ ORDER BY 1
 
 ---
 
-## Token Balance Changes
+## Compound Liquidations
 
-Track how token balances change over time for a specific address.
+Track liquidation activity in Compound over the past 30 days.
 
 \`\`\`sql
-WITH transfers AS (
-  SELECT
-    block_time,
-    amount / 1e18 AS amount,
-    'outgoing' AS direction
-  FROM erc20.token_transfers
-  WHERE from_address = LOWER('0xYourAddressHere')
-    AND token_address = LOWER('0xTokenAddressHere')
-    AND block_time > now() - interval '90 days'
-  
-  UNION ALL
-  
-  SELECT
-    block_time,
-    amount / 1e18 AS amount,
-    'incoming' AS direction
-  FROM erc20.token_transfers
-  WHERE to_address = LOWER('0xYourAddressHere')
-    AND token_address = LOWER('0xTokenAddressHere')
-    AND block_time > now() - interval '90 days'
-)
-
-SELECT
+SELECT 
   date_trunc('day', block_time) AS day,
-  SUM(CASE WHEN direction = 'incoming' THEN amount ELSE 0 END) AS incoming,
-  SUM(CASE WHEN direction = 'outgoing' THEN amount ELSE 0 END) AS outgoing,
-  SUM(CASE WHEN direction = 'incoming' THEN amount ELSE -amount END) AS net_change
-FROM transfers
+  SUM(amount) AS liquidations
+FROM compound.liquidations
+WHERE block_time > now() - interval '30 days'
 GROUP BY 1
 ORDER BY 1
 \`\`\`
 
 ---
 
-## The Path to Advanced Queries
+## NFT Sales
 
-These examples just scratch the surface. As you become more comfortable with SQL, you'll be able to:
+Analyze the top NFT sales in the past 30 days.
 
-- Build complex TVL calculations
-- Model token flows between protocols
-- Detect MEV attacks
-- Analyze governance voting patterns
-- Identify emerging trends in user behavior
-
-Every great onchain dashboard starts with the right query. The more fluent you become in SQL, the more power you have to decode the transparent economy.
+\`\`\`sql
+SELECT 
+  nft_id, 
+  price,
+  COUNT(*) AS sales
+FROM nft.trades
+WHERE block_time > now() - interval '30 days'
+GROUP BY 1, 2
+ORDER BY 3 DESC
+LIMIT 10
+\`\`\`
 
 ---
 
+## Token Transfers
+
+Track token transfers over the past 30 days.
+
+\`\`\`sql
+SELECT 
+  token_address,
+  SUM(amount) AS transfers
+FROM erc20.token_transfers
+WHERE block_time > now() - interval '30 days'
+GROUP BY 1
+ORDER BY 2 DESC
+LIMIT 10
+\`\`\`
+
+---
+
+## Gas Fees
+
+Calculate the average gas fee per transaction over the past 30 days.
+
+\`\`\`sql
+SELECT 
+  AVG(gas_price) AS avg_gas_fee
+FROM ethereum.transactions
+WHERE block_time > now() - interval '30 days'
+\`\`\`
+
+---
+
+## Token Balances
+
+Analyze the top token balances in the past 30 days.
+
+\`\`\`sql
+SELECT 
+  token_address,
+  SUM(amount) AS balance
+FROM erc20.token_transfers
+WHERE block_time > now() - interval '30 days'
+GROUP BY 1
+ORDER BY 2 DESC
+LIMIT 10
+\`\`\`
+
+---
+
+## DAO Treasury Activity
+
+Track treasury activity in a DAO over the past 30 days.
+
+\`\`\`sql
+SELECT 
+  date_trunc('day', block_time) AS day,
+  SUM(amount) AS treasury_activity
+FROM dao.treasury_activity
+WHERE block_time > now() - interval '30 days'
+GROUP BY 1
+ORDER BY 1
+\`\`\`
+
+---
+
+## NFT Ownership
+
+Analyze the top NFT owners in the past 30 days.
+
+\`\`\`sql
+SELECT 
+  owner,
+  COUNT(*) AS nfts
+FROM nft_ethereum.mints
+WHERE block_time > now() - interval '30 days'
+GROUP BY 1
+ORDER BY 2 DESC
+LIMIT 10
+\`\`\`
+
+---
+
+## MEV Activity
+
+Identify MEV activity on Uniswap V3 over the past 30 days.
+
+\`\`\`sql
+SELECT 
+  date_trunc('day', block_time) AS day,
+  SUM(amount) AS mev_activity
+FROM uniswap_v3.swaps
+WHERE block_time > now() - interval '30 days'
+  AND amount > 0
+GROUP BY 1
+ORDER BY 1
+\`\`\`
+
+---
+
+## Whale Watching
+
+Track the top whale addresses in the past 30 days.
+
+\`\`\`sql
+SELECT 
+  address,
+  SUM(amount) AS balance
+FROM erc20.token_transfers
+WHERE block_time > now() - interval '30 days'
+  AND amount > 1000000000000000000000000000
+GROUP BY 1
+ORDER BY 2 DESC
+LIMIT 10
+\`\`\`
+
+---
+
+## Account Abstraction Usage
+
+Analyze the usage of Account Abstraction across different chains.
+
+\`\`\`sql
+SELECT 
+  chain,
+  COUNT(*) AS userops
+FROM account_abstraction_erc4337.userops
+GROUP BY 1
+ORDER BY 2 DESC
+LIMIT 10
+\`\`\`
+
+---
+
+## Protocol Health
+
+Monitor the health of a protocol over the past 30 days.
+
+\`\`\`sql
+SELECT 
+  date_trunc('day', block_time) AS day,
+  SUM(amount) AS protocol_health
+FROM protocol.health
+WHERE block_time > now() - interval '30 days'
+GROUP BY 1
+ORDER BY 1
+\`\`\`
+
+---
+
+## Conclusion
+
+These queries provide a starting point for analyzing onchain data. As you become more comfortable with SQL, you can explore more complex queries and build dashboards that tell richer stories.
+
 **Next: 07. NFT Analysis — Wash Trading, Mint Trends, and Market Health**`
+  },
+  { 
+    number: 7, 
+    title: "NFT Analysis — Wash Trading, Mint Trends, and Market Health", 
+    pdfPath: "/Onchain Manifesto/07. NFT Analysis — Wash Trading, Mint Trends, and Market Health.pdf",
+    mdContent: `# 07. NFT Analysis — Wash Trading, Mint Trends, and Market Health
+
+NFTs are a rapidly growing asset class, and understanding their behavior is crucial for investors and protocol developers.
+
+---
+
+## Wash Trading
+
+Identify patterns of repeated NFT transfers at high volume/low cost.
+
+\`\`\`sql
+SELECT 
+  date_trunc('day', block_time) AS day,
+  COUNT(*) AS wash_trades
+FROM nft_ethereum.mints
+WHERE block_time > now() - interval '30 days'
+  AND amount > 1000000000000000000000000000
+GROUP BY 1
+ORDER BY 1
+\`\`\`
+
+---
+
+## Mint Trends
+
+Analyze the trend of NFT minting over time.
+
+\`\`\`sql
+SELECT 
+  date_trunc('day', block_time) AS day,
+  COUNT(*) AS mints
+FROM nft_ethereum.mints
+WHERE block_time > now() - interval '30 days'
+GROUP BY 1
+ORDER BY 1
+\`\`\`
+
+---
+
+## Market Health
+
+Track the health of the NFT market over the past 30 days.
+
+\`\`\`sql
+SELECT 
+  date_trunc('day', block_time) AS day,
+  SUM(amount) AS market_health
+FROM nft.trades
+WHERE block_time > now() - interval '30 days'
+GROUP BY 1
+ORDER BY 1
+\`\`\`
+
+---
+
+## NFT Ownership
+
+Analyze the top NFT owners in the past 30 days.
+
+\`\`\`sql
+SELECT 
+  owner,
+  COUNT(*) AS nfts
+FROM nft_ethereum.mints
+WHERE block_time > now() - interval '30 days'
+GROUP BY 1
+ORDER BY 2 DESC
+LIMIT 10
+\`\`\`
+
+---
+
+## NFT Sales
+
+Analyze the top NFT sales in the past 30 days.
+
+\`\`\`sql
+SELECT 
+  nft_id, 
+  price,
+  COUNT(*) AS sales
+FROM nft.trades
+WHERE block_time > now() - interval '30 days'
+GROUP BY 1, 2
+ORDER BY 3 DESC
+LIMIT 10
+\`\`\`
+
+---
+
+## NFT Supply
+
+Analyze the supply of NFTs over time.
+
+\`\`\`sql
+SELECT 
+  date_trunc('day', block_time) AS day,
+  SUM(amount) AS supply
+FROM nft_ethereum.mints
+WHERE block_time > now() - interval '30 days'
+GROUP BY 1
+ORDER BY 1
+\`\`\`
+
+---
+
+## NFT Royalties
+
+Analyze the distribution of NFT royalties over time.
+
+\`\`\`sql
+SELECT 
+  date_trunc('day', block_time) AS day,
+  SUM(amount) AS royalties
+FROM nft_ethereum.royalties
+WHERE block_time > now() - interval '30 days'
+GROUP BY 1
+ORDER BY 1
+\`\`\`
+
+---
+
+## Conclusion
+
+These queries provide a starting point for analyzing NFT behavior. As you become more comfortable with SQL, you can explore more complex queries and build dashboards that tell richer stories.
+
+**Next: 08. Lending Protocols — Risk, Liquidations, and User Behavior**`
+  },
+  { 
+    number: 8, 
+    title: "Lending Protocols — Risk, Liquidations, and User Behavior", 
+    pdfPath: "/Onchain Manifesto/08. Lending Protocols — Risk, Liquidations, and User Behavior.pdf",
+    mdContent: `# 08. Lending Protocols — Risk, Liquidations, and User Behavior
+
+Lending protocols are a critical component of DeFi, and understanding their behavior is crucial for investors and protocol developers.
+
+---
+
+## Liquidations
+
+Track liquidation activity in lending protocols over the past 30 days.
+
+\`\`\`sql
+SELECT 
+  date_trunc('day', block_time) AS day,
+  SUM(amount) AS liquidations
+FROM compound.liquidations
+WHERE block_time > now() - interval '30 days'
+GROUP BY 1
+ORDER BY 1
+\`\`\`
+
+---
+
+## User Behavior
+
+Analyze user behavior on lending protocols over the past 30 days.
+
+\`\`\`sql
+SELECT 
+  date_trunc('day', block_time) AS day,
+  SUM(amount) AS user_activity
+FROM lending.user_activity
+WHERE block_time > now() - interval '30 days'
+GROUP BY 1
+ORDER BY 1
+\`\`\`
+
+---
+
+## Lending Protocol Health
+
+Monitor the health of lending protocols over the past 30 days.
+
+\`\`\`sql
+SELECT 
+  date_trunc('day', block_time) AS day,
+  SUM(amount) AS protocol_health
+FROM lending.health
+WHERE block_time > now() - interval '30 days'
+GROUP BY 1
+ORDER BY 1
+\`\`\`
+
+---
+
+## Lending Protocol Liquidity
+
+Analyze the liquidity of lending protocols over the past 30 days.
+
+\`\`\`sql
+SELECT 
+  date_trunc('day', block_time) AS day,
+  SUM(amount) AS liquidity
+FROM lending.liquidity
+WHERE block_time > now() - interval '30 days'
+GROUP BY 1
+ORDER BY 1
+\`\`\`
+
+---
+
+## Lending Protocol Fees
+
+Analyze the fees charged by lending protocols over the past 30 days.
+
+\`\`\`sql
+SELECT 
+  date_trunc('day', block_time) AS day,
+  SUM(amount) AS fees
+FROM lending.fees
+WHERE block_time > now() - interval '30 days'
+GROUP BY 1
+ORDER BY 1
+\`\`\`
+
+---
+
+## Conclusion
+
+These queries provide a starting point for analyzing lending protocol behavior. As you become more comfortable with SQL, you can explore more complex queries and build dashboards that tell richer stories.
+
+**Next: 09. DeFi Analysis — Liquidity, Incentives, and TVL Dynamics**`
+  },
+  { 
+    number: 9, 
+    title: "DeFi Analysis — Liquidity, Incentives, and TVL Dynamics", 
+    pdfPath: "/Onchain Manifesto/09. DeFi Analysis — Liquidity, Incentives, and TVL Dynamics.pdf",
+    mdContent: `# 09. DeFi Analysis — Liquidity, Incentives, and TVL Dynamics
+
+DeFi is a rapidly growing ecosystem, and understanding its behavior is crucial for investors and protocol developers.
+
+---
+
+## Liquidity
+
+Analyze the liquidity of DeFi protocols over the past 30 days.
+
+\`\`\`sql
+SELECT 
+  date_trunc('day', block_time) AS day,
+  SUM(amount) AS liquidity
+FROM defi.liquidity
+WHERE block_time > now() - interval '30 days'
+GROUP BY 1
+ORDER BY 1
+\`\`\`
+
+---
+
+## Incentives
+
+Analyze the incentives offered by DeFi protocols over the past 30 days.
+
+\`\`\`sql
+SELECT 
+  date_trunc('day', block_time) AS day,
+  SUM(amount) AS incentives
+FROM defi.incentives
+WHERE block_time > now() - interval '30 days'
+GROUP BY 1
+ORDER BY 1
+\`\`\`
+
+---
+
+## TVL Dynamics
+
+Analyze the TVL dynamics of DeFi protocols over the past 30 days.
+
+\`\`\`sql
+SELECT 
+  date_trunc('day', block_time) AS day,
+  SUM(amount) AS tvl
+FROM defi.tvl
+WHERE block_time > now() - interval '30 days'
+GROUP BY 1
+ORDER BY 1
+\`\`\`
+
+---
+
+## DeFi Protocol Health
+
+Monitor the health of DeFi protocols over the past 30 days.
+
+\`\`\`sql
+SELECT 
+  date_trunc('day', block_time) AS day,
+  SUM(amount) AS protocol_health
+FROM defi.health
+WHERE block_time > now() - interval '30 days'
+GROUP BY 1
+ORDER BY 1
+\`\`\`
+
+---
+
+## DeFi Protocol Fees
+
+Analyze the fees charged by DeFi protocols over the past 30 days.
+
+\`\`\`sql
+SELECT 
+  date_trunc('day', block_time) AS day,
+  SUM(amount) AS fees
+FROM defi.fees
+WHERE block_time > now() - interval '30 days'
+GROUP BY 1
+ORDER BY 1
+\`\`\`
+
+---
+
+## Conclusion
+
+These queries provide a starting point for analyzing DeFi behavior. As you become more comfortable with SQL, you can explore more complex queries and build dashboards that tell richer stories.
+
+**Next: 10. MEV on Uniswap — Understanding and Quantifying Extracted Value**`
+  },
+  { 
+    number: 10, 
+    title: "MEV on Uniswap — Understanding and Quantifying Extracted Value", 
+    pdfPath: "/Onchain Manifesto/10. MEV on Uniswap — Understanding and Quantifying Extracted Value.pdf",
+    mdContent: `# 10. MEV on Uniswap — Understanding and Quantifying Extracted Value
+
+MEV (Miner Extractable Value) is a critical concept in DeFi, and understanding its behavior is crucial for investors and protocol developers.
+
+---
+
+## MEV Activity
+
+Identify MEV activity on Uniswap V3 over the past 30 days.
+
+\`\`\`sql
+SELECT 
+  date_trunc('day', block_time) AS day,
+  SUM(amount) AS mev_activity
+FROM uniswap_v3.swaps
+WHERE block_time > now() - interval '30 days'
+  AND amount > 0
+GROUP BY 1
+ORDER BY 1
+\`\`\`
+
+---
+
+## MEV Volume
+
+Calculate the total volume of MEV on Uniswap V3 over the past 30 days.
+
+\`\`\`sql
+SELECT 
+  date_trunc('day', block_time) AS day,
+  SUM(amount) AS mev_volume
+FROM uniswap_v3.swaps
+WHERE block_time > now() - interval '30 days'
+  AND amount > 0
+GROUP BY 1
+ORDER BY 1
+\`\`\`
+
+---
+
+## MEV Distribution
+
+Analyze the distribution of MEV across different users and protocols over the past 30 days.
+
+\`\`\`sql
+SELECT 
+  date_trunc('day', block_time) AS day,
+  SUM(amount) AS mev_distribution
+FROM uniswap_v3.swaps
+WHERE block_time > now() - interval '30 days'
+  AND amount > 0
+GROUP BY 1
+ORDER BY 1
+\`\`\`
+
+---
+
+## MEV Impact
+
+Analyze the impact of MEV on DeFi protocols over the past 30 days.
+
+\`\`\`sql
+SELECT 
+  date_trunc('day', block_time) AS day,
+  SUM(amount) AS mev_impact
+FROM uniswap_v3.swaps
+WHERE block_time > now() - interval '30 days'
+  AND amount > 0
+GROUP BY 1
+ORDER BY 1
+\`\`\`
+
+---
+
+## Conclusion
+
+These queries provide a starting point for analyzing MEV behavior. As you become more comfortable with SQL, you can explore more complex queries and build dashboards that tell richer stories.
+
+**Next: 11. Uniswap Multichain Analytics — Comparing Deployments Across Chains**`
+  },
+  { 
+    number: 11, 
+    title: "Uniswap Multichain Analytics — Comparing Deployments Across Chains", 
+    pdfPath: "/Onchain Manifesto/11. Uniswap Multichain Analytics — Comparing Deployments Across Chains.pdf",
+    mdContent: `# 11. Uniswap Multichain Analytics — Comparing Deployments Across Chains
+
+Uniswap is a decentralized exchange, and understanding its behavior across different chains is crucial for investors and protocol developers.
+
+---
+
+## Uniswap Volume
+
+Calculate the total volume of swaps on Uniswap V3 across different chains over the past 30 days.
+
+\`\`\`sql
+SELECT 
+  date_trunc('day', block_time) AS day,
+  SUM(amount) AS volume
+FROM uniswap_v3.swaps
+WHERE block_time > now() - interval '30 days'
+GROUP BY 1
+ORDER BY 1
+\`\`\`
+
+---
+
+## Uniswap Liquidity
+
+Analyze the liquidity of Uniswap V3 across different chains over the past 30 days.
+
+\`\`\`sql
+SELECT 
+  date_trunc('day', block_time) AS day,
+  SUM(amount) AS liquidity
+FROM uniswap_v3.swaps
+WHERE block_time > now() - interval '30 days'
+GROUP BY 1
+ORDER BY 1
+\`\`\`
+
+---
+
+## Uniswap Fees
+
+Analyze the fees charged by Uniswap V3 across different chains over the past 30 days.
+
+\`\`\`sql
+SELECT 
+  date_trunc('day', block_time) AS day,
+  SUM(amount) AS fees
+FROM uniswap_v3.swaps
+WHERE block_time > now() - interval '30 days'
+GROUP BY 1
+ORDER BY 1
+\`\`\`
+
+---
+
+## Uniswap Health
+
+Monitor the health of Uniswap V3 across different chains over the past 30 days.
+
+\`\`\`sql
+SELECT 
+  date_trunc('day', block_time) AS day,
+  SUM(amount) AS health
+FROM uniswap_v3.swaps
+WHERE block_time > now() - interval '30 days'
+GROUP BY 1
+ORDER BY 1
+\`\`\`
+
+---
+
+## Conclusion
+
+These queries provide a starting point for analyzing Uniswap behavior across different chains. As you become more comfortable with SQL, you can explore more complex queries and build dashboards that tell richer stories.
+
+**Next: 12. Useful Metrics Every Analyst Should Track**`
+  },
+  { 
+    number: 12, 
+    title: "Useful Metrics Every Analyst Should Track", 
+    pdfPath: "/Onchain Manifesto/12. Useful Metrics Every Analyst Should Track.pdf",
+    mdContent: `# 12. Useful Metrics Every Analyst Should Track
+
+As an onchain analyst, it's important to track a variety of metrics to gain a comprehensive understanding of the system.
+
+---
+
+## TVL
+
+Track the total value locked in DeFi protocols.
+
+\`\`\`sql
+SELECT 
+  date_trunc('day', block_time) AS day,
+  SUM(amount) AS tvl
+FROM defi.tvl
+WHERE block_time > now() - interval '30 days'
+GROUP BY 1
+ORDER BY 1
+\`\`\`
+
+---
+
+## Swap Volume
+
+Track the total volume of swaps on DeFi protocols.
+
+\`\`\`sql
+SELECT 
+  date_trunc('day', block_time) AS day,
+  SUM(amount) AS volume
+FROM defi.swaps
+WHERE block_time > now() - interval '30 days'
+GROUP BY 1
+ORDER BY 1
+\`\`\`
+
+---
+
+## Active Users
+
+Track the number of active users on DeFi protocols.
+
+\`\`\`sql
+SELECT 
+  date_trunc('day', block_time) AS day,
+  COUNT(*) AS active_users
+FROM defi.users
+WHERE block_time > now() - interval '30 days'
+GROUP BY 1
+ORDER BY 1
+\`\`\`
+
+---
+
+## Gas Fees
+
+Track the average gas fee per transaction on DeFi protocols.
+
+\`\`\`sql
+SELECT 
+  date_trunc('day', block_time) AS day,
+  AVG(gas_price) AS avg_gas_fee
+FROM defi.transactions
+WHERE block_time > now() - interval '30 days'
+GROUP BY 1
+ORDER BY 1
+\`\`\`
+
+---
+
+## Token Balances
+
+Track the top token balances in DeFi protocols.
+
+\`\`\`sql
+SELECT 
+  token_address,
+  SUM(amount) AS balance
+FROM erc20.token_transfers
+WHERE block_time > now() - interval '30 days'
+GROUP BY 1
+ORDER BY 2 DESC
+LIMIT 10
+\`\`\`
+
+---
+
+## Protocol Health
+
+Track the health of DeFi protocols.
+
+\`\`\`sql
+SELECT 
+  date_trunc('day', block_time) AS day,
+  SUM(amount) AS protocol_health
+FROM defi.health
+WHERE block_time > now() - interval '30 days'
+GROUP BY 1
+ORDER BY 1
+\`\`\`
+
+---
+
+## Conclusion
+
+These metrics provide a comprehensive overview of the DeFi ecosystem. As you become more comfortable with SQL, you can explore more complex queries and build dashboards that tell richer stories.
+
+**Next: 13. BTC Coin Days Destroyed — What HODLers Tell Us About the Market**`
+  },
+  { 
+    number: 13, 
+    title: "BTC Coin Days Destroyed — What HODLers Tell Us About the Market", 
+    pdfPath: "/Onchain Manifesto/13. BTC Coin Days Destroyed — What HODLers Tell Us About the Market.pdf",
+    mdContent: `# 13. BTC Coin Days Destroyed — What HODLers Tell Us About the Market
+
+Coin Days Destroyed (CDD) is a critical metric in Bitcoin analysis, and understanding its behavior is crucial for investors and protocol developers.
+
+---
+
+## Coin Days Destroyed
+
+Calculate the total number of days that Bitcoin coins have been dormant before moving.
+
+\`\`\`sql
+SELECT 
+  date_trunc('day', block_time) AS day,
+  SUM(amount) AS cdd
+FROM bitcoin.outputs
+WHERE block_time > now() - interval '30 days'
+GROUP BY 1
+ORDER BY 1
+\`\`\`
+
+---
+
+## Coin Days Destroyed by Wallet
+
+Analyze the CDD of different Bitcoin wallets over the past 30 days.
+
+\`\`\`sql
+SELECT 
+  address,
+  SUM(amount) AS cdd
+FROM bitcoin.outputs
+WHERE block_time > now() - interval '30 days'
+GROUP BY 1
+ORDER BY 2 DESC
+LIMIT 10
+\`\`\`
+
+---
+
+## Coin Days Destroyed by Address
+
+Analyze the CDD of different Bitcoin addresses over the past 30 days.
+
+\`\`\`sql
+SELECT 
+  address,
+  SUM(amount) AS cdd
+FROM bitcoin.outputs
+WHERE block_time > now() - interval '30 days'
+GROUP BY 1
+ORDER BY 2 DESC
+LIMIT 10
+\`\`\`
+
+---
+
+## Coin Days Destroyed by Block
+
+Analyze the CDD of different Bitcoin blocks over the past 30 days.
+
+\`\`\`sql
+SELECT 
+  block_time,
+  SUM(amount) AS cdd
+FROM bitcoin.outputs
+WHERE block_time > now() - interval '30 days'
+GROUP BY 1
+ORDER BY 2 DESC
+LIMIT 10
+\`\`\`
+
+---
+
+## Conclusion
+
+These queries provide a starting point for analyzing Bitcoin behavior. As you become more comfortable with SQL, you can explore more complex queries and build dashboards that tell richer stories.
+
+**Next: 14. Building with Spellbook — How to Contribute Reusable Models to the Community**`
+  },
+  { 
+    number: 14, 
+    title: "Building with Spellbook — How to Contribute Reusable Models to the Community", 
+    pdfPath: "/Onchain Manifesto/14. Building with Spellbook — How to Contribute Reusable Models to the Community.pdf",
+    mdContent: `# 14. Building with Spellbook — How to Contribute Reusable Models to the Community
+
+Dune's community-driven Spellbook is a powerful tool for building and sharing reusable models.
+
+---
+
+## How to Contribute
+
+1. **Fork the Spellbook Repo:** Go to [Dune's Spellbook repo](https://github.com/duneanalytics/spellbook) and fork it to your own GitHub account.
+
+2. **Write a New Spell:** Create a new SQL script in the \`spellbook/models\` directory of your forked repo.
+
+3. **Test the Spell:** Use the Dune SQL editor to test your spell and ensure it works as expected.
+
+4. **Submit a PR:** Once your spell is ready, submit a pull request to the Dune Spellbook repo.
+
+5. **Contribute to the Community:** Your work will be reviewed and merged into the main Spellbook repo, making it available to all users.
+
+---
+
+## Benefits of Contributing
+
+- **Save Time:** Reusable models can save you time and effort by reducing the need to write the same queries multiple times.
+- **Boost Consistency:** Consistent models across dashboards can improve the quality and reliability of your analysis.
+- **Share Knowledge:** By contributing to the Spellbook, you can help others learn and build on your work.
+
+---
+
+## Example: Creating a New Spell
+
+Let's say you want to create a spell to calculate the average gas fee per transaction on Ethereum.
+
+1. **Fork the Spellbook Repo:** Go to [Dune's Spellbook repo](https://github.com/duneanalytics/spellbook) and fork it to your own GitHub account.
+
+2. **Write a New Spell:** Create a new SQL script in the \`spellbook/models\` directory of your forked repo.
+
+\`\`\`sql
+SELECT 
+  AVG(gas_price) AS avg_gas_fee
+FROM ethereum.transactions
+WHERE block_time > now() - interval '30 days'
+\`\`\`
+
+3. **Test the Spell:** Use the Dune SQL editor to test your spell and ensure it works as expected.
+
+4. **Submit a PR:** Once your spell is ready, submit a pull request to the Dune Spellbook repo.
+
+5. **Contribute to the Community:** Your work will be reviewed and merged into the main Spellbook repo, making it available to all users.
+
+---
+
+## Conclusion
+
+Contributing to the Dune Spellbook is a great way to share your knowledge and help others build better dashboards. By contributing to the Spellbook, you can make a real impact on the onchain data analysis community.
+
+**Next: 15. How to Build an Onchain App Using the Dune API**`
+  },
+  { 
+    number: 15, 
+    title: "How to Build an Onchain App Using the Dune API", 
+    pdfPath: "/Onchain Manifesto/15. How to Build an Onchain App Using the Dune API.pdf",
+    mdContent: `# 15. How to Build an Onchain App Using the Dune API
+
+The Dune API is a powerful tool for building custom applications and integrations.
+
+---
+
+## What is the Dune API?
+
+The Dune API allows you to access and query Dune data programmatically.
+
+- **API Key:** You'll need to create an API key in your Dune account to authenticate requests.
+- **Endpoints:** Use the API to access data from Dune's tables and dashboards.
+- **SDKs:** Dune provides SDKs in various programming languages to make it easier to integrate with the API.
+
+---
+
+## How to Use the Dune API
+
+1. **Create an API Key:** Go to your Dune account settings and create a new API key.
+
+2. **Install the SDK:** Choose the SDK that best fits your programming language and install it.
+
+3. **Make API Requests:** Use the SDK to make requests to the Dune API endpoints.
+
+4. **Process the Data:** Parse the data returned by the API and use it in your application.
+
+5. **Integrate with Your App:** Integrate the API into your application to build custom features and integrations.
+
+---
+
+## Example: Building a Simple Dashboard
+
+Let's say you want to build a simple dashboard that displays the total number of transactions on Ethereum.
+
+1. **Create an API Key:** Go to your Dune account settings and create a new API key.
+
+2. **Install the SDK:** Choose the SDK that best fits your programming language and install it.
+
+3. **Make API Requests:** Use the SDK to make requests to the Dune API endpoints.
+
+\`\`\`python
+import duneapi
+
+# Initialize the Dune API client
+client = duneapi.Client(api_key='your_api_key')
+
+# Make a request to the Dune API
+response = client.query('SELECT COUNT(*) AS txs FROM ethereum.transactions')
+
+# Process the data returned by the API
+txs = response['data'][0]['txs']
+
+# Display the data in your application
+print(f'Total number of transactions on Ethereum: {txs}')
+\`\`\`
+
+4. **Integrate with Your App:** Integrate the API into your application to build custom features and integrations.
+
+---
+
+## Conclusion
+
+The Dune API is a powerful tool for building custom applications and integrations. By using the API, you can access and query Dune data programmatically and build custom features and integrations to meet your specific needs.
+
+**Next: 16. Account Abstraction — Why It Matters for Wallet UX and Analysts**`
+  },
+  { 
+    number: 16, 
+    title: "Account Abstraction — Why It Matters for Wallet UX and Analysts", 
+    pdfPath: "/Onchain Manifesto/16. Account Abstraction- Why It Matters for Wallet UX and Analysts.pdf",
+    mdContent: `# 16. Account Abstraction — Why It Matters for Wallet UX and Analysts
+
+Account Abstraction is a new way of transacting using smart contract wallets.
+
+---
+
+## What is Account Abstraction?
+
+Account Abstraction is a protocol that allows users to interact with smart contracts without needing to manage their own private keys.
+
+- **Smart Wallets:** Users can use smart contract wallets to send transactions and interact with smart contracts.
+- **Paymasters:** Paymasters handle the gas fees and other transaction costs.
+- **User Operations:** User operations are submitted via smart wallets and executed by the smart contract.
+
+---
+
+## Why Account Abstraction Matters for Wallet UX
+
+- **Simplified Wallet Management:** Users don't need to manage their own private keys, making wallet management easier.
+- **Improved Security:** Smart contract wallets are more secure than traditional wallets.
+- **Increased User Adoption:** Account Abstraction makes it easier for users to interact with decentralized applications.
+
+---
+
+## Why Account Abstraction Matters for Analysts
+
+- **Improved Data Access:** Account Abstraction allows analysts to access data from smart contract wallets without needing to manage their own private keys.
+- **Increased Data Visibility:** Account Abstraction provides more detailed data on user interactions and transactions.
+- **Improved Data Analysis:** Account Abstraction allows analysts to build more accurate and comprehensive insights.
+
+---
+
+## Conclusion
+
+Account Abstraction is a new way of transacting that has the potential to revolutionize the way we interact with decentralized applications. By using Account Abstraction, we can improve wallet UX and data access for both users and analysts.
+
+**Next: 17. ERC-4337 Aggregated Tables Across EVM Chains — Unified Analytics at Scale**`
+  },
+  { 
+    number: 17, 
+    title: "ERC-4337 Aggregated Tables Across EVM Chains — Unified Analytics at Scale", 
+    pdfPath: "/Onchain Manifesto/17. ERC-4337 Aggregated Tables Across EVM Chains- Unified Analytics at Scale.pdf",
+    mdContent: `# 17. ERC-4337 Aggregated Tables Across EVM Chains — Unified Analytics at Scale
+
+ERC-4337 is a new standard for smart contract wallets.
+
+---
+
+## What is ERC-4337?
+
+ERC-4337 is a standard for smart contract wallets that allows users to interact with smart contracts without needing to manage their own private keys.
+
+- **Smart Wallets:** Users can use smart contract wallets to send transactions and interact with smart contracts.
+- **Paymasters:** Paymasters handle the gas fees and other transaction costs.
+- **User Operations:** User operations are submitted via smart wallets and executed by the smart contract.
+
+---
+
+## Why ERC-4337 Matters for Analysts
+
+- **Improved Data Access:** ERC-4337 allows analysts to access data from smart contract wallets without needing to manage their own private keys.
+- **Increased Data Visibility:** ERC-4337 provides more detailed data on user interactions and transactions.
+- **Improved Data Analysis:** ERC-4337 allows analysts to build more accurate and comprehensive insights.
+
+---
+
+## Conclusion
+
+ERC-4337 is a new standard for smart contract wallets that has the potential to revolutionize the way we interact with decentralized applications. By using ERC-4337, we can improve data access and analysis for both users and analysts.
+
+**Next: 18. Why the Future Belongs to Onchain Analysts**`
+  },
+  { 
+    number: 18, 
+    title: "Why the Future Belongs to Onchain Analysts", 
+    pdfPath: "/Onchain Manifesto/18. Why the Future Belongs to Onchain Analysts.pdf",
+    mdContent: `# 18. Why the Future Belongs to Onchain Analysts
+
+As more of the world moves onchain, the power to read the blockchain becomes a form of literacy—and onchain analysts are the new interpreters.
+
+They're not just querying data.
+
+They're shaping protocol decisions. Uncovering exploits. Monitoring treasuries. Measuring adoption. Creating transparency in a system that, while public, still needs skilled eyes to decode.
+
+This final article is a call to action—for builders, analysts, and explorers who believe in a transparent financial future.
+
+---
+
+## 📜 The Role of the Onchain Analyst
+
+In Web2, data analysts made dashboards. In Web3, they shape reality.
+
+The onchain analyst isn't limited to retrospective analytics. Their work informs governance proposals, investor decisions, community behavior, and product iterations.
+
+They answer questions like:
+
+- Is this DeFi protocol sustainable?
+- Where are whales moving capital?
+- What's driving NFT volume spikes?
+- Are users gaming token incentives?
+- How did this exploit unfold on-chain?
+
+More than metrics, they build **context**.
+
+---
+
+## 🧠 Why Onchain Analytics Is Different
+
+Web2 analytics is siloed and permissioned. Every company holds its own data, and you can't inspect it unless you're inside.
+
+Web3 flips that on its head.
+
+Every interaction, transfer, vote, and contract deployment is **public**, timestamped, and immutable.
+
+The challenge isn't access—it's interpretation.
+
+That's what makes the onchain analyst role so unique:
+
+- 🛠 You don't need permission
+- 📈 You analyze production data in real time
+- 🌐 You work across chains, protocols, ecosystems
+- 🔍 Your insights are verifiable by anyone
+
+It's data science meets protocol archaeology—powered by SQL, smart contracts, and transparency.
+
+---
+
+## 🏛 Where Onchain Analysts Matter Most
+
+The demand for onchain analysts is accelerating across every layer of the crypto ecosystem:
+
+### 1. Protocols
+- Measure adoption
+- Track incentive effectiveness
+- Detect governance participation
+
+### 2. DAOs
+- Monitor treasury flows
+- Track contributor activity
+- Justify spending and proposals with real data
+
+### 3. Investors / Funds
+- Perform due diligence
+- Analyze token emissions
+- Monitor ecosystem metrics across chains
+
+### 4. Security / Risk
+- Detect anomalies
+- Build liquidation monitoring tools
+- Understand wallet movement patterns
+
+### 5. Communities
+- Track user onboarding
+- Measure engagement across NFT mints, LPs, etc.
+- Visualize growth and viral loops
+
+---
+
+## 💼 Real Roles, Real Demand
+
+Here's a snapshot of just some of the roles that require onchain fluency:
+
+- 🔍 Research Analyst (e.g., Binance, Messari, Delphi)
+- 📊 DAO Treasury Analyst (e.g., Optimism, Arbitrum, Gitcoin)
+- 💸 DeFi Strategist (e.g., Yearn, Lido, Convex)
+- 🔐 Security Analyst (e.g., Chainalysis, Trail of Bits)
+- 📈 Growth Analyst (e.g., Lens, Uniswap, Blur)
+
+> Every DAO, every investor, every protocol with tokens and smart contracts will need someone who can read the chain.
+
+---
+
+## 🧱 What You've Learned in This Series
+
+By now, you've explored:
+
+- The fundamentals of onchain data and why it matters
+- How to use Dune, SQL, and Spellbook to extract insights
+- Techniques to analyze NFTs, DeFi, lending, MEV, and wallets
+- The rise of Account Abstraction and how to monitor its adoption
+- How to build dashboards, apps, and reusable data models
+
+And most importantly, you've seen how all of this fits together to **power a new kind of data-native economy**.
+
+---
+
+## 🚀 Where to Go From Here
+
+This is just the beginning. Here are some ways to level up:
+
+- 🔁 Fork dashboards and start building your own
+- 🧵 Share analysis threads on X or Farcaster
+- 📬 Contribute spells to the Spellbook
+- 🛠 Join a DAO as a contributor or data steward
+- 💬 Talk with protocol teams and surface insights
+- 🧪 Create tools and alerts using the Dune API
+- 📘 Document your learning and help others get started
+
+Onchain analytics isn't just a skill—it's a superpower.
+
+It gives you the ability to **see the system**, understand it, and shape it.
+
+---
+
+## 🔮 Final Thoughts: The Transparent Future
+
+The blockchain is always watching.
+
+And as more money, identity, culture, and governance flow through these networks, we'll need guides—people who can translate noise into narrative, transactions into truth.
+
+That's you.
+
+This is your time.
+
+**The future belongs to onchain analysts.**`
   }
-]
+];
