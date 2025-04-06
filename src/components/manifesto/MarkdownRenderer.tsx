@@ -49,6 +49,19 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
     return false;
   };
 
+  // Check if a text block appears to be a standalone SQL query
+  const isStandaloneQuery = (text: string): boolean => {
+    const trimmedText = text.trim().toUpperCase();
+    // Check if the text starts with common SQL commands
+    return trimmedText.startsWith('SELECT') || 
+           trimmedText.startsWith('INSERT') || 
+           trimmedText.startsWith('UPDATE') || 
+           trimmedText.startsWith('DELETE') || 
+           trimmedText.startsWith('CREATE') || 
+           trimmedText.startsWith('ALTER') || 
+           trimmedText.startsWith('DROP');
+  };
+
   // Extract code block content
   const extractCodeBlock = (lines: string[], startIndex: number): { content: string, endIndex: number } => {
     let endIndex = startIndex;
@@ -99,6 +112,53 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
     );
   };
 
+  // Render SQL Code Block
+  const renderSqlCodeBlock = (content: string, blockIndex: number) => {
+    return (
+      <div className="my-6 overflow-hidden rounded-lg bg-slate-900 text-white shadow-lg">
+        {/* Code block header with language and copy button */}
+        <div className="flex items-center justify-between bg-slate-800 px-4 py-2">
+          <div className="rounded-md bg-slate-700 px-2 py-1 text-sm font-medium text-slate-300">SQL</div>
+          <Button
+            onClick={() => copyToClipboard(content, blockIndex)}
+            variant="ghost"
+            size="icon"
+            className="text-slate-400 hover:text-white transition-colors"
+            aria-label="Copy code"
+          >
+            {copiedIndex === blockIndex ? (
+              <Check className="h-4 w-4" />
+            ) : (
+              <Copy className="h-4 w-4" />
+            )}
+          </Button>
+        </div>
+        
+        {/* Code content */}
+        <pre className="p-4 text-sm overflow-x-auto">
+          <code className="language-sql whitespace-pre-wrap">
+            {content.split('\n').map((codeLine, idx) => (
+              <div key={idx} className="leading-relaxed">
+                {/* Apply syntax highlighting for SQL */}
+                <span dangerouslySetInnerHTML={{ 
+                  __html: codeLine
+                    .replace(/\b(SELECT|FROM|WHERE|ORDER BY|GROUP BY|HAVING|JOIN|LEFT JOIN|INNER JOIN|RIGHT JOIN|UNION|AS|ON|AND|OR|NOT|IN|BETWEEN|LIKE|CASE|WHEN|THEN|ELSE|END|COUNT|SUM|AVG|MIN|MAX|NULL|IS|DISTINCT)\b/gi, 
+                      match => `<span class="text-blue-400">${match}</span>`)
+                    .replace(/('[^']*')/g, 
+                      match => `<span class="text-amber-400">${match}</span>`)
+                    .replace(/\b(\d+(?:\.\d+)?)\b/g, 
+                      match => `<span class="text-cyan-300">${match}</span>`)
+                    .replace(/(-&gt;|=|&gt;|&lt;|\+|-|\*|\/|%)/g, 
+                      match => `<span class="text-pink-400">${match}</span>`)
+                }} />
+              </div>
+            ))}
+          </code>
+        </pre>
+      </div>
+    );
+  };
+
   // Convert markdown content to HTML
   const allLines = animatedContent.split('\n');
   const renderedContent = [];
@@ -120,46 +180,8 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
         const blockIndex = renderedContent.length;
         
         renderedContent.push(
-          <div key={`code-${i}`} className="my-6 overflow-hidden rounded-lg bg-slate-900 text-white shadow-lg">
-            {/* Code block header with language and copy button */}
-            <div className="flex items-center justify-between bg-slate-800 px-4 py-2">
-              <div className="rounded-md bg-slate-700 px-2 py-1 text-sm font-medium text-slate-300">SQL</div>
-              <Button
-                onClick={() => copyToClipboard(codeContent, blockIndex)}
-                variant="ghost"
-                size="icon"
-                className="text-slate-400 hover:text-white transition-colors"
-                aria-label="Copy code"
-              >
-                {copiedIndex === blockIndex ? (
-                  <Check className="h-4 w-4" />
-                ) : (
-                  <Copy className="h-4 w-4" />
-                )}
-              </Button>
-            </div>
-            
-            {/* Code content */}
-            <pre className="p-4 text-sm overflow-x-auto">
-              <code className="language-sql whitespace-pre-wrap">
-                {codeContent.split('\n').map((codeLine, idx) => (
-                  <div key={idx} className="leading-relaxed">
-                    {/* Apply syntax highlighting for SQL */}
-                    <span dangerouslySetInnerHTML={{ 
-                      __html: codeLine
-                        .replace(/\b(SELECT|FROM|WHERE|ORDER BY|GROUP BY|HAVING|JOIN|LEFT JOIN|INNER JOIN|RIGHT JOIN|UNION|AS|ON|AND|OR|NOT|IN|BETWEEN|LIKE|CASE|WHEN|THEN|ELSE|END|COUNT|SUM|AVG|MIN|MAX|NULL|IS|DISTINCT)\b/gi, 
-                          match => `<span class="text-blue-400">${match}</span>`)
-                        .replace(/('[^']*')/g, 
-                          match => `<span class="text-amber-400">${match}</span>`)
-                        .replace(/\b(\d+(?:\.\d+)?)\b/g, 
-                          match => `<span class="text-cyan-300">${match}</span>`)
-                        .replace(/(-&gt;|=|&gt;|&lt;|\+|-|\*|\/|%)/g, 
-                          match => `<span class="text-pink-400">${match}</span>`)
-                    }} />
-                  </div>
-                ))}
-              </code>
-            </pre>
+          <div key={`code-${i}`}>
+            {renderSqlCodeBlock(codeContent, blockIndex)}
           </div>
         );
         
@@ -264,6 +286,39 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
           {line}
         </div>
       );
+    }
+    
+    // Check for standalone SQL queries and render them as SQL blocks
+    else if (isStandaloneQuery(line) && line.includes(' ')) {
+      // Collect all following lines that look like they're part of the same query
+      let queryLines = [line];
+      let j = i + 1;
+      
+      // Continue collecting lines until we hit a blank line or a new block
+      while (j < allLines.length && 
+             allLines[j].trim() !== '' && 
+             !allLines[j].startsWith('#') && 
+             !allLines[j].startsWith('-') && 
+             !allLines[j].startsWith('>') && 
+             !allLines[j].startsWith('|') && 
+             !allLines[j].startsWith('```')) {
+        queryLines.push(allLines[j]);
+        j++;
+      }
+      
+      // Create the SQL code block
+      const queryContent = queryLines.join('\n');
+      const blockIndex = renderedContent.length;
+      
+      renderedContent.push(
+        <div key={`sql-query-${i}`}>
+          {renderSqlCodeBlock(queryContent, blockIndex)}
+        </div>
+      );
+      
+      // Skip to after the query
+      i = j - 1;
+      continue;
     }
     
     // Regular paragraph
