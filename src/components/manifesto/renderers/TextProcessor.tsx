@@ -6,6 +6,15 @@ interface TextProcessorProps {
 }
 
 const TextProcessor: React.FC<TextProcessorProps> = ({ text }) => {
+  // Remove the "Next: XX. Chapter Title" line if it's the last line of the content
+  // This is now handled by the ChapterReader component's CTA button
+  const processNextChapterText = (input: string) => {
+    return input.replace(/\n\*\*Next:.*?\*\*\s*$/, '');
+  };
+
+  // Process the text to remove redundant next chapter text first
+  const processedText = processNextChapterText(text);
+  
   // First handle Markdown-style links: [text](url)
   const processLinks = (input: string) => {
     const linkRegex = /\[([^\]]+)\]\(([^)]+)\)/g;
@@ -66,7 +75,7 @@ const TextProcessor: React.FC<TextProcessorProps> = ({ text }) => {
   };
   
   // Process links first, then handle bold text within the result
-  const linkProcessed = processLinks(text);
+  const linkProcessed = processLinks(processedText);
   
   if (Array.isArray(linkProcessed)) {
     return (
@@ -81,7 +90,7 @@ const TextProcessor: React.FC<TextProcessorProps> = ({ text }) => {
   }
   
   // If no links were found, just process bold text
-  return <>{processBoldText(text)}</>;
+  return <>{processBoldText(processedText)}</>;
 };
 
 export default TextProcessor;
