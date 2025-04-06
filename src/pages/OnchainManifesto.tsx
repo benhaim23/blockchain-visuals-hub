@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { BookOpen, FileText } from "lucide-react";
@@ -106,12 +107,12 @@ const OnchainManifesto: React.FC = () => {
           </p>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="w-full mb-6">
-              <TabsTrigger value="toc" className="flex-1">
+            <TabsList className="w-full mb-6 border-2 border-border dark:border-slate-700 transition-all duration-300 hover:border-primary/30 dark:hover:border-primary/40 shadow-sm hover:shadow-md">
+              <TabsTrigger value="toc" className="flex-1 transition-all duration-300 hover:bg-primary/5">
                 <FileText className="mr-2 h-4 w-4" />
                 Table of Contents
               </TabsTrigger>
-              <TabsTrigger value="reader" className="flex-1">
+              <TabsTrigger value="reader" className="flex-1 transition-all duration-300 hover:bg-primary/5">
                 <BookOpen className="mr-2 h-4 w-4" />
                 Reader
               </TabsTrigger>
@@ -126,7 +127,7 @@ const OnchainManifesto: React.FC = () => {
 
             <TabsContent value="reader" className="mt-0">
               {isLoading ? (
-                <div className="bg-card/80 backdrop-blur-sm rounded-lg border border-border min-h-[600px] flex items-center justify-center">
+                <div className="bg-card/80 backdrop-blur-sm rounded-lg border-2 border-border dark:border-slate-700 min-h-[600px] flex items-center justify-center shadow-sm">
                   <p>Loading chapter content...</p>
                 </div>
               ) : (

@@ -25,13 +25,13 @@ const ChapterReader: React.FC<ChapterReaderProps> = ({
   const showMarkdown = chapter && mdContent; // Always prefer markdown if available
   
   return (
-    <div className="bg-card/80 backdrop-blur-sm rounded-lg border border-border min-h-[600px] flex flex-col">
-      <div className="p-4 border-b border-border flex items-center justify-between">
+    <div className="bg-card/80 backdrop-blur-sm rounded-lg border-2 border-border dark:border-slate-700 min-h-[600px] flex flex-col shadow-sm transition-all duration-300 hover:shadow-md dark:hover:border-primary/40 hover:border-primary/30">
+      <div className="p-4 border-b-2 border-border dark:border-slate-700 flex items-center justify-between">
         <Button 
           variant="ghost" 
           onClick={onPreviousChapter}
           disabled={currentChapter <= 0}
-          className="gap-2 text-purple-500 hover:text-purple-600 hover:bg-purple-100/10"
+          className="gap-2 text-purple-500 hover:text-purple-600 hover:bg-purple-100/10 transition-all duration-300 hover:scale-105"
         >
           <ChevronLeft className="h-4 w-4" />
           Previous
@@ -45,7 +45,7 @@ const ChapterReader: React.FC<ChapterReaderProps> = ({
           variant="ghost" 
           onClick={onNextChapter}
           disabled={currentChapter >= chapters.length - 1}
-          className="gap-2 text-purple-500 hover:text-purple-600 hover:bg-purple-100/10"
+          className="gap-2 text-purple-500 hover:text-purple-600 hover:bg-purple-100/10 transition-all duration-300 hover:scale-105"
         >
           Next
           <ChevronRight className="h-4 w-4" />
@@ -65,7 +65,7 @@ const ChapterReader: React.FC<ChapterReaderProps> = ({
                 href={chapter?.pdfPath} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="ml-2 text-primary hover:underline"
+                className="ml-2 text-primary hover:underline transition-all duration-300 hover:text-primary/80"
               >
                 Open PDF
               </a>
