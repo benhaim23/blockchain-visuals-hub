@@ -12,7 +12,7 @@ This article dives into the foundation of the onchain data stack. From Bitcoin�
 
 The two primary models in blockchain data are fundamentally different.
 
-#### 🔗 **Bitcoin: UTXO (Unspent Transaction Output)**
+#### 🔗 Bitcoin: UTXO (Unspent Transaction Output)
 
 Bitcoin doesn’t track balances. Instead, every wallet’s “balance” is the sum of unspent outputs it controls. Each transaction consumes previous outputs and generates new ones—like handing in old bills to receive change.
 
@@ -21,7 +21,7 @@ Bitcoin doesn’t track balances. Instead, every wallet’s “balance” is the
 - `bitcoin.outputs`: Where each BTC was sent
 - `bitcoin.inputs`: Where each BTC came from (linked to previous outputs)
 
-#### 📘 **Ethereum: Account-Based**
+#### 📘 Ethereum: Account-Based
 
 Ethereum uses a stateful model like a bank ledger. Wallets (EOAs) and smart contracts (CAs) have balances, and transactions mutate this shared state.
 
@@ -110,7 +110,7 @@ This is what separates surface-level data pulls from true onchain analytics. Whe
 - Decipher UTXO flows  
 - Join event logs with contract interactions  
 - Build modular spells that others can depend on  
-- Understand both data *and* the systems that generate it
+- Understand both data and the systems that generate it
 
 …you stop being a user of data and start becoming a builder of meaning.
 
