@@ -1,8 +1,5 @@
 
 import React from 'react';
-import { GlowingBox } from '@/components/ui/glowing-box';
-import { GlowingEffect } from '@/components/ui/glowing-effect';
-import { cn } from '@/lib/utils';
 
 interface MarkdownRendererProps {
   content: string;
@@ -15,43 +12,18 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
       {content.split('\n').map((line, index) => {
         // Headers
         if (line.startsWith('# ')) {
-          return (
-            <div key={index} className="relative my-6 rounded-lg">
-              <GlowingEffect spread={40} glow={true} disabled={false} proximity={60} inactiveZone={0.01} borderWidth={3} />
-              <h1 className="text-3xl font-bold mt-6 mb-4 px-4 py-2 relative z-10">{line.substring(2)}</h1>
-            </div>
-          );
+          return <h1 key={index} className="text-3xl font-bold mt-6 mb-4">{line.substring(2)}</h1>;
         } else if (line.startsWith('## ')) {
-          return (
-            <div key={index} className="relative my-5 rounded-lg">
-              <GlowingEffect spread={35} glow={true} disabled={false} proximity={60} inactiveZone={0.01} borderWidth={2} />
-              <h2 className="text-2xl font-bold mt-5 mb-3 px-3 py-2 relative z-10">{line.substring(3)}</h2>
-            </div>
-          );
+          return <h2 key={index} className="text-2xl font-bold mt-5 mb-3">{line.substring(3)}</h2>;
         } else if (line.startsWith('### ')) {
-          return (
-            <div key={index} className="relative my-4 rounded-lg">
-              <GlowingEffect spread={30} glow={true} disabled={false} proximity={60} inactiveZone={0.01} borderWidth={2} />
-              <h3 className="text-xl font-bold mt-4 mb-2 px-3 py-1 relative z-10">{line.substring(4)}</h3>
-            </div>
-          );
+          return <h3 key={index} className="text-xl font-bold mt-4 mb-2">{line.substring(4)}</h3>;
         } else if (line.startsWith('#### ')) {
-          return (
-            <div key={index} className="relative my-3 rounded-lg">
-              <GlowingEffect spread={25} glow={true} disabled={false} proximity={60} inactiveZone={0.01} borderWidth={2} />
-              <h4 className="text-lg font-bold mt-3 mb-2 px-2 py-1 relative z-10">{line.substring(5)}</h4>
-            </div>
-          );
+          return <h4 key={index} className="text-lg font-bold mt-3 mb-2">{line.substring(5)}</h4>;
         }
         
         // Lists
         else if (line.startsWith('- ')) {
-          return (
-            <div key={index} className="relative my-1 rounded-lg ml-4">
-              <GlowingEffect spread={20} glow={true} disabled={false} proximity={40} inactiveZone={0.01} borderWidth={1} />
-              <li className="ml-6 mb-1 px-2 py-1 relative z-10">{line.substring(2)}</li>
-            </div>
-          );
+          return <li key={index} className="ml-6 mb-1">{line.substring(2)}</li>;
         } 
         
         // Bold text - we'll handle the ** markers properly
@@ -61,33 +33,23 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
           
           if (parts.length > 1) {
             return (
-              <GlowingBox key={index} className="my-4" contentClassName="py-2 px-3">
-                <p className="mb-0">
-                  {parts.map((part, i) => {
-                    // Every even index (0, 2, 4...) is regular text
-                    // Every odd index (1, 3, 5...) is bold text
-                    return i % 2 === 0 ? 
-                      <React.Fragment key={i}>{part}</React.Fragment> : 
-                      <strong key={i}>{part}</strong>;
-                  })}
-                </p>
-              </GlowingBox>
+              <p key={index} className="mb-4">
+                {parts.map((part, i) => {
+                  // Every even index (0, 2, 4...) is regular text
+                  // Every odd index (1, 3, 5...) is bold text
+                  return i % 2 === 0 ? 
+                    <React.Fragment key={i}>{part}</React.Fragment> : 
+                    <strong key={i}>{part}</strong>;
+                })}
+              </p>
             );
           }
-          return (
-            <GlowingBox key={index} className="my-4" contentClassName="py-2 px-3">
-              <p className="mb-0">{line}</p>
-            </GlowingBox>
-          );
+          return <p key={index} className="mb-4">{line}</p>;
         }
         
         // Blockquotes
         else if (line.startsWith('> ')) {
-          return (
-            <GlowingBox key={index} className="my-4" spread={25} borderWidth={2} contentClassName="bg-muted/30">
-              <blockquote className="border-l-4 border-primary pl-4 italic my-0 text-muted-foreground">{line.substring(2)}</blockquote>
-            </GlowingBox>
-          );
+          return <blockquote key={index} className="border-l-4 border-primary pl-4 italic my-4 text-muted-foreground">{line.substring(2)}</blockquote>;
         }
         
         // Tables
@@ -99,26 +61,19 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
           
           const cells = line.split('|').filter(cell => cell.trim() !== '');
           return (
-            <GlowingBox key={index} className="my-1" spread={20} contentClassName="p-0 overflow-hidden">
-              <div className="flex w-full">
-                {cells.map((cell, cellIndex) => (
-                  <div key={cellIndex} className="flex-1 px-2 py-1 border">
-                    {cell.trim()}
-                  </div>
-                ))}
-              </div>
-            </GlowingBox>
+            <div key={index} className="flex w-full my-1">
+              {cells.map((cell, cellIndex) => (
+                <div key={cellIndex} className="flex-1 px-2 py-1 border">
+                  {cell.trim()}
+                </div>
+              ))}
+            </div>
           );
         }
         
         // Horizontal rule
         else if (line === '---') {
-          return (
-            <div key={index} className="relative my-6">
-              <GlowingEffect spread={40} glow={true} disabled={false} proximity={60} inactiveZone={0.01} borderWidth={2} />
-              <hr className="border-t border-muted relative z-10" />
-            </div>
-          );
+          return <hr key={index} className="my-6 border-t border-muted" />;
         }
         
         // Empty line
@@ -142,20 +97,15 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
           
           if (formattedText.includes('<')) {
             return (
-              <GlowingBox key={index} className="my-4" contentClassName="py-2 px-3">
-                <p 
-                  className="mb-0" 
-                  dangerouslySetInnerHTML={{ __html: formattedText }}
-                />
-              </GlowingBox>
+              <p 
+                key={index} 
+                className="mb-4" 
+                dangerouslySetInnerHTML={{ __html: formattedText }}
+              />
             );
           }
           
-          return (
-            <GlowingBox key={index} className="my-4" contentClassName="py-2 px-3">
-              <p className="mb-0">{formattedText}</p>
-            </GlowingBox>
-          );
+          return <p key={index} className="mb-4">{formattedText}</p>;
         }
       })}
     </div>
