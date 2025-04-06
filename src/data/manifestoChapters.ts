@@ -1,3 +1,4 @@
+
 export interface ManifestoChapter {
   number: number;
   title: string;
@@ -975,4 +976,127 @@ FROM nft_ethereum.mints
 WHERE block_time > now() - interval '7 days'
 GROUP BY 1
 ORDER BY 2 DESC
-LIMIT
+LIMIT 10
+\`\`\`
+
+---
+
+## Whale Watching
+
+Track large transfers of popular tokens.
+
+\`\`\`sql
+SELECT 
+  block_time,
+  from_address,
+  to_address,
+  token_address,
+  amount / 1e18 AS token_amount
+FROM erc20.token_transfers
+WHERE block_time > now() - interval '24 hours'
+  AND amount > 100000 * 1e18 -- Large transfers (adjust based on token decimals)
+ORDER BY amount DESC
+LIMIT 100
+\`\`\`
+
+---
+
+## User Activity Segmentation
+
+Segment users by their transaction frequency.
+
+\`\`\`sql
+SELECT
+  CASE 
+    WHEN tx_count > 100 THEN 'power_user'
+    WHEN tx_count > 20 THEN 'active_user'
+    WHEN tx_count > 5 THEN 'regular_user'
+    ELSE 'casual_user'
+  END AS user_segment,
+  COUNT(*) AS wallet_count
+FROM (
+  SELECT 
+    from_address, 
+    COUNT(*) AS tx_count
+  FROM ethereum.transactions
+  WHERE block_time > now() - interval '30 days'
+  GROUP BY 1
+) t
+GROUP BY 1
+ORDER BY wallet_count DESC
+\`\`\`
+
+---
+
+## Protocol Revenue Analysis
+
+Calculate daily revenues for a protocol like Uniswap.
+
+\`\`\`sql
+SELECT 
+  date_trunc('day', block_time) AS day,
+  SUM(fee_amount_usd) AS fee_revenue_usd
+FROM uniswap_v3.fees
+WHERE block_time > now() - interval '30 days'
+GROUP BY 1
+ORDER BY 1
+\`\`\`
+
+---
+
+## Token Balance Changes
+
+Track how token balances change over time for a specific address.
+
+\`\`\`sql
+WITH transfers AS (
+  SELECT
+    block_time,
+    amount / 1e18 AS amount,
+    'outgoing' AS direction
+  FROM erc20.token_transfers
+  WHERE from_address = LOWER('0xYourAddressHere')
+    AND token_address = LOWER('0xTokenAddressHere')
+    AND block_time > now() - interval '90 days'
+  
+  UNION ALL
+  
+  SELECT
+    block_time,
+    amount / 1e18 AS amount,
+    'incoming' AS direction
+  FROM erc20.token_transfers
+  WHERE to_address = LOWER('0xYourAddressHere')
+    AND token_address = LOWER('0xTokenAddressHere')
+    AND block_time > now() - interval '90 days'
+)
+
+SELECT
+  date_trunc('day', block_time) AS day,
+  SUM(CASE WHEN direction = 'incoming' THEN amount ELSE 0 END) AS incoming,
+  SUM(CASE WHEN direction = 'outgoing' THEN amount ELSE 0 END) AS outgoing,
+  SUM(CASE WHEN direction = 'incoming' THEN amount ELSE -amount END) AS net_change
+FROM transfers
+GROUP BY 1
+ORDER BY 1
+\`\`\`
+
+---
+
+## The Path to Advanced Queries
+
+These examples just scratch the surface. As you become more comfortable with SQL, you'll be able to:
+
+- Build complex TVL calculations
+- Model token flows between protocols
+- Detect MEV attacks
+- Analyze governance voting patterns
+- Identify emerging trends in user behavior
+
+Every great onchain dashboard starts with the right query. The more fluent you become in SQL, the more power you have to decode the transparent economy.
+
+---
+
+**Next: 07. NFT Analysis — Wash Trading, Mint Trends, and Market Health**`
+  }
+]
