@@ -1,6 +1,8 @@
 
 import React, { useEffect, useState } from 'react';
 import { useAnimatedText } from '@/hooks/useAnimatedText';
+import { Copy, CheckCheck } from 'lucide-react';
+import { Button } from '@/components/ui/button';
 
 interface MarkdownRendererProps {
   content: string;
@@ -27,6 +29,22 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
     const previousFences = lines.slice(0, currentIndex).filter(l => l.trim().startsWith('```'));
     // If we have an odd number of code fences before this line, we're in a code block
     return previousFences.length % 2 !== 0;
+  };
+
+  // Function to get language from code block opening
+  const getCodeLanguage = (lines: string[], startIndex: number): string => {
+    if (startIndex + 1 < lines.length) {
+      const nextLine = lines[startIndex + 1].trim();
+      if (['sql', 'javascript', 'typescript', 'json', 'bash', 'python', 'css', 'html'].includes(nextLine)) {
+        return nextLine;
+      }
+    }
+    return '';
+  };
+
+  // Copy code function
+  const copyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text);
   };
 
   // Convert markdown content to HTML
@@ -121,9 +139,59 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
           return <div key={index} className="h-4"></div>;
         }
         
-        // Code blocks
+        // Handle code blocks - starting fence
         else if (line.startsWith('```')) {
-          // Skip the opening and closing code block markers
+          // Check if this is a code block for SQL
+          const language = line.substring(3).trim().toLowerCase();
+          // If it's the end of a block, just return a spacer
+          if (index > 0 && isWithinCodeBlock(allLines, index - 1)) {
+            return <div key={index} className="mb-8"></div>;
+          }
+          
+          // If it's the start of a block, check if it's an SQL block
+          if (language === 'sql' || language === '') {
+            // Find the end of this code block
+            const endIndex = allLines.findIndex((l, i) => i > index && l.trim() === '```');
+            if (endIndex === -1) return null; // No end found
+            
+            // Extract the code content
+            const codeContent = allLines.slice(index + 1, endIndex).join('\n');
+            
+            // For SQL blocks, create a special formatted block with copy button
+            if (language === 'sql') {
+              const [copied, setCopied] = useState(false);
+              
+              const handleCopy = () => {
+                copyToClipboard(codeContent);
+                setCopied(true);
+                setTimeout(() => setCopied(false), 2000);
+              };
+              
+              return (
+                <div key={index} className="relative my-6 rounded-lg overflow-hidden">
+                  <div className="flex justify-between items-center bg-slate-800 dark:bg-slate-900 text-slate-200 px-4 py-2 text-sm font-mono">
+                    <span>SQL</span>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={handleCopy}
+                      className="h-8 px-2 text-slate-200 hover:text-white hover:bg-slate-700"
+                    >
+                      {copied ? <CheckCheck size={16} /> : <Copy size={16} />}
+                      <span className="ml-2">{copied ? 'Copied!' : 'Copy'}</span>
+                    </Button>
+                  </div>
+                  <pre className="bg-slate-800 dark:bg-slate-900 p-4 overflow-x-auto text-sm text-blue-400 dark:text-blue-300">
+                    <code>{codeContent}</code>
+                  </pre>
+                </div>
+              );
+            }
+            
+            // Skip to the end of the code block so we don't process its contents line by line
+            return null;
+          }
+          
           return <div key={index} className="my-4"></div>;
         }
         
@@ -134,11 +202,26 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
         
         // Handle code content - detect if this line is within a code block
         else if (isWithinCodeBlock(allLines, index)) {
-          return (
-            <div key={index} className="font-mono text-sm bg-slate-100 dark:bg-slate-800 p-1.5 rounded-none first:rounded-t last:rounded-b text-indigo-600 dark:text-indigo-400 border-l-4 border-indigo-300 dark:border-indigo-700 whitespace-pre-wrap">
-              {line}
-            </div>
-          );
+          // We're already handling code blocks as a whole above, so we'll skip individual lines
+          // This is only for non-SQL code blocks
+          const isPartOfSqlBlock = (() => {
+            // Find the opening code fence for this block
+            for (let i = index - 1; i >= 0; i--) {
+              if (allLines[i].startsWith('```')) {
+                return allLines[i].substring(3).trim().toLowerCase() === 'sql';
+              }
+            }
+            return false;
+          })();
+          
+          if (!isPartOfSqlBlock) {
+            return (
+              <div key={index} className="font-mono text-sm bg-slate-100 dark:bg-slate-800 p-1.5 rounded-none first:rounded-t last:rounded-b text-indigo-600 dark:text-indigo-400 border-l-4 border-indigo-300 dark:border-indigo-700 whitespace-pre-wrap">
+                {line}
+              </div>
+            );
+          }
+          return null;
         }
         
         // Regular paragraph
