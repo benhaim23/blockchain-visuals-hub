@@ -312,24 +312,17 @@ const Skills: React.FC = () => {
                   <motion.li 
                     key={index} 
                     variants={item}
-                    className="relative pl-6 pb-6" // Removed bottom padding restrictions
+                    className="relative pl-6 border-l-2 border-primary/30 hover:border-primary transition-colors duration-300 py-1"
                   >
-                    {/* Timeline dot */}
-                    <div className="absolute -left-1 top-1.5">
+                    <div className="absolute -left-[9px] top-1.5">
                       <div className="rounded-full p-1 bg-background border-2 border-primary">
                         {edu.icon}
                       </div>
                     </div>
-                    
-                    {/* Timeline line - adjusted to extend further */}
-                    {index < educationList.length - 1 && (
-                      <div className="absolute left-[11px] top-12 w-0.5 bg-primary/30 h-full" />
-                    )}
-                    
                     <div className="space-y-1">
                       <div className="font-semibold text-lg">{edu.degree}</div>
                       <div className="text-muted-foreground">{edu.school}</div>
-                      <div className="text-sm text-muted-foreground flex items-center gap-2 mt-1">
+                      <div className="text-sm text-muted-foreground flex items-center gap-2">
                         <Badge variant="outline" className="bg-primary/5">
                           {edu.period}
                         </Badge>
