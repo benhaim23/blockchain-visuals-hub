@@ -6,7 +6,7 @@ interface TextProcessorProps {
 }
 
 const TextProcessor: React.FC<TextProcessorProps> = ({ text }) => {
-  // Split text by ** markers for bold text
+  // Split text by ** markers
   const segments = text.split(/(\*\*[^*]+\*\*)/g);
   
   return (
