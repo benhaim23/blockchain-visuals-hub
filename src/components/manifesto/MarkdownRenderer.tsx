@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useAnimatedText } from '@/hooks/useAnimatedText';
 
@@ -113,28 +114,17 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
           return null;
         }
         // Skip language indicators in code blocks
-        else if (['sql', 'javascript', 'typescript', 'json', 'python', 'rust'].includes(line.trim().toLowerCase())) {
+        else if (line === 'sql' || line === 'javascript' || line === 'typescript' || line === 'json') {
           return null;
         }
-        
         // Handle code content - detect if this line is within a code block
-        else if (animatedContent.split('\n').slice(0, index).some(l => l.startsWith('```'))) {
-          // Check if we're inside a code block (after opening ``` and before closing ```)
-          const linesBeforeCurrentLine = animatedContent.split('\n').slice(0, index);
-          const lastOpeningMarkerIndex = linesBeforeCurrentLine.lastIndexOf(linesBeforeCurrentLine.filter(l => l.startsWith('```')).pop() || '');
-          const linesAfterOpeningMarker = linesBeforeCurrentLine.slice(lastOpeningMarkerIndex + 1);
-          
-          // If there's no closing ``` after the last opening ```, then we're still inside a code block
-          if (!linesAfterOpeningMarker.some(l => l.startsWith('```'))) {
-            return (
-              <div key={index} className="font-mono text-sm bg-slate-100 dark:bg-slate-800 p-1 px-3 rounded-sm text-indigo-600 dark:text-indigo-400 overflow-x-auto">
-                {line}
-              </div>
-            );
-          }
-          
-          // Otherwise, we're not in a code block
-          return <p key={index} className="mb-4 text-slate-700 dark:text-slate-300">{line}</p>;
+        else if (animatedContent.split('\n').slice(0, index).some(l => l.startsWith('```')) && 
+                !animatedContent.split('\n').slice(0, index).slice(animatedContent.split('\n').slice(0, index).lastIndexOf('```')).includes('```')) {
+          return (
+            <div key={index} className="font-mono text-sm bg-slate-100 dark:bg-slate-800 p-1 rounded-sm text-indigo-600 dark:text-indigo-400">
+              {line}
+            </div>
+          );
         }
         
         // Regular paragraph
