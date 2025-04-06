@@ -1,55 +1,28 @@
 
 import React from 'react';
-import { Link } from 'react-router-dom';
-import { manifestoChapters } from '@/data/manifestoChapters';
 
 interface TextProcessorProps {
   text: string;
 }
 
 const TextProcessor: React.FC<TextProcessorProps> = ({ text }) => {
-  // Handle "Next: Chapter X" pattern at the end of chapters
-  if (text.startsWith("Next:") || text.startsWith("**Next:")) {
-    // Extract the chapter number from the text using a regex
-    const chapterMatch = text.match(/Next:? (\d+)\./i) || 
-                         text.match(/\*\*Next:\*\* (\d+)\./i) ||
-                         text.match(/Next: (\d+)\./i);
-    
-    if (chapterMatch && chapterMatch[1]) {
-      const nextChapterNum = parseInt(chapterMatch[1], 10);
-      
-      // Find the next chapter in our chapters array
-      const nextChapter = manifestoChapters.find(chapter => chapter.number === nextChapterNum);
-      
-      if (nextChapter) {
-        return (
-          <span className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 cursor-pointer transition-colors">
-            <Link to="/manifesto" onClick={() => window.dispatchEvent(new CustomEvent('selectChapter', { detail: nextChapterNum }))}>
-              {text.replace(/\*\*/g, '')}
-            </Link>
-          </span>
-        );
-      }
-    }
-  }
-
-  // Handle bold text with ** markers
-  if (text.includes('**')) {
-    const parts = text.split(/(\*\*.*?\*\*)/g);
-    return (
-      <>
-        {parts.map((part, index) => {
-          if (part.startsWith('**') && part.endsWith('**')) {
-            return <strong key={index}>{part.slice(2, -2)}</strong>;
-          }
-          return <span key={index}>{part}</span>;
-        })}
-      </>
-    );
-  }
-
-  // Return regular text
-  return <span>{text}</span>;
+  // Split text by ** markers
+  const segments = text.split(/(\*\*[^*]+\*\*)/g);
+  
+  return (
+    <>
+      {segments.map((segment, idx) => {
+        // Check if this segment is bold (surrounded by **)
+        if (segment.startsWith('**') && segment.endsWith('**')) {
+          // Remove the ** and render as bold
+          const cleanText = segment.substring(2, segment.length - 2);
+          return <strong key={idx} className="text-blue-700 dark:text-blue-400">{cleanText}</strong>;
+        }
+        // Regular text
+        return <React.Fragment key={idx}>{segment}</React.Fragment>;
+      })}
+    </>
+  );
 };
 
 export default TextProcessor;
