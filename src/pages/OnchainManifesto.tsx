@@ -7,7 +7,7 @@ import { ChevronLeft, ChevronRight, BookOpen, FileText } from "lucide-react";
 import { cn } from "@/lib/utils";
 import Header from '@/components/Header';
 import MusicPlayer from '@/components/MusicPlayer';
-import { ThemeProvider } from '@/context/ThemeContext';
+import { Squares } from "@/components/ui/squares-background";
 
 const manifestoChapters = [
   { 
@@ -145,10 +145,21 @@ const OnchainManifesto: React.FC = () => {
   };
 
   return (
-    <ThemeProvider>
+    <>
       <Header />
-      <div className="min-h-screen pt-24 pb-16">
-        <div className="container mx-auto px-4 max-w-5xl">
+      <div className="min-h-screen pt-24 pb-16 relative">
+        {/* Background squares */}
+        <div className="absolute inset-0 z-0 overflow-hidden">
+          <Squares 
+            direction="diagonal"
+            speed={0.5}
+            squareSize={40}
+            borderColor="rgba(51, 51, 51, 0.3)" 
+            hoverFillColor="rgba(34, 34, 34, 0.5)"
+          />
+        </div>
+        
+        <div className="container mx-auto px-4 max-w-5xl relative z-10">
           <h1 className="text-3xl md:text-5xl font-bold mb-8 crypto-gradient">The Onchain Manifesto</h1>
           <p className="text-muted-foreground mb-8 text-lg">
             A comprehensive guide to blockchain analytics, exploring the transparent world of on-chain data 
@@ -168,13 +179,13 @@ const OnchainManifesto: React.FC = () => {
             </TabsList>
 
             <TabsContent value="toc" className="mt-0">
-              <div className="bg-card rounded-lg border border-border p-6">
+              <div className="bg-card/80 backdrop-blur-sm rounded-lg border border-border p-6">
                 <h2 className="text-2xl font-semibold mb-4">Chapters</h2>
                 <div className="space-y-3">
                   {manifestoChapters.map((chapter) => (
                     <div 
                       key={chapter.number}
-                      className="flex items-center justify-between p-3 hover:bg-muted rounded-md cursor-pointer transition-colors"
+                      className="flex items-center justify-between p-3 hover:bg-muted/80 rounded-md cursor-pointer transition-colors"
                       onClick={() => {
                         setCurrentChapter(chapter.number);
                         setActiveTab("reader");
@@ -192,7 +203,7 @@ const OnchainManifesto: React.FC = () => {
             </TabsContent>
 
             <TabsContent value="reader" className="mt-0">
-              <div className="bg-card rounded-lg border border-border min-h-[600px] flex flex-col">
+              <div className="bg-card/80 backdrop-blur-sm rounded-lg border border-border min-h-[600px] flex flex-col">
                 {/* Navigation controls */}
                 <div className="p-4 border-b border-border flex items-center justify-between">
                   <Button 
@@ -265,7 +276,7 @@ const OnchainManifesto: React.FC = () => {
         </div>
       </div>
       <MusicPlayer />
-    </ThemeProvider>
+    </>
   );
 };
 
