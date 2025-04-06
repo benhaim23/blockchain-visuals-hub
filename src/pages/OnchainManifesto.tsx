@@ -1,12 +1,13 @@
 
 import React, { useState, useEffect } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
-import { BookOpen, FileText, Sparkles } from "lucide-react";
+import { BookOpen, FileText, Sparkles, Book as BookIcon } from "lucide-react";
 import Header from '@/components/Header';
 import { Squares } from "@/components/ui/squares-background";
 import { manifestoChapters } from '@/data/manifestoChapters_updated';
 import TableOfContents from '@/components/manifesto/TableOfContents';
 import ChapterReader from '@/components/manifesto/ChapterReader';
+import BookView from '@/components/manifesto/BookView';
 import { toast } from '@/components/ui/use-toast';
 import { MatrixText } from '@/components/ui/matrix-text';
 
@@ -19,14 +20,14 @@ const OnchainManifesto: React.FC = () => {
   const goToNextChapter = () => {
     if (currentChapter < manifestoChapters.length - 1) {
       setCurrentChapter(currentChapter + 1);
-      setActiveTab("reader");
+      setActiveTab(activeTab === "toc" ? "reader" : activeTab);
     }
   };
 
   const goToPreviousChapter = () => {
     if (currentChapter > 0) {
       setCurrentChapter(currentChapter - 1);
-      setActiveTab("reader");
+      setActiveTab(activeTab === "toc" ? "reader" : activeTab);
     }
   };
 
@@ -39,7 +40,7 @@ const OnchainManifesto: React.FC = () => {
     // Update the document title based on the current page/chapter
     if (activeTab === "toc") {
       document.title = "The Onchain Manifesto | Mark Benhaim";
-    } else if (activeTab === "reader" && manifestoChapters[currentChapter]) {
+    } else if ((activeTab === "reader" || activeTab === "book") && manifestoChapters[currentChapter]) {
       document.title = `${manifestoChapters[currentChapter].title} | The Onchain Manifesto`;
     }
     
@@ -129,6 +130,14 @@ const OnchainManifesto: React.FC = () => {
                 <span className="text-blue-800 dark:text-blue-300">Reader</span>
                 <Sparkles className="ml-2 h-3 w-3 text-amber-500 animate-pulse" />
               </TabsTrigger>
+              <TabsTrigger 
+                value="book" 
+                className="flex-1 transition-all duration-300 hover:bg-blue-50 dark:hover:bg-primary/5 data-[state=active]:bg-blue-100 dark:data-[state=active]:bg-slate-800"
+              >
+                <BookIcon className="mr-2 h-4 w-4 text-blue-600 dark:text-blue-400" />
+                <span className="text-blue-800 dark:text-blue-300">Book View</span>
+                <Sparkles className="ml-2 h-3 w-3 text-amber-500 animate-pulse" />
+              </TabsTrigger>
             </TabsList>
 
             <TabsContent value="toc" className="mt-0">
@@ -136,7 +145,7 @@ const OnchainManifesto: React.FC = () => {
                 chapters={manifestoChapters.map(chapter => ({
                   ...chapter,
                   description: chapter.title.includes('—') 
-                    ? chapter.title.split('—')[1].trim() 
+                    ? chapter.title.split('—')[1]?.trim() 
                     : ''
                 }))} 
                 onSelectChapter={handleSelectChapter} 
@@ -150,6 +159,22 @@ const OnchainManifesto: React.FC = () => {
                 </div>
               ) : (
                 <ChapterReader 
+                  currentChapter={currentChapter}
+                  chapters={manifestoChapters}
+                  mdContent={mdContent}
+                  onPreviousChapter={goToPreviousChapter}
+                  onNextChapter={goToNextChapter}
+                />
+              )}
+            </TabsContent>
+
+            <TabsContent value="book" className="mt-0">
+              {isLoading ? (
+                <div className="bg-white/90 dark:bg-card/80 backdrop-blur-sm rounded-lg border-2 border-blue-200 dark:border-slate-700 min-h-[600px] flex items-center justify-center shadow-lg">
+                  <p className="text-blue-600 dark:text-blue-400 animate-pulse">Loading chapter content...</p>
+                </div>
+              ) : (
+                <BookView 
                   currentChapter={currentChapter}
                   chapters={manifestoChapters}
                   mdContent={mdContent}

@@ -13,15 +13,19 @@ import {
 } from "@/components/ui/carousel";
 import { Button } from "@/components/ui/button";
 
+interface ChapterWithDescription extends ManifestoChapter {
+  description?: string;
+}
+
 interface TableOfContentsProps {
-  chapters: ManifestoChapter[];
+  chapters: ChapterWithDescription[];
   onSelectChapter: (chapterIndex: number) => void;
 }
 
 const TableOfContents: React.FC<TableOfContentsProps> = ({ chapters, onSelectChapter }) => {
   const [view, setView] = useState<'list' | 'carousel'>('list');
   
-  const getDisplayNumber = (chapter: ManifestoChapter) => {
+  const getDisplayNumber = (chapter: ChapterWithDescription) => {
     return chapter.number === 0 ? "Executive Summary" : `${chapter.number}.`;
   };
 
