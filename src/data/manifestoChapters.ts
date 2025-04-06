@@ -330,19 +330,613 @@ In the next article, we'll walk you through the Dune platform itself—how to wr
     number: 3, 
     title: "The Dune Platform — A Gateway to Onchain Transparency", 
     pdfPath: "/Onchain Manifesto/03. The Dune Platform- A Gateway to Onchain Transparencyconomy.pdf",
-    mdPath: "" 
+    mdContent: `# **03. The Dune Platform: A Gateway to Onchain Transparency**
+
+> "You don't need to run a node. You just need a query."
+
+At first glance, blockchains seem like a mess of cryptographic hashes and pseudonymous wallets. But behind the complexity lies one of the most powerful features of this technology: every action is stored on a public ledger—and you can query it.
+
+That's where **Dune** comes in.
+
+Dune is a powerful analytics platform that transforms the firehose of raw blockchain data into a structured, queryable database. It's where data analysts, protocol teams, and community sleuths go to build dashboards, monitor behavior, and uncover what's really happening onchain.
+
+Let's get you oriented.
+
+---
+
+## Why Dune?
+
+Think of Dune as the **SQL-powered Google for blockchain activity**. It sits on top of the raw data from EVM chains and lets you query, join, visualize, and share insights—without needing to set up a node, parse hex logs, or manage infrastructure.
+
+### 🔍 Key Benefits
+
+- **Instant access to decoded data** across Ethereum, Polygon, Arbitrum, Base, Optimism, and others  
+- **No need to run a node or process logs manually**
+- **Custom SQL queries** with live results
+- **Powerful dashboards** that update automatically
+- **Community-driven Spellbook** for reusable query logic
+- **Free-tier access to build and publish**
+
+---
+
+## Navigating the Interface
+
+When you open [dune.com](https://dune.com), you'll find:
+
+### 🧾 **Queries**
+
+This is where the magic happens. Every query is a SQL script that pulls from decoded blockchain tables.
+
+- Use the **query editor** to write and run SQL
+- Visualize results with tables, charts, or graphs
+- Save your queries, fork others, or share links publicly
+
+### 📊 **Dashboards**
+
+Dashboards are collections of queries with visualizations. They let you tell a story with data.
+
+- Track metrics over time (TVL, swap volume, active users)
+- Combine multiple chains or protocols in one place
+- Embed charts in blog posts, docs, or Notion pages
+
+### 📚 **Table Explorer**
+
+Explore the underlying schema.
+
+- Filter by blockchain (e.g. \`ethereum\`, \`arbitrum\`, \`bitcoin\`)
+- Browse by category: \`transactions\`, \`token_transfers\`, \`logs\`, etc.
+- View column definitions and data samples
+
+### 🧙‍♀️ **Spellbook**
+
+A collection of curated, reusable models written by the Dune community and maintained in the open-source Spellbook repo.
+
+- Abstracts complex logic into reusable tables
+- Contributes to standardization of metrics across dashboards
+- Learn more in our dedicated Spellbook article
+
+---
+
+## Core Tables You'll Use Often
+
+| Table                      | Description                                            |
+| -------------------------- | ------------------------------------------------------ |
+| \`ethereum.transactions\`    | All Ethereum L1 transactions                           |
+| \`ethereum.token_transfers\` | ERC-20 transfer events                                 |
+| \`ethereum.logs\`            | Raw event logs from contracts                          |
+| \`ethereum.traces\`          | Internal transactions (e.g. from smart contract calls) |
+| \`prices.usd\`               | Historical token prices by minute                      |
+| \`erc20.events\`             | Decoded logs for token transfers, approvals, etc.      |
+| \`erc721.events\`            | NFT mints, transfers, sales, and metadata              |
+| \`uniswap_v3.swaps\`         | Detailed DEX activity for Uniswap v3                   |
+| \`compound.liquidations\`    | Liquidation activity in lending protocols              |
+
+> These are the building blocks of DeFi, NFT, and wallet behavior analytics.
+
+---
+
+## Getting Started with a Query
+
+Here's a simple example: count the daily number of Ethereum transactions over the past 30 days.
+
+\`\`\`sql
+SELECT
+  date_trunc('day', block_time) AS day,
+  COUNT(*) AS tx_count
+FROM ethereum.transactions
+WHERE block_time > now() - interval '30 days'
+GROUP BY 1
+ORDER BY 1
+\`\`\`
+
+Click **Run**, and you'll see a time series of transaction counts. Add a line chart, give it a title, and you've just built your first visualization.
+
+------
+
+## Forking and Iterating
+
+Dune is collaborative by design.
+
+- Found a cool dashboard? **Fork it**, and customize it for your use case.
+- Need a metric that doesn't exist? Build it, publish it, and help others.
+
+Each query is a learning opportunity. Reading, editing, and reverse-engineering community dashboards is one of the fastest ways to learn.
+
+------
+
+## DuneSQL vs Legacy Engine
+
+Dune is currently transitioning from the legacy engine to **DuneSQL**, a modular and more scalable engine based on **Databricks** and **dbt**.
+
+We'll explore this in-depth later, but know that:
+
+- **DuneSQL** uses a separate editor and schema
+- **Spellbook models** are written for DuneSQL only
+- Long-term support and future features will prioritize DuneSQL
+
+> If you're just getting started, build in DuneSQL.
+
+------
+
+## Best Practices
+
+- **Use \`date_trunc\`** to group time series cleanly
+- **Add \`WHERE block_time >\`** to filter large tables
+- **Join with \`prices.usd\`** for consistent USD metrics
+- **Document your queries**—future you (and others) will thank you
+- **Use \`limit\` when exploring** new tables to avoid timeouts
+
+------
+
+## What You Can Build
+
+- 🏦 DAO treasury trackers
+- 📈 DEX volume and LP revenue dashboards
+- 🎨 NFT minting + secondary market trend boards
+- 🧠 MEV activity heatmaps
+- 🔎 Whales and wallet label explorers
+- 🧱 Protocol-specific analytics: Compound, Aave, Lido, etc.
+
+You're limited only by your creativity—and your understanding of the underlying data.
+
+------
+
+## Ready to Query the Chain?
+
+The Dune platform gives you a real-time lens into the most transparent data system ever created. It's free, powerful, and open.
+
+But like any tool, it's only as good as the person using it.
+
+In the next article, we'll dig deeper into the structure of blockchain tables—how to read them, understand them, and link them together to tell meaningful stories.
+
+**Next: Understanding Tables — Ethereum, Bitcoin, NFTs, ERC4337, and More**`
   },
   { 
     number: 4, 
     title: "Understanding Tables — Ethereum, Bitcoin, NFTs, ERC4337, and More", 
     pdfPath: "/Onchain Manifesto/04. Understanding Tables — Ethereum, Bitcoin, NFTs, ERC4337, and More.pdf",
-    mdPath: "" 
+    mdContent: `# 04. Understanding Tables — Ethereum, Bitcoin, NFTs, ERC4337, and More
+
+If the blockchain is the raw ledger, and Dune is the window into it—then tables are the DNA of onchain analytics.
+
+To do real work as an onchain data analyst, you need to know how blockchain data is structured, how Dune organizes it, and how to query the right fields.
+
+This article walks through the anatomy of blockchain tables—covering Ethereum, Bitcoin, ERC4337 (Account Abstraction), NFTs, and more.
+
+---
+
+## The EVM Data Model
+
+Most blockchains supported by Dune are **EVM-compatible** (Ethereum Virtual Machine), meaning they use the same account-based structure:
+
+- **EOAs (Externally Owned Accounts):** wallets controlled by private keys  
+- **Contract Accounts:** smart contracts that execute code when called  
+
+Every action on an EVM chain emits:
+
+- A **transaction**
+- One or more **events** (emitted from smart contracts)
+- Changes to **state** (tracked via internal calls)
+
+Dune decodes all of these into readable tables.
+
+---
+
+## Core Ethereum Tables
+
+Here are the most essential tables you'll use on Ethereum and other EVM chains:
+
+### \`ethereum.transactions\`
+
+Every transaction sent on the network.
+
+**Key fields:**
+
+- \`hash\`: transaction hash  
+- \`from\`, \`to\`: sender and recipient  
+- \`value\`: ETH transferred  
+- \`gas_used\`, \`gas_price\`: cost of execution  
+- \`block_time\`: timestamp  
+
+---
+
+### \`ethereum.logs\`
+
+Decoded event logs from smart contracts.
+
+**Use this to capture things like:**
+
+- Token transfers  
+- NFT mints  
+- DAO proposals  
+- DEX swaps  
+
+You'll often filter by \`event_name\` and \`contract_address\`.
+
+---
+
+### \`ethereum.token_transfers\`
+
+Normalized view of ERC20 transfers (built from \`logs\`).
+
+**Key fields:**
+
+- \`token_address\`: contract address of the token  
+- \`from\`, \`to\`: sender and receiver  
+- \`amount\`: token amount  
+- \`block_time\`: when it happened  
+
+This is useful for tracking token flow, whale movements, or airdrops.
+
+---
+
+### \`prices.usd\`
+
+Maps token prices over time for consistent USD calculations.
+
+**Join on:**  
+- \`contract_address\`  
+- \`minute\` (rounded timestamp)  
+
+---
+
+## NFT Tables
+
+For NFTs, Dune often decodes each major collection or marketplace into its own schema.
+
+Look for schemas like:
+
+- \`seaport_ethereum\` (OpenSea)  
+- \`blur_ethereum\`  
+- \`nft_ethereum\`  
+- \`erc721_transfers\`  
+
+Track:
+
+- \`minted\`, \`sold\`, \`transferred\`, \`burned\`
+- Price, buyer, seller, royalty fees
+
+---
+
+## Bitcoin Tables: UTXO Model
+
+Unlike Ethereum's account model, Bitcoin uses a **UTXO** (Unspent Transaction Output) model.
+
+That means there is no "account balance." Instead, wallets hold a collection of unspent outputs.
+
+Dune provides:
+
+### \`bitcoin.inputs\`
+
+Each input spent in a BTC transaction.
+
+**Fields:**
+
+- \`address\`: the spender  
+- \`value\`: amount of BTC  
+- \`block_time\`: when the transaction occurred  
+
+---
+
+### \`bitcoin.outputs\`
+
+Each output generated in a BTC transaction.
+
+**Fields:**
+
+- \`address\`: the receiver  
+- \`value\`: BTC received  
+- \`block_time\`: timestamp  
+
+Together, these two tables allow analysis of HODLing behavior, coin lifespan, and metrics like **Coin Days Destroyed (CDD)**.
+
+---
+
+## ERC-4337 Tables (Account Abstraction)
+
+ERC-4337 introduces a new way of transacting using smart contract wallets.
+
+Dune decodes these contracts into a special schema—\`erc4337\`.
+
+### \`erc4337_<chain>.EntryPoint_v0_6_evt_UserOperationEvent\`
+
+Each user operation submitted via a smart wallet.
+
+**Fields to know:**
+
+- \`sender\`: the smart wallet  
+- \`paymaster\`: who paid gas  
+- \`actualGasCost\`: gas used  
+- \`success\`: if the operation succeeded  
+
+Also explore:
+
+- \`AccountDeployed\` events  
+- \`handleOps()\` calls  
+- \`EntryPoint\` contract interactions  
+
+---
+
+## Aggregated Spellbook Tables
+
+Dune's community-built **Spellbook** offers aggregated, cleaned-up models across chains.
+
+Instead of querying 9 versions of a table, use:
+
+- \`account_abstraction_erc4337.userops\`: unified ERC-4337 activity  
+- \`uniswap_v3.uniswap_v3_swaps\`: all Uniswap V3 swaps across chains  
+- \`nft.trades\`: normalized NFT sales data  
+
+We'll explore Spellbook more later—just know these **save time** and **boost consistency**.
+
+---
+
+## Best Practices
+
+- Always filter by \`block_time >\` to avoid scanning full history  
+- Use \`date_trunc('day', timestamp)\` to group time series  
+- Join with \`prices.usd\` to convert token amounts to USD  
+- Use \`LIMIT\` when exploring new tables  
+- Use \`LOWER()\` to normalize addresses when joining  
+- Explore schema docs in the left-hand panel of Dune's editor  
+
+---
+
+## Where to Find Table Names
+
+In the Dune query editor:
+
+- Look to the left sidebar  
+- Browse by chain → schema → table  
+- Click a table to preview fields and structure  
+
+Or type \`/ethereum.\` to trigger autocomplete.
+
+---
+
+## You Are What You Query
+
+Every meaningful dashboard starts with understanding the structure beneath it.
+
+In Web2, this might mean knowing the difference between GA4 and Mixpanel.
+
+In Web3, it means understanding tables like:
+
+- \`ethereum.transactions\`  
+- \`erc20.token_transfers\`  
+- \`bitcoin.outputs\`  
+- \`erc4337.UserOperationEvent\`  
+- \`spellbook.models.uniswap_v3_swaps\`  
+
+Once you master the table structure, the data opens up.
+
+---
+
+**Next: 05. SQL Basics for Blockchain Analytics**`
   },
   { 
     number: 5, 
     title: "SQL Basics for Blockchain Analytics", 
     pdfPath: "/Onchain Manifesto/05. SQL Basics for Blockchain Analytics.pdf",
-    mdPath: "" 
+    mdContent: `# 05. SQL Basics for Blockchain Analytics
+
+To unlock insights from onchain data, you need one essential tool: **SQL**.
+
+It's the language that lets you ask questions like:
+
+- "How many users swapped on Uniswap last week?"
+- "Which wallets minted the most NFTs yesterday?"
+- "What's the average gas fee per transaction over time?"
+- "How much revenue did this protocol generate in the last 30 days?"
+
+SQL (Structured Query Language) is the backbone of every great onchain dashboard—and you don't need to be a software engineer to learn it.
+
+This guide will help you speak fluent SQL in the blockchain context.
+
+---
+
+## SQL on Dune: A Quick Refresher
+
+Dune uses **PostgreSQL-style syntax** with some extensions for time and math functions.
+
+Queries are typically structured like this:
+
+\`\`\`sql
+SELECT column_1, column_2
+FROM table_name
+WHERE conditions
+GROUP BY column_1
+ORDER BY column_1
+\`\`\`
+
+Let's look at each part in the context of onchain data.
+
+------
+
+## SELECT: Choose What You Want
+
+Use \`SELECT\` to define the columns you want to display.
+
+Example:
+
+\`\`\`sql
+SELECT 
+  block_time, 
+  from_address, 
+  to_address, 
+  value
+FROM ethereum.transactions
+\`\`\`
+
+You can also use functions inside \`SELECT\`, such as:
+
+- \`COUNT(*)\` – total rows
+- \`SUM(value)\` – total value transferred
+- \`AVG(gas_price)\` – average gas price
+
+------
+
+## WHERE: Filter the Data
+
+You don't want all of history—just what matters.
+
+\`\`\`sql
+WHERE block_time > now() - interval '7 days'
+\`\`\`
+
+Other common conditions:
+
+\`\`\`sql
+WHERE value > 0
+WHERE from = LOWER('0xabc123...')
+WHERE contract_address = '0xUniswapV3Pool'
+\`\`\`
+
+✅ Use \`LOWER()\` to normalize addresses when joining or filtering.
+
+------
+
+## GROUP BY: Aggregate the Results
+
+Use \`GROUP BY\` when you want to summarize data.
+
+Example: count swaps per day:
+
+\`\`\`sql
+SELECT 
+  date_trunc('day', block_time) AS day,
+  COUNT(*) AS swap_count
+FROM uniswap_v3.uniswap_v3_swaps
+WHERE block_time > now() - interval '30 days'
+GROUP BY 1
+ORDER BY 1
+\`\`\`
+
+💡 \`date_trunc()\` is your best friend for time series.
+
+------
+
+## JOIN: Combine Tables
+
+Join lets you merge data from different tables—for example, adding USD prices:
+
+\`\`\`sql
+SELECT 
+  t.block_time,
+  t.token_address,
+  t.amount / 1e18 AS token_amount,
+  p.price,
+  (t.amount / 1e18) * p.price AS amount_usd
+FROM erc20.token_transfers t
+LEFT JOIN prices.usd p
+  ON t.token_address = p.contract_address
+  AND date_trunc('minute', t.block_time) = p.minute
+WHERE t.block_time > now() - interval '7 days'
+\`\`\`
+
+🧠 Always match on both \`token_address\` and \`minute\` for price joins.
+
+------
+
+## CASE: Create Custom Categories
+
+Conditional logic with \`CASE\` lets you label rows:
+
+\`\`\`sql
+SELECT
+  CASE 
+    WHEN amount > 1000 THEN 'whale'
+    WHEN amount > 100 THEN 'mid-tier'
+    ELSE 'small'
+  END AS size_category,
+  COUNT(*) AS tx_count
+FROM erc20.token_transfers
+GROUP BY 1
+\`\`\`
+
+------
+
+## Common Functions in Blockchain Analytics
+
+- \`COUNT(*)\`: number of rows (events, transactions)
+- \`SUM(column)\`: total tokens transferred or gas used
+- \`AVG(column)\`: average gas fee, average swap size
+- \`MAX/MIN\`: largest NFT sale, smallest transfer
+- \`RANK()/ROW_NUMBER() OVER (PARTITION BY ...)\`: leaderboard logic
+- \`date_trunc('day', timestamp)\`: daily grouping
+
+------
+
+## Template Queries to Get You Started
+
+**Daily transaction count:**
+
+\`\`\`sql
+SELECT 
+  date_trunc('day', block_time) AS day,
+  COUNT(*) AS txs
+FROM ethereum.transactions
+WHERE block_time > now() - interval '30 days'
+GROUP BY 1
+ORDER BY 1
+\`\`\`
+
+**Top NFT minters (past 7 days):**
+
+\`\`\`sql
+SELECT 
+  minter, 
+  COUNT(*) AS mints
+FROM nft_ethereum.mints
+WHERE block_time > now() - interval '7 days'
+GROUP BY 1
+ORDER BY 2 DESC
+LIMIT 10
+\`\`\`
+
+**Uniswap revenue in USD (last 30 days):**
+
+\`\`\`sql
+SELECT 
+  date_trunc('day', block_time) AS day,
+  SUM(fee_amount_usd) AS daily_revenue
+FROM uniswap_v3.fees
+WHERE block_time > now() - interval '30 days'
+GROUP BY 1
+ORDER BY 1
+\`\`\`
+
+------
+
+## Mistakes to Avoid
+
+🚫 Querying full tables without a time filter → always use \`WHERE block_time >\`
+
+🚫 Joining price data without \`date_trunc('minute')\` → you'll miss matches
+
+🚫 Comparing uppercase and lowercase addresses → use \`LOWER()\` consistently
+
+🚫 Using \`SELECT *\` in big tables → only select the fields you need
+
+------
+
+## Why SQL Matters in Web3
+
+SQL is the **lingua franca of data**—and onchain data is just a new domain.
+
+If you can write clear, thoughtful queries, you can:
+
+- Understand protocol health
+- Monitor DAO treasuries
+- Detect suspicious activity
+- Track product usage
+- Inform investment decisions
+
+You're not just writing queries—you're building visibility in a transparent economy.
+
+------
+
+**Next: 06. Useful Queries — From Token Transfers to Whale Watching**`
   },
   { 
     number: 6, 

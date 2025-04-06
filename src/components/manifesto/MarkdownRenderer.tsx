@@ -123,7 +123,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
         }
         
         // Skip language indicators in code blocks
-        else if (['sql', 'javascript', 'typescript', 'json', 'bash', 'python', 'css', 'html'].includes(line.trim())) {
+        else if (['sql', 'javascript', 'typescript', 'json', 'bash', 'python', 'css', 'html'].some(lang => line.trim() === lang)) {
           return null;
         }
         
