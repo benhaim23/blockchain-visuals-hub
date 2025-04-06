@@ -63,7 +63,7 @@ const ChapterReader: React.FC<ChapterReaderProps> = ({
       <div className="flex-1 p-3 md:p-6">
         {showMarkdown ? (
           <ScrollArea className="h-[600px] pr-0 md:pr-4">
-            <div className="px-0 md:px-1">
+            <div className="px-0 md:px-1 prose-table:border-collapse prose-table:w-full prose-td:border prose-td:border-blue-200 dark:prose-td:border-slate-700">
               <MarkdownRenderer content={mdContent} />
             </div>
             
