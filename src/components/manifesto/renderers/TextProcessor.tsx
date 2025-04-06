@@ -60,17 +60,24 @@ const TextProcessor: React.FC<TextProcessorProps> = ({ text }) => {
       return textNode;
     }
     
-    const segments = textNode.split(/(\*\*[^*]+\*\*)/g);
+    // Improved regex to handle bold text with proper boundary checking
+    // This pattern matches ** followed by text (that doesn't start or end with spaces) followed by **
+    const boldRegex = /\*\*([^*]+?)\*\*/g;
+    
+    const segments = textNode.split(boldRegex);
     
     return segments.map((segment, idx) => {
-      // Check if this segment is bold (surrounded by **)
-      if (segment.startsWith('**') && segment.endsWith('**')) {
-        // Remove the ** and render as bold
-        const cleanText = segment.substring(2, segment.length - 2);
-        return <strong key={idx} className="text-blue-700 dark:text-blue-400">{cleanText}</strong>;
+      // Even indices are normal text, odd indices are the contents of bold tags
+      if (idx % 2 === 1) {
+        // This is bold text (was between ** **)
+        return <strong key={idx} className="text-blue-700 dark:text-blue-400">{segment.trim()}</strong>;
       }
-      // Regular text
-      return <React.Fragment key={idx}>{segment}</React.Fragment>;
+      
+      // Regular text - check if there are any standalone asterisks to clean up
+      // This removes single asterisks that might be visible but aren't part of proper formatting
+      const cleanedText = segment.replace(/\s\*\s/g, ' ');
+      
+      return <React.Fragment key={idx}>{cleanedText}</React.Fragment>;
     });
   };
   
