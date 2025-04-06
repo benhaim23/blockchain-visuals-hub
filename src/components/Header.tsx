@@ -184,13 +184,14 @@ const Header: React.FC = () => {
 
           {isMobile && (
             <div className="mt-8 pt-6 border-t border-border/30">
-              <a
-                href="mailto:markbenhaim0@gmail.com"
+              <Button
                 className="flex items-center justify-center w-full px-4 py-3 rounded-lg bg-primary text-primary-foreground"
+                interactive={true}
+                onClick={() => window.location.href = 'mailto:markbenhaim0@gmail.com'}
               >
-                <Mail className="h-5 w-5 mr-2" />
+                <Mail className="h-5 w-5" />
                 <span className="font-medium">Contact Me</span>
-              </a>
+              </Button>
             </div>
           )}
         </div>

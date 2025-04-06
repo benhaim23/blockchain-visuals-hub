@@ -62,6 +62,7 @@ const Hero: React.FC = () => {
                 "rounded-full px-8 py-6 w-full sm:w-auto bg-primary hover:bg-primary/90",
                 theme === 'dark' ? 'bg-primary/90 hover:bg-primary/80' : 'bg-primary hover:bg-primary/90'
               )}
+              interactive={true}
               onClick={() => {
                 const contactSection = document.getElementById('contact');
                 if (contactSection) {
@@ -77,6 +78,7 @@ const Hero: React.FC = () => {
                 "rounded-full px-8 py-6 w-full sm:w-auto border-2 flex items-center justify-center gap-2",
                 theme === 'dark' ? 'border-primary/40 hover:border-primary/60 hover:bg-primary/10' : 'border-primary/30 hover:border-primary/50 hover:bg-primary/5'
               )}
+              interactive={true}
               onClick={() => {
                 const projectsSection = document.getElementById('projects');
                 if (projectsSection) {

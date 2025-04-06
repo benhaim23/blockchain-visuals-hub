@@ -83,26 +83,11 @@ const ProjectCard: React.FC<ProjectCardProps> = ({ project, index }) => {
             <Button 
               variant="default" 
               size="sm"
-              className={cn(
-                "text-foreground/90 rounded-full pl-4 pr-3 bg-primary/80 hover:bg-primary shadow-sm",
-                "flex items-center gap-2 transition-all duration-300 hover:shadow-md",
-                "relative overflow-hidden border-none w-auto"
-              )}
+              interactive={true}
+              className="rounded-full pl-4 pr-3 bg-primary/80 hover:bg-primary shadow-sm"
               onClick={() => window.open(project.link, '_blank')}
-              onMouseEnter={() => setIsHovering(true)}
-              onMouseLeave={() => setIsHovering(false)}
             >
-              <span className="relative z-10 font-medium">View Details</span>
-              <ExternalLink 
-                className={cn(
-                  "h-4 w-4 relative z-10 transition-transform duration-300 ease-out",
-                  isHovering ? "translate-x-1" : ""
-                )} 
-              />
-              <div className={cn(
-                "absolute inset-0 bg-primary/50 rounded-full transition-all duration-300 ease-in-out",
-                isHovering ? "opacity-100" : "opacity-0"
-              )} />
+              View Details <ExternalLink className="h-4 w-4 ml-1" />
             </Button>
           </CardFooter>
         )}

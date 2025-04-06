@@ -27,9 +27,10 @@ const Footer: React.FC = () => {
               <Button 
                 variant="ghost" 
                 className="mt-4 group" 
+                interactive={true}
                 onClick={() => window.location.href = 'mailto:markbenhaim0@gmail.com'}
               >
-                Contact Me <ArrowRight className="ml-1 w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                Contact Me <ArrowRight className="ml-1 w-4 h-4" />
               </Button>
             )}
           </div>

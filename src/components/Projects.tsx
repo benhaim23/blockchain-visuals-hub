@@ -59,10 +59,10 @@ const Projects: React.FC = () => {
         <Button 
           variant="outline" 
           className="rounded-full"
+          interactive={true}
           onClick={() => window.open('https://github.com/benhaim23', '_blank')}
         >
-          <Code className="mr-2 h-4 w-4" />
-          View More on GitHub
+          <Code className="h-4 w-4" /> View More on GitHub
         </Button>
       </div>
     </section>
