@@ -1,8 +1,11 @@
+
 import React from 'react';
-import { BarChart, PieChart, AreaChart, Users, Megaphone, Briefcase, Code, Database, Network, Shield, Search, FlaskConical, Award, GraduationCap } from 'lucide-react';
+import { BarChart, PieChart, AreaChart, Users, Megaphone, Briefcase, Code, Database, Network, Shield, Search, FlaskConical, Award, GraduationCap, CheckCircle, Bookmark, Medal, FileCheck } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
+import { motion } from 'framer-motion';
+import { useTheme } from '@/context/ThemeContext';
 
 interface SkillCategoryProps {
   title: string;
@@ -45,6 +48,7 @@ const SkillCategory: React.FC<SkillCategoryProps> = ({
 );
 
 const Skills: React.FC = () => {
+  const { theme } = useTheme();
   const skillCategories = [
     {
       title: "Blockchain & Crypto",
@@ -147,6 +151,51 @@ const Skills: React.FC = () => {
     },
   ];
 
+  const certificationsList = [
+    { id: 1, name: "Blockchain and Digital Currencies - UNIC", icon: <Database className="h-4 w-4" /> },
+    { id: 2, name: "Brainstation Data Science Bootcamp", icon: <Code className="h-4 w-4" /> },
+    { id: 3, name: "IBM Professional Certificate for Data Science", icon: <BarChart className="h-4 w-4" /> },
+    { id: 4, name: "Python for Trading - Quantinsti", icon: <PieChart className="h-4 w-4" /> },
+    { id: 5, name: "Tableau Desktop Specialist", icon: <AreaChart className="h-4 w-4" /> }
+  ];
+
+  const educationList = [
+    {
+      degree: "Master's in Applied Data Science",
+      school: "University of Michigan",
+      period: "2023 - Present",
+      icon: <Database className="h-5 w-5 text-sky-400" />
+    },
+    {
+      degree: "Master's in Blockchain & Digital Currency",
+      school: "University of Nicosia",
+      period: "2018 - 2019",
+      icon: <Network className="h-5 w-5 text-indigo-400" />
+    },
+    {
+      degree: "Bachelor of Commerce (Accounting)",
+      school: "Concordia University, John Molson School of Business",
+      period: "2015 - 2018",
+      honors: "Ernst & Young Scholarship, Beta Gamma Sigma, Dean's Honor List",
+      icon: <Briefcase className="h-5 w-5 text-amber-400" />
+    }
+  ];
+
+  const container = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const item = {
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0 }
+  };
+
   return (
     <section id="skills" className="section-container">
       <div className="max-w-4xl mx-auto text-center mb-12">
@@ -182,64 +231,114 @@ const Skills: React.FC = () => {
         </h3>
         
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-          <Card className="glass-card hover:shadow-md transition-all duration-300">
-            <CardHeader className="flex flex-row items-start space-x-4 pb-2">
-              <div className="p-2 rounded-md bg-primary/10">
-                <Award className="h-6 w-6 text-primary" />
+          {/* Certifications Card */}
+          <motion.div
+            className="glass-card rounded-xl overflow-hidden border-2 border-primary/10 hover:border-primary/30 transition-all duration-300"
+            whileHover={{ y: -5 }}
+          >
+            <div className="p-5 bg-gradient-to-r from-primary/5 to-transparent">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="p-2.5 rounded-lg bg-primary/10 backdrop-blur-md">
+                  <FileCheck className="h-6 w-6 text-primary" />
+                </div>
+                <div>
+                  <h4 className="text-xl font-semibold">Certifications</h4>
+                  <p className="text-muted-foreground text-sm">Professional qualifications</p>
+                </div>
               </div>
-              <div>
-                <CardTitle className="text-xl">Certifications</CardTitle>
-                <CardDescription>Professional qualifications</CardDescription>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-3">
-                {[
-                  "Blockchain and Digital Currencies - UNIC",
-                  "Brainstation Data Science Bootcamp",
-                  "IBM Professional Certificate for Data Science",
-                  "Python for Trading - Quantinsti",
-                  "Tableau Desktop Specialist"
-                ].map((cert, index) => (
-                  <li key={index} className="flex items-start gap-2 group">
-                    <Badge variant="outline" className="mt-0.5 group-hover:bg-primary/20 transition-colors">
-                      {index + 1}
-                    </Badge>
-                    <span className="font-medium">{cert}</span>
-                  </li>
+            </div>
+            <div className="p-5">
+              <motion.ul 
+                className="space-y-3"
+                variants={container}
+                initial="hidden"
+                whileInView="show"
+                viewport={{ once: true }}
+              >
+                {certificationsList.map((cert) => (
+                  <motion.li 
+                    key={cert.id} 
+                    className={cn(
+                      "flex items-center gap-3 p-2.5 rounded-lg group transition-all duration-300",
+                      theme === 'dark' 
+                        ? "hover:bg-primary/10" 
+                        : "hover:bg-primary/5"
+                    )}
+                    variants={item}
+                  >
+                    <div className={cn(
+                      "w-8 h-8 rounded-full flex items-center justify-center text-white font-medium transition-all duration-300",
+                      theme === 'dark' 
+                        ? "bg-primary/30 group-hover:bg-primary/50" 
+                        : "bg-primary/20 group-hover:bg-primary/40"
+                    )}>
+                      {cert.id}
+                    </div>
+                    <span className="font-medium group-hover:text-primary transition-colors duration-300 flex items-center gap-2">
+                      {cert.name}
+                      {cert.icon}
+                    </span>
+                  </motion.li>
                 ))}
-              </ul>
-            </CardContent>
-          </Card>
+              </motion.ul>
+            </div>
+          </motion.div>
           
-          <Card className="glass-card hover:shadow-md transition-all duration-300">
-            <CardHeader className="flex flex-row items-start space-x-4 pb-2">
-              <div className="p-2 rounded-md bg-primary/10">
-                <GraduationCap className="h-6 w-6 text-primary" />
+          {/* Education Card */}
+          <motion.div 
+            className="glass-card rounded-xl overflow-hidden border-2 border-primary/10 hover:border-primary/30 transition-all duration-300"
+            whileHover={{ y: -5 }}
+          >
+            <div className="p-5 bg-gradient-to-r from-primary/5 to-transparent">
+              <div className="flex items-center gap-3 mb-3">
+                <div className="p-2.5 rounded-lg bg-primary/10 backdrop-blur-md">
+                  <GraduationCap className="h-6 w-6 text-primary" />
+                </div>
+                <div>
+                  <h4 className="text-xl font-semibold">Education</h4>
+                  <p className="text-muted-foreground text-sm">Academic background</p>
+                </div>
               </div>
-              <div>
-                <CardTitle className="text-xl">Education</CardTitle>
-                <CardDescription>Academic background</CardDescription>
-              </div>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-4">
-                <li className="border-l-2 border-primary/30 pl-4 py-1 hover:border-primary transition-colors">
-                  <div className="font-medium text-base">Master's in Applied Data Science</div>
-                  <div className="text-sm text-muted-foreground">University of Michigan, 2023 - Present</div>
-                </li>
-                <li className="border-l-2 border-primary/30 pl-4 py-1 hover:border-primary transition-colors">
-                  <div className="font-medium text-base">Master's in Blockchain & Digital Currency</div>
-                  <div className="text-sm text-muted-foreground">University of Nicosia, 2018 - 2019</div>
-                </li>
-                <li className="border-l-2 border-primary/30 pl-4 py-1 hover:border-primary transition-colors">
-                  <div className="font-medium text-base">Bachelor of Commerce (Accounting)</div>
-                  <div className="text-sm text-muted-foreground">Concordia University, John Molson School of Business, 2015 - 2018</div>
-                  <div className="text-xs text-muted-foreground">Honors: Ernst & Young Scholarship, Beta Gamma Sigma, Dean's Honor List</div>
-                </li>
-              </ul>
-            </CardContent>
-          </Card>
+            </div>
+            <div className="p-5">
+              <motion.ul 
+                className="space-y-6"
+                variants={container}
+                initial="hidden"
+                whileInView="show"
+                viewport={{ once: true }}
+              >
+                {educationList.map((edu, index) => (
+                  <motion.li 
+                    key={index} 
+                    variants={item}
+                    className="relative pl-6 border-l-2 border-primary/30 hover:border-primary transition-colors duration-300 py-1"
+                  >
+                    <div className="absolute -left-[9px] top-1.5">
+                      <div className="rounded-full p-1 bg-background border-2 border-primary">
+                        {edu.icon}
+                      </div>
+                    </div>
+                    <div className="space-y-1">
+                      <div className="font-semibold text-lg">{edu.degree}</div>
+                      <div className="text-muted-foreground">{edu.school}</div>
+                      <div className="text-sm text-muted-foreground flex items-center gap-2">
+                        <Badge variant="outline" className="bg-primary/5">
+                          {edu.period}
+                        </Badge>
+                      </div>
+                      {edu.honors && (
+                        <div className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
+                          <Medal className="h-3.5 w-3.5 text-amber-400" />
+                          <span>{edu.honors}</span>
+                        </div>
+                      )}
+                    </div>
+                  </motion.li>
+                ))}
+              </motion.ul>
+            </div>
+          </motion.div>
         </div>
       </div>
     </section>
