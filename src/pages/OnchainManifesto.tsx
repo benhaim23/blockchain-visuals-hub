@@ -8,6 +8,12 @@ import { cn } from "@/lib/utils";
 
 const manifestoChapters = [
   { 
+    number: 0, 
+    title: "The Onchain Analyst Decoding the Transparent Economy", 
+    pdfPath: "/Onchain Manifesto/The Onchain Analyst Decoding the Transparent Economy.pdf",
+    mdPath: "/Onchain Manifesto/The Onchain Analyst Decoding the Transparent Economy.md"
+  },
+  { 
     number: 1, 
     title: "What Does an Onchain Data Analyst Do?", 
     pdfPath: "/Onchain Manifesto/01. What Does an Onchain Data Analyst Do?.pdf" 
@@ -96,36 +102,31 @@ const manifestoChapters = [
     number: 18, 
     title: "Why the Future Belongs to Onchain Analysts", 
     pdfPath: "/Onchain Manifesto/18. Why the Future Belongs to Onchain Analysts.pdf" 
-  },
-  { 
-    number: 19, 
-    title: "The Onchain Analyst Decoding the Transparent Economy", 
-    pdfPath: "/Onchain Manifesto/The Onchain Analyst Decoding the Transparent Economy.pdf" 
   }
 ];
 
 const OnchainManifesto: React.FC = () => {
   const [activeTab, setActiveTab] = useState("toc");
-  const [currentChapter, setCurrentChapter] = useState(1);
+  const [currentChapter, setCurrentChapter] = useState(0);
   const [mdContent, setMdContent] = useState<string>("");
 
   const goToNextChapter = () => {
-    if (currentChapter < manifestoChapters.length) {
+    if (currentChapter < manifestoChapters.length - 1) {
       setCurrentChapter(currentChapter + 1);
       setActiveTab("reader");
     }
   };
 
   const goToPreviousChapter = () => {
-    if (currentChapter > 1) {
+    if (currentChapter > 0) {
       setCurrentChapter(currentChapter - 1);
       setActiveTab("reader");
     }
   };
 
-  // Load markdown content for the final chapter (which is in MD format)
+  // Load markdown content for the first chapter (executive summary)
   React.useEffect(() => {
-    if (currentChapter === 19) {
+    if (currentChapter === 0) {
       fetch('/Onchain Manifesto/The Onchain Analyst Decoding the Transparent Economy.md')
         .then(response => response.text())
         .then(text => {
@@ -134,6 +135,11 @@ const OnchainManifesto: React.FC = () => {
         .catch(error => console.error('Error loading markdown:', error));
     }
   }, [currentChapter]);
+
+  // Display the correct chapter number in TOC
+  const getDisplayNumber = (chapter: typeof manifestoChapters[0]) => {
+    return chapter.number === 0 ? "Executive Summary" : `${chapter.number}.`;
+  };
 
   return (
     <div className="min-h-screen pt-24 pb-16">
@@ -170,7 +176,7 @@ const OnchainManifesto: React.FC = () => {
                     }}
                   >
                     <div className="flex items-center gap-3">
-                      <span className="text-primary font-medium">{chapter.number}.</span>
+                      <span className="text-primary font-medium">{getDisplayNumber(chapter)}</span>
                       <span className="font-medium">{chapter.title}</span>
                     </div>
                     <ChevronRight className="h-5 w-5 text-muted-foreground" />
@@ -187,7 +193,7 @@ const OnchainManifesto: React.FC = () => {
                 <Button 
                   variant="ghost" 
                   onClick={goToPreviousChapter}
-                  disabled={currentChapter <= 1}
+                  disabled={currentChapter <= 0}
                   className="gap-2"
                 >
                   <ChevronLeft className="h-4 w-4" />
@@ -195,13 +201,13 @@ const OnchainManifesto: React.FC = () => {
                 </Button>
 
                 <span className="font-medium">
-                  Chapter {currentChapter}: {manifestoChapters[currentChapter - 1]?.title}
+                  {currentChapter === 0 ? 'Executive Summary' : `Chapter ${currentChapter}`}: {manifestoChapters[currentChapter]?.title}
                 </span>
 
                 <Button 
                   variant="ghost" 
                   onClick={goToNextChapter}
-                  disabled={currentChapter >= manifestoChapters.length}
+                  disabled={currentChapter >= manifestoChapters.length - 1}
                   className="gap-2"
                 >
                   Next
@@ -211,8 +217,8 @@ const OnchainManifesto: React.FC = () => {
 
               {/* Content area */}
               <div className="flex-1 p-4">
-                {currentChapter === 19 ? (
-                  // For the markdown file
+                {currentChapter === 0 ? (
+                  // For the markdown file (executive summary)
                   <ScrollArea className="h-[600px] w-full pr-4">
                     <div className="prose dark:prose-invert max-w-none">
                       {mdContent.split('\n').map((line, index) => {
@@ -241,9 +247,9 @@ const OnchainManifesto: React.FC = () => {
                   // For PDF files
                   <div className="h-[600px] w-full">
                     <iframe
-                      src={manifestoChapters[currentChapter - 1]?.pdfPath}
+                      src={manifestoChapters[currentChapter]?.pdfPath}
                       className="w-full h-full"
-                      title={`Chapter ${currentChapter}: ${manifestoChapters[currentChapter - 1]?.title}`}
+                      title={`Chapter ${currentChapter}: ${manifestoChapters[currentChapter]?.title}`}
                     />
                   </div>
                 )}
