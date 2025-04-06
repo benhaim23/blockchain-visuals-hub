@@ -33,7 +33,7 @@ export function CustomCursor({ className }: CustomCursorProps) {
           e.target.closest('input') ||
           e.target.dataset.interactive === 'true';
         
-        setIsHovering(Boolean(isInteractive))
+        setIsHovering(isInteractive)
       }
     }
 
@@ -53,7 +53,7 @@ export function CustomCursor({ className }: CustomCursorProps) {
   return (
     <motion.div
       className={cn(
-        "fixed top-0 left-0 w-6 h-6 pointer-events-none z-[9999]",
+        "fixed top-0 left-0 w-6 h-6 pointer-events-none z-50",
         "text-primary",
         isClicking ? "scale-90" : "scale-100",
         isHovering ? "scale-125" : "scale-100",
