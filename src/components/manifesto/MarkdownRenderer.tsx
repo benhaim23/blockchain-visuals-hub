@@ -1,12 +1,15 @@
 
-import React from 'react';
+import React, { useState } from 'react';
+import { TextGenerateEffect } from "@/components/ui/text-generate-effect";
 
 interface MarkdownRendererProps {
   content: string;
 }
 
 const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
-  // Convert markdown content to HTML
+  const [key] = useState(() => Math.random().toString(36).substring(7));
+  
+  // Process the content to separate paragraphs, headers, etc.
   return (
     <div className="prose dark:prose-invert max-w-none">
       {content.split('\n').map((line, index) => {
@@ -16,7 +19,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
         } else if (line.startsWith('## ')) {
           return <h2 key={index} className="text-2xl font-bold mt-5 mb-3">{line.substring(3)}</h2>;
         } else if (line.startsWith('### ')) {
-          return <h3 key={index} className="text-xl font-bold mt-4 mb-2">{line.substring(4)}</h3>;
+          return <h3 key={index} className="text-xl font-bold mt-4 mb-2 text-purple-500">{line.substring(4)}</h3>;
         } else if (line.startsWith('#### ')) {
           return <h4 key={index} className="text-lg font-bold mt-3 mb-2">{line.substring(5)}</h4>;
         }
@@ -26,25 +29,31 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
           return <li key={index} className="ml-6 mb-1">{line.substring(2)}</li>;
         } 
         
-        // Bold text - we'll handle the ** markers properly
+        // Bold text handling (removed ** markers)
         else if (line.includes('**')) {
           // Replace ** with span for bold text
           const parts = line.split('**');
           
           if (parts.length > 1) {
             return (
-              <p key={index} className="mb-4">
-                {parts.map((part, i) => {
-                  // Every even index (0, 2, 4...) is regular text
-                  // Every odd index (1, 3, 5...) is bold text
-                  return i % 2 === 0 ? 
-                    <React.Fragment key={i}>{part}</React.Fragment> : 
-                    <strong key={i}>{part}</strong>;
-                })}
-              </p>
+              <TextGenerateEffect 
+                key={`${index}-${key}`}
+                words={line.replace(/\*\*/g, '')} 
+                className="mb-4"
+                duration={2}
+                filter={false}
+              />
             );
           }
-          return <p key={index} className="mb-4">{line}</p>;
+          return (
+            <TextGenerateEffect 
+              key={`${index}-${key}`}
+              words={line} 
+              className="mb-4"
+              duration={2}
+              filter={false}
+            />
+          );
         }
         
         // Blockquotes
@@ -81,13 +90,13 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
           return <div key={index} className="h-4"></div>;
         }
         
-        // Regular paragraph
+        // Regular paragraph with text generation effect
         else {
           // Process inline formatting
           let formattedText = line;
           
           // Bold text
-          formattedText = formattedText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+          formattedText = formattedText.replace(/\*\*(.*?)\*\*/g, '$1');
           
           // Italic text
           formattedText = formattedText.replace(/\*(.*?)\*/g, '<em>$1</em>');
@@ -105,7 +114,15 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
             );
           }
           
-          return <p key={index} className="mb-4">{formattedText}</p>;
+          return (
+            <TextGenerateEffect 
+              key={`${index}-${key}`}
+              words={formattedText} 
+              className="mb-4"
+              duration={2}
+              filter={false}
+            />
+          );
         }
       })}
     </div>
