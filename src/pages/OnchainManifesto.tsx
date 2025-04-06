@@ -9,6 +9,7 @@ import { manifestoChapters } from '@/data/manifestoChapters';
 import TableOfContents from '@/components/manifesto/TableOfContents';
 import ChapterReader from '@/components/manifesto/ChapterReader';
 import { toast } from '@/components/ui/use-toast';
+import { MatrixText } from '@/components/ui/matrix-text';
 
 const OnchainManifesto: React.FC = () => {
   const [activeTab, setActiveTab] = useState("toc");
@@ -93,7 +94,15 @@ const OnchainManifesto: React.FC = () => {
         </div>
         
         <div className="container mx-auto px-4 max-w-5xl relative z-10">
-          <h1 className="text-3xl md:text-5xl font-bold mb-8 crypto-gradient">The Onchain Manifesto</h1>
+          <div className="mb-8">
+            <MatrixText 
+              text="The Onchain Manifesto" 
+              className="h-auto" 
+              initialDelay={400}
+              letterAnimationDuration={600}
+              letterInterval={80}
+            />
+          </div>
           <p className="text-muted-foreground mb-8 text-lg">
             A comprehensive guide to blockchain analytics, exploring the transparent world of on-chain data 
             and how to derive meaningful insights from blockchain networks.

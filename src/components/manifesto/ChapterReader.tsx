@@ -31,7 +31,7 @@ const ChapterReader: React.FC<ChapterReaderProps> = ({
           variant="ghost" 
           onClick={onPreviousChapter}
           disabled={currentChapter <= 0}
-          className="gap-2"
+          className="gap-2 text-purple-500 hover:text-purple-600 hover:bg-purple-100/10"
         >
           <ChevronLeft className="h-4 w-4" />
           Previous
@@ -45,7 +45,7 @@ const ChapterReader: React.FC<ChapterReaderProps> = ({
           variant="ghost" 
           onClick={onNextChapter}
           disabled={currentChapter >= chapters.length - 1}
-          className="gap-2"
+          className="gap-2 text-purple-500 hover:text-purple-600 hover:bg-purple-100/10"
         >
           Next
           <ChevronRight className="h-4 w-4" />
