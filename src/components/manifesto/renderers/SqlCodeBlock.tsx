@@ -18,11 +18,62 @@ const SqlCodeBlock: React.FC<SqlCodeBlockProps> = ({ content, blockIndex }) => {
     });
   };
 
+  // SQL syntax highlighting function
+  const highlightSql = (code: string) => {
+    const lines = code.split('\n');
+    
+    return lines.map((line, lineIndex) => {
+      // Replace SQL keywords with colored spans (purple #9b87f5)
+      let formattedLine = line.replace(
+        /\b(SELECT|FROM|WHERE|GROUP BY|ORDER BY|HAVING|JOIN|LEFT JOIN|RIGHT JOIN|INNER JOIN|ON|AND|OR|AS|UNION|ALL|DISTINCT|COUNT|SUM|AVG|MIN|MAX|LIMIT|OFFSET|CASE|WHEN|THEN|ELSE|END|WITH|OVER|PARTITION BY|ROW_NUMBER|RANK|DENSE_RANK)\b/gi,
+        (match) => `<span class="text-[#9b87f5]">${match}</span>`
+      );
+      
+      // Highlight function calls
+      formattedLine = formattedLine.replace(
+        /\b([a-zA-Z0-9_]+)(?=\s*\()/g,
+        (match) => `<span class="text-[#9b87f5]">${match}</span>`
+      );
+      
+      // Highlight strings (coral #F97316)
+      formattedLine = formattedLine.replace(
+        /('.*?')/g,
+        (match) => `<span class="text-[#F97316]">${match}</span>`
+      );
+      
+      // Highlight numbers (green/teal #33C3F0)
+      formattedLine = formattedLine.replace(
+        /\b(\d+(?:\.\d+)?(?:e[+-]?\d+)?)\b/g,
+        (match) => `<span class="text-[#33C3F0]">${match}</span>`
+      );
+      
+      // Highlight special operators 
+      formattedLine = formattedLine.replace(
+        /(\*|=|>|<|\+|-|\/|%|!=|&lt;=|&gt;=|&lt;|&gt;)/g,
+        (match) => `<span class="text-blue-400">${match}</span>`
+      );
+      
+      // Highlight intervals
+      formattedLine = formattedLine.replace(
+        /\b(interval)\b/gi,
+        (match) => `<span class="text-[#9b87f5]">${match}</span>`
+      );
+      
+      return (
+        <div 
+          key={lineIndex} 
+          className="leading-relaxed"
+          dangerouslySetInnerHTML={{ __html: formattedLine }}
+        />
+      );
+    });
+  };
+
   return (
     <div className="my-6 overflow-hidden rounded-lg bg-gray-900 border border-slate-700 shadow-lg">
       {/* Code block header with language and copy button */}
       <div className="flex items-center justify-between bg-gray-800 px-4 py-2 border-b border-slate-700">
-        <div className="px-2 py-1 rounded text-sm font-medium bg-gray-700 text-gray-300">
+        <div className="px-2 py-1 rounded text-sm font-medium bg-gray-700 text-[#9b87f5]">
           SQL
         </div>
         <Button
@@ -42,7 +93,9 @@ const SqlCodeBlock: React.FC<SqlCodeBlockProps> = ({ content, blockIndex }) => {
       
       {/* Code content */}
       <div className="p-4 text-sm overflow-x-auto bg-gray-900 text-gray-200">
-        <pre className="whitespace-pre-wrap font-mono">{content}</pre>
+        <pre className="whitespace-pre-wrap font-mono">
+          {highlightSql(content)}
+        </pre>
       </div>
     </div>
   );
