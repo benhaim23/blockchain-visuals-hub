@@ -29,7 +29,7 @@ export const CustomCursor = memo(({ className }: CustomCursorProps) => {
           e.target.closest('input') ||
           e.target.dataset.interactive === 'true';
         
-        setIsHovering(isInteractive)
+        setIsHovering(!!isInteractive)
       }
     }
 

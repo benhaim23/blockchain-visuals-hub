@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect, useCallback, useMemo, lazy, Suspense } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { BookOpen, FileText, Sparkles } from "lucide-react";
@@ -8,16 +7,19 @@ import { manifestoChapters } from '@/data/manifestoChapters_updated';
 import { toast } from '@/components/ui/use-toast';
 import { MatrixText } from '@/components/ui/matrix-text';
 
-// Lazy load the larger components
+// Lazy load the larger components with higher loading priority
 const TableOfContents = lazy(() => import('@/components/manifesto/TableOfContents'));
 const ChapterReader = lazy(() => import('@/components/manifesto/ChapterReader'));
 
-// Loading placeholder component
+// Simple loading placeholder component
 const LoadingPlaceholder = () => (
   <div className="bg-white/90 dark:bg-card/80 backdrop-blur-sm rounded-lg border-2 border-blue-200 dark:border-slate-700 min-h-[600px] flex items-center justify-center shadow-lg">
     <p className="text-blue-600 dark:text-blue-400 animate-pulse">Loading content...</p>
   </div>
 );
+
+// Content cache for markdown to avoid repeated fetches
+const contentCache = new Map<number, string>();
 
 const OnchainManifesto: React.FC = () => {
   const [activeTab, setActiveTab] = useState("toc");
@@ -28,14 +30,14 @@ const OnchainManifesto: React.FC = () => {
   // Memoized callback functions
   const goToNextChapter = useCallback(() => {
     if (currentChapter < manifestoChapters.length - 1) {
-      setCurrentChapter(currentChapter + 1);
+      setCurrentChapter(prevChapter => prevChapter + 1);
       setActiveTab("reader");
     }
   }, [currentChapter]);
 
   const goToPreviousChapter = useCallback(() => {
     if (currentChapter > 0) {
-      setCurrentChapter(currentChapter - 1);
+      setCurrentChapter(prevChapter => prevChapter - 1);
       setActiveTab("reader");
     }
   }, [currentChapter]);
@@ -56,20 +58,29 @@ const OnchainManifesto: React.FC = () => {
       document.title = `${manifestoChapters[currentChapter].title} | The Onchain Manifesto`;
     }
     
+    // Skip loading if we're not in reader mode
+    if (activeTab !== "reader") return;
+    
     const loadContent = async () => {
-      // Skip loading if we're not in reader mode
-      if (activeTab !== "reader") return;
-      
       setIsLoading(true);
       const chapter = manifestoChapters[currentChapter];
-
-      // Check if we already have the content (memory cache)
-      if (chapter?.mdContent) {
-        setMdContent(chapter.mdContent);
+      
+      // Check if we already have the content in our cache
+      if (contentCache.has(currentChapter)) {
+        setMdContent(contentCache.get(currentChapter) || "");
         setIsLoading(false);
         return;
       }
       
+      // Check if we already have the content stored in the chapter object
+      if (chapter?.mdContent) {
+        setMdContent(chapter.mdContent);
+        contentCache.set(currentChapter, chapter.mdContent);
+        setIsLoading(false);
+        return;
+      }
+      
+      // Otherwise fetch the content
       if (chapter?.mdPath) {
         try {
           const response = await fetch(chapter.mdPath);
@@ -80,6 +91,9 @@ const OnchainManifesto: React.FC = () => {
           
           const text = await response.text();
           setMdContent(text);
+          
+          // Cache the content for future use
+          contentCache.set(currentChapter, text);
         } catch (error) {
           console.error('Error loading markdown:', error);
           toast({
@@ -96,21 +110,27 @@ const OnchainManifesto: React.FC = () => {
       setIsLoading(false);
     };
 
-    loadContent();
+    // Use a small delay before loading to improve perceived performance 
+    // by allowing the UI to render first
+    const timer = setTimeout(() => {
+      loadContent();
+    }, 50);
+    
+    return () => clearTimeout(timer);
   }, [currentChapter, activeTab]);
 
   return (
     <>
       <Header />
       <div className="min-h-screen pt-24 pb-16 relative bg-gradient-to-b from-sky-50 to-white dark:from-gray-900 dark:to-gray-950">
-        <div className="absolute inset-0 z-0 overflow-hidden opacity-30 dark:opacity-50">
+        <div className="absolute inset-0 z-0 overflow-hidden opacity-20 dark:opacity-40">
           <Squares 
             direction="diagonal"
-            speed={0.5}
+            speed={0.75}
             squareSize={40}
             borderColor="rgba(59, 130, 246, 0.3)" 
             hoverFillColor="rgba(59, 130, 246, 0.1)"
-            glowing={true}
+            glowing={false}
           />
         </div>
         
@@ -119,9 +139,9 @@ const OnchainManifesto: React.FC = () => {
             <MatrixText 
               text="The Onchain Manifesto" 
               className="h-auto text-indigo-800 dark:text-indigo-300" 
-              initialDelay={500}
-              letterAnimationDuration={700}
-              letterInterval={100}
+              initialDelay={300}
+              letterAnimationDuration={500}
+              letterInterval={50}
             />
           </div>
           <p className="text-slate-700 dark:text-muted-foreground mb-8 text-lg text-center leading-relaxed">
@@ -133,18 +153,18 @@ const OnchainManifesto: React.FC = () => {
             <TabsList className="w-full mb-6 border-2 border-blue-300 dark:border-slate-700 shadow-md bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm rounded-xl">
               <TabsTrigger 
                 value="toc" 
-                className="flex-1 transition-all duration-300 hover:bg-blue-50 dark:hover:bg-primary/5 data-[state=active]:bg-blue-100 dark:data-[state=active]:bg-slate-800"
+                className="flex-1 data-[state=active]:bg-blue-100 dark:data-[state=active]:bg-slate-800"
               >
                 <FileText className="mr-2 h-4 w-4 text-blue-600 dark:text-blue-400" />
                 <span className="text-blue-800 dark:text-blue-300">Table of Contents</span>
               </TabsTrigger>
               <TabsTrigger 
                 value="reader" 
-                className="flex-1 transition-all duration-300 hover:bg-blue-50 dark:hover:bg-primary/5 data-[state=active]:bg-blue-100 dark:data-[state=active]:bg-slate-800"
+                className="flex-1 data-[state=active]:bg-blue-100 dark:data-[state=active]:bg-slate-800"
               >
                 <BookOpen className="mr-2 h-4 w-4 text-blue-600 dark:text-blue-400" />
                 <span className="text-blue-800 dark:text-blue-300">Reader</span>
-                <Sparkles className="ml-2 h-3 w-3 text-amber-500 animate-pulse" />
+                <Sparkles className="ml-2 h-3 w-3 text-amber-500" />
               </TabsTrigger>
             </TabsList>
 

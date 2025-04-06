@@ -13,7 +13,7 @@ interface TableOfContentsProps {
 
 const TableOfContents: React.FC<TableOfContentsProps> = ({ chapters, onSelectChapter }) => {
   return (
-    <div className="bg-white/90 dark:bg-card/80 backdrop-blur-sm rounded-lg border-2 border-blue-200 dark:border-slate-700 p-6 shadow-lg transition-all duration-300 hover:shadow-xl dark:hover:border-primary/40 hover:border-blue-300">
+    <div className="bg-white/90 dark:bg-card/80 backdrop-blur-sm rounded-lg border-2 border-blue-200 dark:border-slate-700 p-6 shadow-lg">
       <h2 className="text-2xl font-semibold mb-6 text-indigo-900 dark:text-indigo-300 flex items-center">
         <BookOpen className="mr-2 h-5 w-5 text-indigo-600 dark:text-indigo-400" />
         Chapters
@@ -42,14 +42,10 @@ interface ChapterItemProps {
 const ChapterItem = memo(({ chapter, index, onSelectChapter }: ChapterItemProps) => {
   return (
     <motion.div 
-      key={chapter.number}
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ duration: 0.2 + index * 0.05 }}
-      whileHover={{ 
-        scale: 1.02, 
-        transition: { duration: 0.2 }
-      }}
+      whileHover={{ scale: 1.02 }}
       className="relative group"
     >
       <div 
@@ -61,7 +57,7 @@ const ChapterItem = memo(({ chapter, index, onSelectChapter }: ChapterItemProps)
           "shadow-sm hover:shadow-md"
         )}
       >
-        {/* Background gradient for hover effect */}
+        {/* Background gradient */}
         <div className="absolute inset-0 bg-gradient-to-r from-blue-50/90 to-indigo-50/90 dark:from-slate-800/50 dark:to-slate-800/80 
                         group-hover:from-blue-100/80 group-hover:to-indigo-100/80 
                         dark:group-hover:from-slate-700/60 dark:group-hover:to-slate-700/80 
@@ -74,8 +70,8 @@ const ChapterItem = memo(({ chapter, index, onSelectChapter }: ChapterItemProps)
               className={cn(
                 "px-2.5 py-1 min-w-[36px] flex justify-center font-medium text-sm transition-colors duration-200",
                 chapter.number === 0 
-                  ? "bg-amber-100/80 text-amber-800 border-amber-200 dark:bg-amber-900/20 dark:text-amber-300 dark:border-amber-800/50 group-hover:bg-amber-200/90 dark:group-hover:bg-amber-900/30" 
-                  : "bg-blue-100/80 text-blue-800 border-blue-200 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-800/50 group-hover:bg-blue-200/90 dark:group-hover:bg-blue-900/30"
+                  ? "bg-amber-100/80 text-amber-800 border-amber-200 dark:bg-amber-900/20 dark:text-amber-300 dark:border-amber-800/50" 
+                  : "bg-blue-100/80 text-blue-800 border-blue-200 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-800/50"
               )}
             >
               {chapter.number === 0 ? 
@@ -93,13 +89,9 @@ const ChapterItem = memo(({ chapter, index, onSelectChapter }: ChapterItemProps)
               </span>
               
               {'description' in chapter && chapter.description && (
-                <motion.span 
-                  initial={{ opacity: 0.7 }}
-                  whileHover={{ opacity: 1 }}
-                  className="text-xs text-slate-500 dark:text-slate-400 max-w-md line-clamp-1 md:line-clamp-2"
-                >
+                <span className="text-xs text-slate-500 dark:text-slate-400 max-w-md line-clamp-1 md:line-clamp-2">
                   {chapter.description}
-                </motion.span>
+                </span>
               )}
             </div>
           </div>
@@ -110,12 +102,7 @@ const ChapterItem = memo(({ chapter, index, onSelectChapter }: ChapterItemProps)
           )} />
         </div>
         
-        {/* Top shine effect on hover */}
-        <div className="absolute -top-1/2 -left-1/2 w-8 h-[300%] bg-white/40 dark:bg-white/10 rotate-12 transform-gpu 
-                        translate-x-[-120%] opacity-0 group-hover:translate-x-[350%] group-hover:opacity-70 
-                        transition-all duration-1000 pointer-events-none"></div>
-        
-        {/* Bottom accent line with animation */}
+        {/* Bottom accent line */}
         <div className="absolute bottom-0 left-0 w-0 h-1 bg-gradient-to-r from-blue-400 to-indigo-500 
                         dark:from-blue-500 dark:to-indigo-400 group-hover:w-full transition-all duration-500"></div>
       </div>

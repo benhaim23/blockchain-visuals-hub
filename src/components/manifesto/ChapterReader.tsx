@@ -1,5 +1,5 @@
 
-import React, { memo } from 'react';
+import React, { memo, useCallback, useMemo } from 'react';
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, ArrowRight } from "lucide-react";
 import { ManifestoChapter } from '@/data/manifestoChapters';
@@ -33,7 +33,7 @@ const NavigationHeader = memo(({
       variant="ghost" 
       onClick={onPreviousChapter}
       disabled={currentChapter <= 0}
-      className="gap-2 text-blue-600 hover:text-blue-700 hover:bg-blue-100/50 transition-all duration-300 hover:scale-105 dark:text-blue-400 dark:hover:text-blue-300 dark:hover:bg-blue-900/20"
+      className="gap-2 text-blue-600 hover:text-blue-700 hover:bg-blue-100/50 dark:text-blue-400 dark:hover:text-blue-300 dark:hover:bg-blue-900/20"
     >
       <ChevronLeft className="h-4 w-4" />
       Previous
@@ -47,7 +47,7 @@ const NavigationHeader = memo(({
       variant="ghost" 
       onClick={onNextChapter}
       disabled={isLastChapter}
-      className="gap-2 text-blue-600 hover:text-blue-700 hover:bg-blue-100/50 transition-all duration-300 hover:scale-105 dark:text-blue-400 dark:hover:text-blue-300 dark:hover:bg-blue-900/20"
+      className="gap-2 text-blue-600 hover:text-blue-700 hover:bg-blue-100/50 dark:text-blue-400 dark:hover:text-blue-300 dark:hover:bg-blue-900/20"
     >
       Next
       <ChevronRight className="h-4 w-4" />
@@ -91,18 +91,23 @@ const ChapterReader: React.FC<ChapterReaderProps> = ({
   onPreviousChapter, 
   onNextChapter 
 }) => {
-  const chapter = chapters[currentChapter];
-  const showMarkdown = chapter && mdContent; // Always prefer markdown if available
-  const isLastChapter = currentChapter >= chapters.length - 1;
+  // Memoize values to prevent unnecessary recalculations
+  const chapter = useMemo(() => chapters[currentChapter], [chapters, currentChapter]);
+  const isLastChapter = useMemo(() => currentChapter >= chapters.length - 1, [currentChapter, chapters.length]);
   const isMobile = useIsMobile();
   
-  // Get info about the next chapter for the call-to-action link
-  const nextChapter = !isLastChapter ? chapters[currentChapter + 1] : null;
-  const nextChapterTitle = nextChapter ? 
-    `${nextChapter.number}. ${nextChapter.title}` : '';
+  // Memoize nextChapterTitle calculation
+  const nextChapterTitle = useMemo(() => {
+    if (isLastChapter) return '';
+    const nextChapter = chapters[currentChapter + 1];
+    return nextChapter ? `${nextChapter.number}. ${nextChapter.title}` : '';
+  }, [chapters, currentChapter, isLastChapter]);
+  
+  // Determine if we should show markdown - memoized
+  const showMarkdown = useMemo(() => chapter && mdContent, [chapter, mdContent]);
   
   return (
-    <div className="bg-white/90 dark:bg-card/80 backdrop-blur-sm rounded-lg border-2 border-blue-200 dark:border-slate-700 min-h-[600px] flex flex-col shadow-lg transition-all duration-300 hover:shadow-xl dark:hover:border-primary/40 hover:border-blue-300">
+    <div className="bg-white/90 dark:bg-card/80 backdrop-blur-sm rounded-lg border-2 border-blue-200 dark:border-slate-700 min-h-[600px] flex flex-col shadow-lg">
       <NavigationHeader 
         currentChapter={currentChapter}
         chapterTitle={chapter?.title || ''}
@@ -116,7 +121,6 @@ const ChapterReader: React.FC<ChapterReaderProps> = ({
           <ScrollArea className="h-[600px] pr-4">
             <MarkdownRenderer content={mdContent} />
             
-            {/* Call-to-action link at the end of each chapter except the last one */}
             {!isLastChapter && (
               <ChapterCallToAction 
                 isMobile={isMobile}
@@ -133,7 +137,7 @@ const ChapterReader: React.FC<ChapterReaderProps> = ({
                 href={chapter?.pdfPath} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="ml-2 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:underline transition-all duration-300"
+                className="ml-2 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:underline"
               >
                 Open PDF
               </a>
