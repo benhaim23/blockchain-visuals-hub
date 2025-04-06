@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { BookOpen, FileText, Sparkles } from "lucide-react";
@@ -40,12 +39,14 @@ const OnchainManifesto: React.FC = () => {
       setIsLoading(true);
       const chapter = manifestoChapters[currentChapter];
 
+      // First check if we have mdContent already defined
       if (chapter?.mdContent) {
         setMdContent(chapter.mdContent);
         setIsLoading(false);
         return;
       }
       
+      // Otherwise, try to fetch from mdPath
       if (chapter?.mdPath) {
         try {
           const response = await fetch(chapter.mdPath);
