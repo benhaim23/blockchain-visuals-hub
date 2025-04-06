@@ -8,11 +8,13 @@ import { Squares } from "@/components/ui/squares-background";
 import { manifestoChapters } from '@/data/manifestoChapters';
 import TableOfContents from '@/components/manifesto/TableOfContents';
 import ChapterReader from '@/components/manifesto/ChapterReader';
+import { toast } from '@/components/ui/use-toast';
 
 const OnchainManifesto: React.FC = () => {
   const [activeTab, setActiveTab] = useState("toc");
   const [currentChapter, setCurrentChapter] = useState(0);
   const [mdContent, setMdContent] = useState<string>("");
+  const [isLoading, setIsLoading] = useState(false);
 
   const goToNextChapter = () => {
     if (currentChapter < manifestoChapters.length - 1) {
@@ -34,22 +36,37 @@ const OnchainManifesto: React.FC = () => {
   };
 
   useEffect(() => {
-    if (manifestoChapters[currentChapter]?.mdPath) {
-      fetch(manifestoChapters[currentChapter].mdPath)
-        .then(response => response.text())
-        .then(text => {
+    const loadContent = async () => {
+      setIsLoading(true);
+      const chapter = manifestoChapters[currentChapter];
+      
+      if (chapter?.mdPath) {
+        try {
+          const response = await fetch(chapter.mdPath);
+          
+          if (!response.ok) {
+            throw new Error(`Failed to load markdown: ${response.status}`);
+          }
+          
+          const text = await response.text();
           setMdContent(text);
-        })
-        .catch(error => console.error('Error loading markdown:', error));
-    } else if (currentChapter === 0) {
-      // Fallback for executive summary
-      fetch('/Onchain Manifesto/The Onchain Analyst Decoding the Transparent Economy.md')
-        .then(response => response.text())
-        .then(text => {
-          setMdContent(text);
-        })
-        .catch(error => console.error('Error loading markdown:', error));
-    }
+        } catch (error) {
+          console.error('Error loading markdown:', error);
+          toast({
+            title: "Failed to load content",
+            description: "There was an error loading the chapter content. Please try again.",
+            variant: "destructive"
+          });
+          setMdContent("");
+        }
+      } else {
+        setMdContent("");
+      }
+      
+      setIsLoading(false);
+    };
+
+    loadContent();
   }, [currentChapter]);
 
   return (
@@ -94,13 +111,19 @@ const OnchainManifesto: React.FC = () => {
             </TabsContent>
 
             <TabsContent value="reader" className="mt-0">
-              <ChapterReader 
-                currentChapter={currentChapter}
-                chapters={manifestoChapters}
-                mdContent={mdContent}
-                onPreviousChapter={goToPreviousChapter}
-                onNextChapter={goToNextChapter}
-              />
+              {isLoading ? (
+                <div className="bg-card/80 backdrop-blur-sm rounded-lg border border-border min-h-[600px] flex items-center justify-center">
+                  <p>Loading chapter content...</p>
+                </div>
+              ) : (
+                <ChapterReader 
+                  currentChapter={currentChapter}
+                  chapters={manifestoChapters}
+                  mdContent={mdContent}
+                  onPreviousChapter={goToPreviousChapter}
+                  onNextChapter={goToNextChapter}
+                />
+              )}
             </TabsContent>
           </Tabs>
         </div>

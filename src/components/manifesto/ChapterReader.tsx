@@ -4,6 +4,7 @@ import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
 import { ManifestoChapter } from '@/data/manifestoChapters';
 import MarkdownRenderer from './MarkdownRenderer';
+import { ScrollArea } from "@/components/ui/scroll-area";
 
 interface ChapterReaderProps {
   currentChapter: number;
@@ -20,6 +21,9 @@ const ChapterReader: React.FC<ChapterReaderProps> = ({
   onPreviousChapter, 
   onNextChapter 
 }) => {
+  const chapter = chapters[currentChapter];
+  const showMarkdown = chapter?.mdPath && mdContent;
+  
   return (
     <div className="bg-card/80 backdrop-blur-sm rounded-lg border border-border min-h-[600px] flex flex-col">
       <div className="p-4 border-b border-border flex items-center justify-between">
@@ -34,7 +38,7 @@ const ChapterReader: React.FC<ChapterReaderProps> = ({
         </Button>
 
         <span className="font-medium">
-          {currentChapter === 0 ? 'Executive Summary' : `Chapter ${currentChapter}`}: {chapters[currentChapter]?.title}
+          {currentChapter === 0 ? 'Executive Summary' : `Chapter ${currentChapter}`}: {chapter?.title}
         </span>
 
         <Button 
@@ -49,14 +53,16 @@ const ChapterReader: React.FC<ChapterReaderProps> = ({
       </div>
 
       <div className="flex-1 p-4">
-        {chapters[currentChapter]?.mdPath ? (
-          <MarkdownRenderer content={mdContent} />
+        {showMarkdown ? (
+          <ScrollArea className="h-[600px] pr-4">
+            <MarkdownRenderer content={mdContent} />
+          </ScrollArea>
         ) : (
           <div className="h-[600px] w-full">
             <iframe
-              src={chapters[currentChapter]?.pdfPath}
+              src={chapter?.pdfPath}
               className="w-full h-full"
-              title={`Chapter ${currentChapter}: ${chapters[currentChapter]?.title}`}
+              title={`Chapter ${currentChapter}: ${chapter?.title}`}
             />
           </div>
         )}
