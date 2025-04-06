@@ -8,7 +8,6 @@ import Skills from '@/components/Skills';
 import Contact from '@/components/Contact';
 import Footer from '@/components/Footer';
 import ParticleBackground from '@/components/ParticleBackground';
-import MusicPlayer from '@/components/MusicPlayer';
 import { useIsMobile } from '@/hooks/use-mobile';
 
 const Index: React.FC = () => {
@@ -59,7 +58,6 @@ const Index: React.FC = () => {
           </div>
         </main>
         <Footer />
-        <MusicPlayer />
       </div>
     </>
   );
