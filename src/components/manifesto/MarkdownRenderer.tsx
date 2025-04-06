@@ -25,7 +25,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
   return (
     <div className={`prose dark:prose-invert max-w-none prose-slate prose-headings:text-indigo-900 dark:prose-headings:text-indigo-300 prose-a:text-blue-600 dark:prose-a:text-blue-400 transition-opacity duration-500 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
       {animatedContent.split('\n').map((line, index) => {
-        // Clean up asterisks from headers and clean up other formatting
+        // Clean up formatting markers
         const cleanLine = (str: string) => str.replace(/\*\*(.*?)\*\*/g, '$1').replace(/\*(.*?)\*/g, '$1');
         
         // Headers
@@ -106,6 +106,16 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
         // Empty line
         else if (line.trim() === '') {
           return <div key={index} className="h-4"></div>;
+        }
+        
+        // Code blocks
+        else if (line.startsWith('```')) {
+          // Skip the opening and closing code block markers
+          return null;
+        }
+        else if (line === 'sql') {
+          // Skip language indicators in code blocks
+          return null;
         }
         
         // Regular paragraph
