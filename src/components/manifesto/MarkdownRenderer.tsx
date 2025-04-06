@@ -10,20 +10,23 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
   return (
     <div className="prose dark:prose-invert max-w-none">
       {content.split('\n').map((line, index) => {
+        // Clean up asterisks from headers
+        const cleanLine = (str: string) => str.replace(/\*\*(.*?)\*\*/g, '$1');
+        
         // Headers
         if (line.startsWith('# ')) {
-          return <h1 key={index} className="text-3xl font-bold mt-6 mb-4">{line.substring(2)}</h1>;
+          return <h1 key={index} className="text-3xl font-bold mt-6 mb-4">{cleanLine(line.substring(2))}</h1>;
         } else if (line.startsWith('## ')) {
-          return <h2 key={index} className="text-2xl font-bold mt-5 mb-3">{line.substring(3)}</h2>;
+          return <h2 key={index} className="text-2xl font-bold mt-5 mb-3">{cleanLine(line.substring(3))}</h2>;
         } else if (line.startsWith('### ')) {
-          return <h3 key={index} className="text-xl font-bold mt-4 mb-2">{line.substring(4)}</h3>;
+          return <h3 key={index} className="text-xl font-bold mt-4 mb-2">{cleanLine(line.substring(4))}</h3>;
         } else if (line.startsWith('#### ')) {
-          return <h4 key={index} className="text-lg font-bold mt-3 mb-2">{line.substring(5)}</h4>;
+          return <h4 key={index} className="text-lg font-bold mt-3 mb-2">{cleanLine(line.substring(5))}</h4>;
         }
         
         // Lists
         else if (line.startsWith('- ')) {
-          return <li key={index} className="ml-6 mb-1">{line.substring(2)}</li>;
+          return <li key={index} className="ml-6 mb-1">{cleanLine(line.substring(2))}</li>;
         } 
         
         // Bold text - we'll handle the ** markers properly
@@ -49,7 +52,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
         
         // Blockquotes
         else if (line.startsWith('> ')) {
-          return <blockquote key={index} className="border-l-4 border-primary pl-4 italic my-4 text-muted-foreground">{line.substring(2)}</blockquote>;
+          return <blockquote key={index} className="border-l-4 border-primary pl-4 italic my-4 text-muted-foreground">{cleanLine(line.substring(2))}</blockquote>;
         }
         
         // Tables
@@ -64,7 +67,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
             <div key={index} className="flex w-full my-1">
               {cells.map((cell, cellIndex) => (
                 <div key={cellIndex} className="flex-1 px-2 py-1 border">
-                  {cell.trim()}
+                  {cleanLine(cell.trim())}
                 </div>
               ))}
             </div>
