@@ -1,8 +1,9 @@
 
 import React, { useState } from 'react';
-import { Code } from 'lucide-react';
+import { Filter, Code } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ProjectCard from '@/components/ProjectCard';
+import { NavBar } from '@/components/ui/tubelight-navbar';
 import { projects } from '@/data/projects';
 
 const Projects: React.FC = () => {
@@ -11,6 +12,22 @@ const Projects: React.FC = () => {
   const filteredProjects = filter 
     ? projects.filter(project => project.category === filter)
     : projects;
+
+  const filterItems = [
+    { name: 'All Projects', url: '#', value: null },
+    { name: 'Analytics', url: '#', value: 'analytics' },
+    { name: 'Development', url: '#', value: 'development' },
+    { name: 'Trading', url: '#', value: 'trading' },
+  ];
+
+  const activeItem = filter === null ? 'All Projects' : 
+                     filter === 'analytics' ? 'Analytics' :
+                     filter === 'development' ? 'Development' : 'Trading';
+
+  const handleFilterChange = (name: string) => {
+    const selectedFilter = filterItems.find(item => item.name === name);
+    setFilter(selectedFilter?.value || null);
+  };
 
   return (
     <section id="projects" className="section-container">
@@ -22,35 +39,13 @@ const Projects: React.FC = () => {
           spanning development, trading systems, data analytics, and community building.
         </p>
         
-        <div className="flex flex-wrap justify-center gap-2 mt-8">
-          <Button
-            variant={filter === null ? "default" : "outline"}
-            className="rounded-full text-sm"
-            onClick={() => setFilter(null)}
-          >
-            All Projects
-          </Button>
-          <Button
-            variant={filter === "analytics" ? "default" : "outline"}
-            className="rounded-full text-sm"
-            onClick={() => setFilter("analytics")}
-          >
-            Analytics
-          </Button>
-          <Button
-            variant={filter === "development" ? "default" : "outline"}
-            className="rounded-full text-sm"
-            onClick={() => setFilter("development")}
-          >
-            Development
-          </Button>
-          <Button
-            variant={filter === "trading" ? "default" : "outline"}
-            className="rounded-full text-sm"
-            onClick={() => setFilter("trading")}
-          >
-            Trading
-          </Button>
+        <div className="flex justify-center mt-8">
+          <NavBar 
+            items={filterItems} 
+            activeItem={activeItem}
+            onItemClick={handleFilterChange}
+            className="mx-auto"
+          />
         </div>
       </div>
 
