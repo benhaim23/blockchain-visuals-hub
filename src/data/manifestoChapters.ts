@@ -2,7 +2,7 @@
 export interface ManifestoChapter {
   number: number;
   title: string;
-  pdfPath: string;
+  pdfPath?: string;
   mdPath?: string;
   mdContent?: string;
 }
@@ -1860,5 +1860,41 @@ For onchain analysts, MEV represents one of the most technically fascinating are
     title: "Useful Metrics Every Analyst Should Track", 
     pdfPath: "/Onchain Manifesto/12. Useful Metrics Every Analyst Should Track.pdf",
     mdPath: "/Onchain Manifesto/12. Useful Metrics Every Analyst Should Track.md" 
+  },
+  { 
+    number: 13, 
+    title: "BTC Coin Days Destroyed — What HODLers Tell Us About the Market", 
+    pdfPath: "/Onchain Manifesto/13. BTC Coin Days Destroyed — What HODLers Tell Us About the Market.pdf",
+    mdPath: "/Onchain Manifesto/13. BTC Coin Days Destroyed — What HODLers Tell Us About the Market.md" 
+  },
+  { 
+    number: 14, 
+    title: "Building with Spellbook — How to Contribute Reusable Models to the Community", 
+    pdfPath: "/Onchain Manifesto/14. Building with Spellbook — How to Contribute Reusable Models to the Community.pdf",
+    mdPath: "/Onchain Manifesto/14. Building with Spellbook — How to Contribute Reusable Models to the Community.md" 
+  },
+  { 
+    number: 15, 
+    title: "How to Build an Onchain App Using the Dune API", 
+    pdfPath: "/Onchain Manifesto/15. How to Build an Onchain App Using the Dune API.pdf",
+    mdPath: "/Onchain Manifesto/15. How to Build an Onchain App Using the Dune API.md" 
+  },
+  { 
+    number: 16, 
+    title: "Account Abstraction — Why It Matters for Wallet UX and Analysts", 
+    pdfPath: "/Onchain Manifesto/16. Account Abstraction- Why It Matters for Wallet UX and Analysts.pdf",
+    mdPath: "/Onchain Manifesto/16. Account Abstraction Why It Matters for Wallet UX and Analysts.md" 
+  },
+  { 
+    number: 17, 
+    title: "ERC-4337 Aggregated Tables Across EVM Chains: Unified Analytics at Scale", 
+    pdfPath: "/Onchain Manifesto/17. ERC-4337 Aggregated Tables Across EVM Chains- Unified Analytics at Scale.pdf",
+    mdPath: "/Onchain Manifesto/17. ERC-4337 Aggregated Tables Across EVM Chains Unified Analytics at Scale.md" 
+  },
+  { 
+    number: 18, 
+    title: "Why the Future Belongs to Onchain Analysts", 
+    pdfPath: "/Onchain Manifesto/18. Why the Future Belongs to Onchain Analysts.pdf",
+    mdPath: "/Onchain Manifesto/The Onchain Analyst Decoding the Transparent Economy.md" 
   }
 ]
