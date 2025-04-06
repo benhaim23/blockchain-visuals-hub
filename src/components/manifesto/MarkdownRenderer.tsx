@@ -21,10 +21,18 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
     return () => clearTimeout(timer);
   }, [content]);
 
+  // Function to detect if a line is within a code block
+  const isWithinCodeBlock = (lines: string[], currentIndex: number): boolean => {
+    // Find the last code fence before this line
+    const previousFences = lines.slice(0, currentIndex).filter(l => l.trim().startsWith('```'));
+    // If we have an odd number of code fences before this line, we're in a code block
+    return previousFences.length % 2 !== 0;
+  };
+
   // Convert markdown content to HTML
   return (
     <div className={`prose dark:prose-invert max-w-none prose-slate prose-headings:text-indigo-900 dark:prose-headings:text-indigo-300 prose-a:text-blue-600 dark:prose-a:text-blue-400 transition-opacity duration-500 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
-      {animatedContent.split('\n').map((line, index) => {
+      {animatedContent.split('\n').map((line, index, allLines) => {
         // Clean up formatting markers
         const cleanLine = (str: string) => str.replace(/\*\*(.*?)\*\*/g, '$1').replace(/\*(.*?)\*/g, '$1');
         
@@ -72,20 +80,20 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
         
         // Tables
         else if (line.startsWith('| ')) {
+          // This is a table separator row, skip rendering but don't return null
           if (line.includes('---')) {
-            // This is a table header separator, skip rendering
-            return null;
+            return <div key={index} className="hidden"></div>;
           }
           
           const cells = line.split('|').filter(cell => cell.trim() !== '');
           
           // Detect if this is a header row (typically the first row in a table)
-          const isHeaderRow = index > 0 && 
-                             animatedContent.split('\n')[index + 1]?.includes('---') &&
-                             animatedContent.split('\n')[index + 1]?.startsWith('|');
+          const isHeaderRow = index < allLines.length - 1 && 
+                             allLines[index + 1]?.includes('---') &&
+                             allLines[index + 1]?.startsWith('|');
           
           return (
-            <div key={index} className={`flex w-full ${isHeaderRow ? 'bg-blue-100 dark:bg-slate-700 font-medium rounded-t-lg' : 'bg-white/80 dark:bg-slate-800/80 hover:bg-blue-50 dark:hover:bg-slate-700/80'} ${index === animatedContent.split('\n').findIndex(l => l.startsWith('| ')) ? 'rounded-t-lg' : ''}`}>
+            <div key={index} className={`flex w-full ${isHeaderRow ? 'bg-blue-100 dark:bg-slate-700 font-medium rounded-t-lg' : 'bg-white/80 dark:bg-slate-800/80 hover:bg-blue-50 dark:hover:bg-slate-700/80'} ${index === allLines.findIndex(l => l.startsWith('| ')) ? 'rounded-t-lg' : ''}`}>
               {cells.map((cell, cellIndex) => (
                 <div 
                   key={cellIndex} 
@@ -111,17 +119,18 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
         // Code blocks
         else if (line.startsWith('```')) {
           // Skip the opening and closing code block markers
-          return null;
+          return <div key={index} className="my-4"></div>;
         }
+        
         // Skip language indicators in code blocks
-        else if (line === 'sql' || line === 'javascript' || line === 'typescript' || line === 'json') {
+        else if (['sql', 'javascript', 'typescript', 'json', 'bash', 'python', 'css', 'html'].includes(line.trim())) {
           return null;
         }
+        
         // Handle code content - detect if this line is within a code block
-        else if (animatedContent.split('\n').slice(0, index).some(l => l.startsWith('```')) && 
-                !animatedContent.split('\n').slice(0, index).slice(animatedContent.split('\n').slice(0, index).lastIndexOf('```')).includes('```')) {
+        else if (isWithinCodeBlock(allLines, index)) {
           return (
-            <div key={index} className="font-mono text-sm bg-slate-100 dark:bg-slate-800 p-1 rounded-sm text-indigo-600 dark:text-indigo-400">
+            <div key={index} className="font-mono text-sm bg-slate-100 dark:bg-slate-800 p-1.5 rounded-none first:rounded-t last:rounded-b text-indigo-600 dark:text-indigo-400 border-l-4 border-indigo-300 dark:border-indigo-700 whitespace-pre-wrap">
               {line}
             </div>
           );
@@ -140,6 +149,9 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
           
           // Code
           formattedText = formattedText.replace(/`(.*?)`/g, '<code class="bg-slate-100 dark:bg-slate-800 px-1 py-0.5 rounded text-indigo-600 dark:text-indigo-400 font-mono text-sm">$1</code>');
+          
+          // Handle links
+          formattedText = formattedText.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline" target="_blank" rel="noopener noreferrer">$1</a>');
           
           if (formattedText.includes('<')) {
             return (
