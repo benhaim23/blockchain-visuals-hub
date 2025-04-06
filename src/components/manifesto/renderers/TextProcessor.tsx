@@ -9,11 +9,11 @@ interface TextProcessorProps {
 
 const TextProcessor: React.FC<TextProcessorProps> = ({ text }) => {
   // Handle "Next: Chapter X" pattern at the end of chapters
-  if (text.startsWith("Next:") || text.startsWith("**Next:")) {
+  if (text.startsWith("Next:") || text.startsWith("Next") || text.startsWith("**Next:") || text.startsWith("**Next")) {
     // Extract the chapter number from the text using a regex
-    const chapterMatch = text.match(/Next:? (\d+)\./i) || 
-                         text.match(/\*\*Next:\*\* (\d+)\./i) ||
-                         text.match(/Next: (\d+)\./i);
+    const chapterMatch = text.match(/Next:?\s*(\d+)\.?/i) || 
+                         text.match(/\*\*Next:?\*\*\s*(\d+)\.?/i) ||
+                         text.match(/Next:?\s*(\d+)\.?/i);
     
     if (chapterMatch && chapterMatch[1]) {
       const nextChapterNum = parseInt(chapterMatch[1], 10);
@@ -22,10 +22,13 @@ const TextProcessor: React.FC<TextProcessorProps> = ({ text }) => {
       const nextChapter = manifestoChapters.find(chapter => chapter.number === nextChapterNum);
       
       if (nextChapter) {
+        // Remove any ** from the text
+        const cleanText = text.replace(/\*\*/g, '');
+        
         return (
           <span className="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 cursor-pointer transition-colors">
             <Link to="/manifesto" onClick={() => window.dispatchEvent(new CustomEvent('selectChapter', { detail: nextChapterNum }))}>
-              {text.replace(/\*\*/g, '')}
+              {cleanText}
             </Link>
           </span>
         );
@@ -33,7 +36,7 @@ const TextProcessor: React.FC<TextProcessorProps> = ({ text }) => {
     }
   }
 
-  // Handle bold text with ** markers
+  // Handle bold text with ** markers - remove them and apply styling
   if (text.includes('**')) {
     const parts = text.split(/(\*\*.*?\*\*)/g);
     return (

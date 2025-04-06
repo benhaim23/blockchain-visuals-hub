@@ -24,6 +24,11 @@ const ChapterReader: React.FC<ChapterReaderProps> = ({
   const chapter = chapters[currentChapter];
   const showMarkdown = chapter && mdContent; // Always prefer markdown if available
   
+  // Display the correct chapter title
+  const chapterTitle = chapter ? 
+    (currentChapter === 0 ? 'Executive Summary' : `Chapter ${currentChapter}: ${chapter.title}`) :
+    'Chapter not found';
+  
   return (
     <div className="bg-white/90 dark:bg-card/80 backdrop-blur-sm rounded-lg border-2 border-blue-200 dark:border-slate-700 min-h-[600px] flex flex-col shadow-lg transition-all duration-300 hover:shadow-xl dark:hover:border-primary/40 hover:border-blue-300">
       <div className="p-4 border-b-2 border-blue-100 dark:border-slate-700 flex items-center justify-between bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-slate-800 dark:to-slate-800 rounded-t-lg">
@@ -38,7 +43,7 @@ const ChapterReader: React.FC<ChapterReaderProps> = ({
         </Button>
 
         <span className="font-medium text-indigo-700 dark:text-indigo-300">
-          {currentChapter === 0 ? 'Executive Summary' : `Chapter ${currentChapter}`}: {chapter?.title}
+          {chapterTitle}
         </span>
 
         <Button 

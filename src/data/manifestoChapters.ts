@@ -1,3 +1,4 @@
+
 import React from 'react';
 
 export interface ManifestoChapter {
@@ -12,31 +13,32 @@ export const manifestoChapters: ManifestoChapter[] = [
   { 
     number: 0,
     title: "Executive Summary",
-    pdfPath: "/Onchain Manifesto/00. Executive Summary.pdf"
+    pdfPath: "/Onchain Manifesto/00. Executive Summary.pdf",
+    mdPath: "/Onchain Manifesto/The Onchain Analyst Decoding the Transparent Economy.md"
   },
   { 
     number: 1,
     title: "Why Onchain Data Matters",
     pdfPath: "/Onchain Manifesto/01. Why Onchain Data Matters.pdf",
-    mdPath: "/Onchain Manifesto/01. Why Onchain Data Matters.md"
+    mdPath: "/Onchain Manifesto/01. What Does an Onchain Data Analyst Do.md"
   },
   { 
     number: 2,
     title: "Dune Analytics 101",
     pdfPath: "/Onchain Manifesto/02. Dune Analytics 101.pdf",
-    mdPath: "/Onchain Manifesto/02. Dune Analytics 101.md"
+    mdPath: "/Onchain Manifesto/02. The Onchain Stack SQL, Spellbook, and Decoding UTXOs.md"
   },
   { 
     number: 3,
     title: "DuneSQL and Spellbook",
     pdfPath: "/Onchain Manifesto/03. DuneSQL and Spellbook.pdf",
-    mdPath: "/Onchain Manifesto/03. DuneSQL and Spellbook.md"
+    mdPath: "/Onchain Manifesto/03. The Dune Platform A Gateway to Onchain Transparency.md"
   },
   { 
     number: 4,
     title: "Onchain Data Structure",
     pdfPath: "/Onchain Manifesto/04. Onchain Data Structure.pdf",
-    mdPath: "/Onchain Manifesto/04. Onchain Data Structure.md"
+    mdPath: "/Onchain Manifesto/04. Understanding Tables — Ethereum, Bitcoin, NFTs, ERC4337, and More.md"
   },
   { 
     number: 5,
@@ -119,7 +121,6 @@ export const manifestoChapters: ManifestoChapter[] = [
   { 
     number: 18, 
     title: "Why the Future Belongs to Onchain Analysts", 
-    pdfPath: "/Onchain Manifesto/18. Why the Future Belongs to Onchain Analysts.pdf",
-    mdPath: "/Onchain Manifesto/The Onchain Analyst Decoding the Transparent Economy.md"
+    pdfPath: "/Onchain Manifesto/18. Why the Future Belongs to Onchain Analysts.pdf"
   }
 ];
