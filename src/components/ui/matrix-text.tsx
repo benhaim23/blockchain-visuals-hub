@@ -17,6 +17,7 @@ interface MatrixTextProps {
     initialDelay?: number;
     letterAnimationDuration?: number;
     letterInterval?: number;
+    pauseAfterCompletion?: number;
 }
 
 export const MatrixText = ({
@@ -25,6 +26,7 @@ export const MatrixText = ({
     initialDelay = 500,
     letterAnimationDuration = 800,
     letterInterval = 150,
+    pauseAfterCompletion = 2000, // 2 second pause after animation completes
 }: MatrixTextProps) => {
     const [letters, setLetters] = useState<LetterState[]>(() =>
         text.split("").map((char) => ({
@@ -81,7 +83,11 @@ export const MatrixText = ({
 
         const animate = () => {
             if (currentIndex >= text.length) {
-                setIsAnimating(false);
+                // After all letters are animated, wait for the specified pause time
+                // before setting isAnimating to false
+                setTimeout(() => {
+                    setIsAnimating(false);
+                }, pauseAfterCompletion);
                 return;
             }
 
@@ -91,7 +97,7 @@ export const MatrixText = ({
         };
 
         animate();
-    }, [animateLetter, text, isAnimating, letterInterval]);
+    }, [animateLetter, text, isAnimating, letterInterval, pauseAfterCompletion]);
 
     useEffect(() => {
         const timer = setTimeout(startAnimation, initialDelay);
