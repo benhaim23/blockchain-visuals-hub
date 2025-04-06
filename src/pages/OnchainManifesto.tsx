@@ -156,6 +156,7 @@ const OnchainManifesto: React.FC = () => {
             squareSize={40}
             borderColor="rgba(51, 51, 51, 0.3)" 
             hoverFillColor="rgba(34, 34, 34, 0.5)"
+            glowing={true}
           />
         </div>
         

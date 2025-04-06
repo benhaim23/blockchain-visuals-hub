@@ -8,6 +8,7 @@ interface SquaresProps {
   squareSize?: number
   hoverFillColor?: string
   className?: string
+  glowing?: boolean
 }
 
 export function Squares({
@@ -17,6 +18,7 @@ export function Squares({
   squareSize = 40,
   hoverFillColor = "#222",
   className,
+  glowing = false,
 }: SquaresProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null)
   const requestRef = useRef<number>()
@@ -54,7 +56,15 @@ export function Squares({
       const startX = Math.floor(gridOffset.current.x / squareSize) * squareSize
       const startY = Math.floor(gridOffset.current.y / squareSize) * squareSize
 
-      ctx.lineWidth = 0.5
+      // For glowing effect
+      if (glowing) {
+        ctx.lineWidth = 1
+        ctx.shadowBlur = 8
+        ctx.shadowColor = "#32CD32" // Lime green glow
+      } else {
+        ctx.lineWidth = 0.5
+        ctx.shadowBlur = 0
+      }
 
       for (let x = startX; x < canvas.width + squareSize; x += squareSize) {
         for (let y = startY; y < canvas.height + squareSize; y += squareSize) {
@@ -70,7 +80,8 @@ export function Squares({
             ctx.fillRect(squareX, squareY, squareSize, squareSize)
           }
 
-          ctx.strokeStyle = borderColor
+          // Use lime green color if glowing is enabled
+          ctx.strokeStyle = glowing ? "#32CD32" : borderColor
           ctx.strokeRect(squareX, squareY, squareSize, squareSize)
         }
       }
@@ -162,7 +173,7 @@ export function Squares({
         cancelAnimationFrame(requestRef.current)
       }
     }
-  }, [direction, speed, borderColor, hoverFillColor, hoveredSquare, squareSize])
+  }, [direction, speed, borderColor, hoverFillColor, hoveredSquare, squareSize, glowing])
 
   return (
     <canvas
