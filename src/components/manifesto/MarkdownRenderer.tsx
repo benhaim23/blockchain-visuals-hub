@@ -25,8 +25,8 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
   return (
     <div className={`prose dark:prose-invert max-w-none prose-slate prose-headings:text-indigo-900 dark:prose-headings:text-indigo-300 prose-a:text-blue-600 dark:prose-a:text-blue-400 transition-opacity duration-500 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
       {animatedContent.split('\n').map((line, index) => {
-        // Clean up asterisks from headers
-        const cleanLine = (str: string) => str.replace(/\*\*(.*?)\*\*/g, '$1');
+        // Clean up asterisks from headers and clean up other formatting
+        const cleanLine = (str: string) => str.replace(/\*\*(.*?)\*\*/g, '$1').replace(/\*(.*?)\*/g, '$1');
         
         // Headers
         if (line.startsWith('# ')) {
@@ -62,7 +62,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
               </p>
             );
           }
-          return <p key={index} className="mb-4 text-slate-700 dark:text-slate-300">{line}</p>;
+          return <p key={index} className="mb-4 text-slate-700 dark:text-slate-300">{cleanLine(line)}</p>;
         }
         
         // Blockquotes
@@ -78,10 +78,19 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
           }
           
           const cells = line.split('|').filter(cell => cell.trim() !== '');
+          
+          // Detect if this is a header row (typically the first row in a table)
+          const isHeaderRow = index > 0 && 
+                             animatedContent.split('\n')[index + 1]?.includes('---') &&
+                             animatedContent.split('\n')[index + 1]?.startsWith('|');
+          
           return (
-            <div key={index} className="flex w-full my-1">
+            <div key={index} className={`flex w-full ${isHeaderRow ? 'bg-blue-100 dark:bg-slate-700 font-medium rounded-t-lg' : 'bg-white/80 dark:bg-slate-800/80 hover:bg-blue-50 dark:hover:bg-slate-700/80'} ${index === animatedContent.split('\n').findIndex(l => l.startsWith('| ')) ? 'rounded-t-lg' : ''}`}>
               {cells.map((cell, cellIndex) => (
-                <div key={cellIndex} className="flex-1 px-2 py-1 border border-blue-200 dark:border-slate-700 text-slate-700 dark:text-slate-300">
+                <div 
+                  key={cellIndex} 
+                  className={`flex-1 px-3 py-2 ${cellIndex === 0 ? 'border-l' : ''} border-r border-t border-b border-blue-200 dark:border-slate-600 text-slate-700 dark:text-slate-300 ${isHeaderRow ? 'font-semibold text-indigo-900 dark:text-indigo-300' : ''}`}
+                >
                   {cleanLine(cell.trim())}
                 </div>
               ))}
