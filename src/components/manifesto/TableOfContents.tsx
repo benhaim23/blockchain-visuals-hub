@@ -1,106 +1,76 @@
 
-import React from 'react';
-import { ChevronRight, BookOpen, Sparkles } from 'lucide-react';
-import { ManifestoChapter } from '@/data/manifestoChapters';
-import { Badge } from "@/components/ui/badge";
-import { motion } from "framer-motion";
-import { cn } from '@/lib/utils';
+import React, { useState } from 'react';
+import { Button } from "@/components/ui/button";
+import { useNavigate } from 'react-router-dom';
+import { ChevronRight } from 'lucide-react';
+
+type ManifestoChapter = {
+  id: string;
+  title: string;
+  path: string;
+  file?: string;
+  content?: string;
+};
 
 interface TableOfContentsProps {
   chapters: ManifestoChapter[];
-  onSelectChapter: (chapterIndex: number) => void;
+  currentChapter?: string;
 }
 
-const TableOfContents: React.FC<TableOfContentsProps> = ({ chapters, onSelectChapter }) => {
+export const TableOfContents: React.FC<TableOfContentsProps> = ({ chapters, currentChapter }) => {
+  const navigate = useNavigate();
+  const [hoveredIndex, setHoveredIndex] = useState<number | null>(null);
+
+  const handleChapterClick = (path: string) => {
+    navigate(`/manifesto/${path}`);
+  };
+
   return (
-    <div className="bg-white/90 dark:bg-card/80 backdrop-blur-sm rounded-lg border-2 border-blue-200 dark:border-slate-700 p-6 shadow-lg transition-all duration-300 hover:shadow-xl dark:hover:border-primary/40 hover:border-blue-300">
-      <h2 className="text-2xl font-semibold mb-6 text-indigo-900 dark:text-indigo-300 flex items-center">
-        <BookOpen className="mr-2 h-5 w-5 text-indigo-600 dark:text-indigo-400" />
-        Chapters
-      </h2>
+    <div className="w-full bg-black/5 dark:bg-white/5 backdrop-blur-lg rounded-lg border border-border p-4 md:p-6">
+      <h2 className="text-xl font-bold mb-4">Table of Contents</h2>
       
-      <div className="space-y-4">
-        {chapters.map((chapter, idx) => (
-          <motion.div 
-            key={chapter.number}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.2 + idx * 0.05 }}
-            whileHover={{ 
-              scale: 1.02, 
-              transition: { duration: 0.2 }
-            }}
-            className="relative group"
-          >
+      <div className="grid grid-cols-1 gap-3">
+        {chapters.map((chapter, index) => {
+          const isActive = currentChapter === chapter.id;
+          
+          return (
             <div 
-              onClick={() => onSelectChapter(chapter.number)}
-              className={cn(
-                "relative overflow-hidden rounded-lg cursor-pointer transition-all duration-300",
-                "border border-blue-100/70 dark:border-slate-700/50",
-                "hover:border-blue-300 dark:hover:border-indigo-500/30",
-                "shadow-sm hover:shadow-md"
-              )}
+              key={chapter.id}
+              className={`
+                relative overflow-hidden group
+                border border-border rounded-lg
+                transition-all duration-300 
+                ${isActive ? 'bg-primary/10 border-primary/50' : 'hover:bg-black/5 dark:hover:bg-white/5'}
+              `}
+              onMouseEnter={() => setHoveredIndex(index)}
+              onMouseLeave={() => setHoveredIndex(null)}
             >
-              {/* Background gradient for hover effect */}
-              <div className="absolute inset-0 bg-gradient-to-r from-blue-50/90 to-indigo-50/90 dark:from-slate-800/50 dark:to-slate-800/80 
-                              group-hover:from-blue-100/80 group-hover:to-indigo-100/80 
-                              dark:group-hover:from-slate-700/60 dark:group-hover:to-slate-700/80 
-                              transition-all duration-300"></div>
+              {/* Shine effect on hover */}
+              {hoveredIndex === index && (
+                <div className="absolute top-0 -inset-full h-full w-1/2 z-5 block transform -skew-x-12 bg-gradient-to-r from-transparent to-white opacity-20 animate-shine" />
+              )}
               
-              <div className="relative flex items-center justify-between p-4 z-10">
-                <div className="flex items-center gap-3 group-hover:translate-x-1 transition-transform duration-300">
-                  <Badge 
-                    variant="outline" 
-                    className={cn(
-                      "px-2.5 py-1 min-w-[36px] flex justify-center font-medium text-sm transition-colors duration-200",
-                      chapter.number === 0 
-                        ? "bg-amber-100/80 text-amber-800 border-amber-200 dark:bg-amber-900/20 dark:text-amber-300 dark:border-amber-800/50 group-hover:bg-amber-200/90 dark:group-hover:bg-amber-900/30" 
-                        : "bg-blue-100/80 text-blue-800 border-blue-200 dark:bg-blue-900/20 dark:text-blue-300 dark:border-blue-800/50 group-hover:bg-blue-200/90 dark:group-hover:bg-blue-900/30"
-                    )}
-                  >
-                    {chapter.number === 0 ? 
-                      <Sparkles className="h-3.5 w-3.5" /> : 
-                      chapter.number
-                    }
-                  </Badge>
-                  
-                  <div className="flex flex-col">
-                    <span className={cn(
-                      "font-medium text-slate-800 dark:text-white text-base transition-colors duration-200",
-                      "group-hover:text-indigo-700 dark:group-hover:text-indigo-300"
-                    )}>
-                      {chapter.title}
-                    </span>
-                    
-                    {chapter.description && (
-                      <motion.span 
-                        initial={{ opacity: 0.7 }}
-                        whileHover={{ opacity: 1 }}
-                        className="text-xs text-slate-500 dark:text-slate-400 max-w-md line-clamp-1 md:line-clamp-2"
-                      >
-                        {chapter.description}
-                      </motion.span>
-                    )}
+              <Button
+                variant="ghost"
+                className={`
+                  w-full justify-between rounded-md text-left p-3 h-auto
+                  ${isActive ? 'text-primary font-medium' : 'text-foreground/90'}
+                `}
+                onClick={() => handleChapterClick(chapter.path)}
+              >
+                <div className="flex items-start">
+                  <div className="rounded-full bg-primary/10 text-primary text-xs font-semibold px-2 py-1 mr-3 mt-0.5">
+                    {String(index + 1).padStart(2, '0')}
+                  </div>
+                  <div>
+                    <div className="font-medium">{chapter.title}</div>
                   </div>
                 </div>
-                
-                <ChevronRight className={cn(
-                  "h-5 w-5 text-blue-500 dark:text-blue-400 transition-all duration-300",
-                  "transform group-hover:translate-x-1 group-hover:text-indigo-600 dark:group-hover:text-indigo-400"
-                )} />
-              </div>
-              
-              {/* Top shine effect on hover */}
-              <div className="absolute -top-1/2 -left-1/2 w-8 h-[300%] bg-white/40 dark:bg-white/10 rotate-12 transform-gpu 
-                              translate-x-[-120%] opacity-0 group-hover:translate-x-[350%] group-hover:opacity-70 
-                              transition-all duration-1000 pointer-events-none"></div>
-              
-              {/* Bottom accent line with animation */}
-              <div className="absolute bottom-0 left-0 w-0 h-1 bg-gradient-to-r from-blue-400 to-indigo-500 
-                              dark:from-blue-500 dark:to-indigo-400 group-hover:w-full transition-all duration-500"></div>
+                <ChevronRight className="h-5 w-5 opacity-50 group-hover:opacity-100 transition-opacity" />
+              </Button>
             </div>
-          </motion.div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );
