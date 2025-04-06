@@ -22,9 +22,9 @@ interface MatrixTextProps {
 export const MatrixText = ({
     text = "HelloWorld!",
     className,
-    initialDelay = 200,
-    letterAnimationDuration = 500,
-    letterInterval = 100,
+    initialDelay = 500,
+    letterAnimationDuration = 800,
+    letterInterval = 150,
 }: MatrixTextProps) => {
     const [letters, setLetters] = useState<LetterState[]>(() =>
         text.split("").map((char) => ({
@@ -126,7 +126,7 @@ export const MatrixText = ({
                             animate={letter.isMatrix ? "matrix" : "normal"}
                             variants={motionVariants}
                             transition={{
-                                duration: 0.1,
+                                duration: 0.2,
                                 ease: "easeInOut",
                             }}
                             style={{

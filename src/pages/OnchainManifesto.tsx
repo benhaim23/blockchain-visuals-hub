@@ -1,4 +1,3 @@
-
 import React, { useState, useEffect } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { BookOpen, FileText } from "lucide-react";
@@ -41,14 +40,12 @@ const OnchainManifesto: React.FC = () => {
       setIsLoading(true);
       const chapter = manifestoChapters[currentChapter];
 
-      // If we have markdown content for this chapter
       if (chapter?.mdContent) {
         setMdContent(chapter.mdContent);
         setIsLoading(false);
         return;
       }
       
-      // If we have a markdown path but no content yet
       if (chapter?.mdPath) {
         try {
           const response = await fetch(chapter.mdPath);
@@ -98,9 +95,9 @@ const OnchainManifesto: React.FC = () => {
             <MatrixText 
               text="The Onchain Manifesto" 
               className="h-auto" 
-              initialDelay={400}
-              letterAnimationDuration={600}
-              letterInterval={80}
+              initialDelay={800}
+              letterAnimationDuration={900}
+              letterInterval={180}
             />
           </div>
           <p className="text-muted-foreground mb-8 text-lg">
