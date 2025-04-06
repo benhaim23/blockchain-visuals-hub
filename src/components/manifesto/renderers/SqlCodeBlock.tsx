@@ -18,30 +18,6 @@ const SqlCodeBlock: React.FC<SqlCodeBlockProps> = ({ content, blockIndex }) => {
     });
   };
 
-  // Simple function to highlight SQL without extra markup
-  const highlightSQL = (code: string) => {
-    return (
-      <pre className="whitespace-pre-wrap">
-        {code.split('\n').map((line, i) => {
-          // Apply very minimal highlighting without adding extra markup
-          const coloredLine = line
-            .replace(/\b(SELECT|FROM|WHERE|ORDER BY|GROUP BY|HAVING|JOIN|LEFT JOIN|INNER JOIN|RIGHT JOIN|UNION|AS|ON|AND|OR|NOT|IN|BETWEEN|LIKE|CASE|WHEN|THEN|ELSE|END|COUNT|SUM|AVG|MIN|MAX|NULL|IS|DISTINCT)\b/gi, 
-              match => `<span class="text-purple-400">${match}</span>`)
-            .replace(/('[^']*')/g, 
-              match => `<span class="text-amber-300">${match}</span>`)
-            .replace(/\b(\d+(?:\.\d+)?)\b/g, 
-              match => `<span class="text-teal-300">${match}</span>`)
-            .replace(/(\*|=|>|<|\+|-|\*|\/|%|interval)/g, 
-              match => `<span class="text-blue-300">${match}</span>`);
-          
-          return (
-            <div key={i} className="leading-relaxed" dangerouslySetInnerHTML={{ __html: coloredLine }} />
-          );
-        })}
-      </pre>
-    );
-  };
-
   return (
     <div className="my-6 overflow-hidden rounded-lg bg-gray-900 border border-slate-700 shadow-lg">
       {/* Code block header with language and copy button */}
@@ -66,7 +42,7 @@ const SqlCodeBlock: React.FC<SqlCodeBlockProps> = ({ content, blockIndex }) => {
       
       {/* Code content */}
       <div className="p-4 text-sm overflow-x-auto bg-gray-900 text-gray-200">
-        {highlightSQL(content)}
+        <pre className="whitespace-pre-wrap font-mono">{content}</pre>
       </div>
     </div>
   );
