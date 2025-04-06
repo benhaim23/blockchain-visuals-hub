@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { BarChart, PieChart, AreaChart, Users, Megaphone, Briefcase, Code, Database, Network, Shield, Search, FlaskConical, Award, GraduationCap, CheckCircle, Bookmark, Medal, FileCheck } from 'lucide-react';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -48,7 +49,6 @@ const SkillCategory: React.FC<SkillCategoryProps> = ({
 
 const Skills: React.FC = () => {
   const { theme } = useTheme();
-  
   const skillCategories = [
     {
       title: "Blockchain & Crypto",
@@ -302,7 +302,7 @@ const Skills: React.FC = () => {
             </div>
             <div className="p-5">
               <motion.ul 
-                className="space-y-10"
+                className="space-y-6"
                 variants={container}
                 initial="hidden"
                 whileInView="show"
@@ -312,31 +312,24 @@ const Skills: React.FC = () => {
                   <motion.li 
                     key={index} 
                     variants={item}
-                    className="relative pl-11 pb-2"
+                    className="relative pl-6 border-l-2 border-primary/30 hover:border-primary transition-colors duration-300 py-1"
                   >
-                    <div className="absolute left-4 top-10 bottom-0 w-0.5 bg-primary/30 -translate-y-8" 
-                         style={{ 
-                           height: 'calc(100% - 12px)',
-                           display: index === educationList.length - 1 ? 'none' : 'block'
-                         }}></div>
-                    
-                    <div className="absolute left-0 top-1.5">
-                      <div className="flex items-center justify-center w-8 h-8 rounded-full bg-background border-2 border-primary">
+                    <div className="absolute -left-[9px] top-1.5">
+                      <div className="rounded-full p-1 bg-background border-2 border-primary">
                         {edu.icon}
                       </div>
                     </div>
-                    
-                    <div className="space-y-2">
-                      <h4 className="text-lg font-semibold">{edu.degree}</h4>
-                      <p className="text-muted-foreground text-base">{edu.school}</p>
-                      <div className="mt-2">
-                        <Badge variant="outline" className="bg-primary/5 px-3 py-0.5">
+                    <div className="space-y-1">
+                      <div className="font-semibold text-lg">{edu.degree}</div>
+                      <div className="text-muted-foreground">{edu.school}</div>
+                      <div className="text-sm text-muted-foreground flex items-center gap-2">
+                        <Badge variant="outline" className="bg-primary/5">
                           {edu.period}
                         </Badge>
                       </div>
                       {edu.honors && (
-                        <div className="flex items-center gap-2 text-sm text-muted-foreground mt-2">
-                          <Medal className="h-3.5 w-3.5 text-amber-400 flex-shrink-0" />
+                        <div className="text-xs text-muted-foreground flex items-center gap-1 mt-1">
+                          <Medal className="h-3.5 w-3.5 text-amber-400" />
                           <span>{edu.honors}</span>
                         </div>
                       )}
