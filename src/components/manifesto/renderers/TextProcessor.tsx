@@ -1,14 +1,11 @@
 
 import React from 'react';
-import { useIsMobile } from '@/hooks/use-mobile';
 
 interface TextProcessorProps {
   text: string;
 }
 
 const TextProcessor: React.FC<TextProcessorProps> = ({ text }) => {
-  const isMobile = useIsMobile();
-  
   // Remove the "Next: XX. Chapter Title" line if it's the last line of the content
   // This is now handled by the ChapterReader component's CTA button
   const processNextChapterText = (input: string) => {
@@ -80,16 +77,20 @@ const TextProcessor: React.FC<TextProcessorProps> = ({ text }) => {
   // Process links first, then handle bold text within the result
   const linkProcessed = processLinks(processedText);
   
-  // Apply a wrapper for mobile if needed
-  const content = Array.isArray(linkProcessed)
-    ? linkProcessed.map((part, index) => 
-        typeof part === 'string' 
-          ? <React.Fragment key={index}>{processBoldText(part)}</React.Fragment>
-          : part
-      )
-    : processBoldText(linkProcessed);
-    
-  return <>{content}</>;
+  if (Array.isArray(linkProcessed)) {
+    return (
+      <>
+        {linkProcessed.map((part, index) => 
+          typeof part === 'string' 
+            ? <React.Fragment key={index}>{processBoldText(part)}</React.Fragment>
+            : part
+        )}
+      </>
+    );
+  }
+  
+  // If no links were found, just process bold text
+  return <>{processBoldText(processedText)}</>;
 };
 
 export default TextProcessor;
