@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight } from "lucide-react";
@@ -25,7 +26,7 @@ const ChapterReader: React.FC<ChapterReaderProps> = ({
   
   // Display the correct chapter title
   const chapterTitle = chapter ? 
-    (currentChapter === 0 ? 'The Onchain Analyst: Decoding the Transparent Economy' : `Chapter ${currentChapter}: ${chapter.title}`) :
+    (currentChapter === 0 ? 'Executive Summary' : `Chapter ${currentChapter}: ${chapter.title}`) :
     'Chapter not found';
   
   return (
