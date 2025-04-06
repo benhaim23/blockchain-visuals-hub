@@ -12,9 +12,9 @@ interface ExpertiseCardProps {
 }
 
 const ExpertiseCard: React.FC<ExpertiseCardProps> = ({ icon, title, description, className }) => (
-  <Card className={cn("glass-card h-full", className)}>
+  <Card className={cn("glass-card h-full transition-all duration-300 hover:scale-[1.02] hover:shadow-lg dark:shadow-primary/5 hover:dark:shadow-primary/10", className)}>
     <CardContent className="flex flex-col items-start space-y-4 p-6">
-      <div className="p-2 rounded-md bg-primary/10">
+      <div className="p-2 rounded-md bg-primary/10 transition-all duration-300 hover:bg-primary/20">
         {icon}
       </div>
       <h3 className="text-xl font-semibold">{title}</h3>
