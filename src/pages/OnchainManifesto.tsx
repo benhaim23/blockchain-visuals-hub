@@ -9,12 +9,38 @@ import TableOfContents from '@/components/manifesto/TableOfContents';
 import ChapterReader from '@/components/manifesto/ChapterReader';
 import { toast } from '@/components/ui/use-toast';
 import { MatrixText } from '@/components/ui/matrix-text';
+import { TypewriterEffectSmooth } from '@/components/ui/typewriter-effect';
 
 const OnchainManifesto: React.FC = () => {
   const [activeTab, setActiveTab] = useState("toc");
   const [currentChapter, setCurrentChapter] = useState(0);
   const [mdContent, setMdContent] = useState<string>("");
   const [isLoading, setIsLoading] = useState(false);
+
+  const descriptionWords = [
+    { text: "A" },
+    { text: "comprehensive" },
+    { text: "guide" },
+    { text: "to" },
+    { text: "blockchain" },
+    { text: "analytics," },
+    { text: "exploring" },
+    { text: "the" },
+    { text: "transparent" },
+    { text: "world" },
+    { text: "of" },
+    { text: "on-chain" },
+    { text: "data", className: "text-blue-500 dark:text-blue-400" },
+    { text: "and" },
+    { text: "how" },
+    { text: "to" },
+    { text: "derive" },
+    { text: "meaningful" },
+    { text: "insights", className: "text-blue-500 dark:text-blue-400" },
+    { text: "from" },
+    { text: "blockchain" },
+    { text: "networks." },
+  ];
 
   const goToNextChapter = () => {
     if (currentChapter < manifestoChapters.length - 1) {
@@ -100,10 +126,12 @@ const OnchainManifesto: React.FC = () => {
               letterInterval={180}
             />
           </div>
-          <p className="text-slate-700 dark:text-muted-foreground mb-8 text-lg text-center leading-relaxed">
-            A comprehensive guide to blockchain analytics, exploring the transparent world of on-chain data 
-            and how to derive meaningful insights from blockchain networks.
-          </p>
+          <div className="flex justify-center mb-8">
+            <TypewriterEffectSmooth 
+              words={descriptionWords} 
+              className="text-center text-sm sm:text-base md:text-lg"
+            />
+          </div>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
             <TabsList className="w-full mb-6 border-2 border-blue-300 dark:border-slate-700 shadow-md bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm rounded-xl">
