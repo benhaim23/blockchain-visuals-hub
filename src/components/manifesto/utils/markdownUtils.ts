@@ -1,40 +1,92 @@
-
 // Utility functions for markdown processing
 
 // Function to detect if a line is within a code block
-export const isWithinCodeBlock = (lines: string[], currentIndex: number): boolean => {
-  // Find the last code fence before this line
-  const previousFences = lines.slice(0, currentIndex).filter(l => l.trim().startsWith('```'));
-  // If we have an odd number of code fences before this line, we're in a code block
-  return previousFences.length % 2 !== 0;
+export const isWithinCodeBlock = (lines: string[], index: number): boolean => {
+  // Find the closest opening ``` before this line
+  let openingIndex = -1;
+  for (let i = index; i >= 0; i--) {
+    if (lines[i].startsWith('```')) {
+      openingIndex = i;
+      break;
+    }
+  }
+  
+  // If no opening found, this isn't in a code block
+  if (openingIndex === -1) return false;
+  
+  // Find the closest closing ``` after the opening but before or at the current index
+  // If the current line is a closing ```, it's not considered part of the code block
+  if (lines[index].trim() === '```') return false;
+  
+  // Find the closest closing ``` after the opening
+  let closingIndex = -1;
+  for (let i = openingIndex + 1; i < lines.length; i++) {
+    if (i !== openingIndex && lines[i].trim() === '```') {
+      closingIndex = i;
+      break;
+    }
+  }
+  
+  // If no closing found after opening, and we're after opening, we're in a code block
+  if (closingIndex === -1) return index > openingIndex;
+  
+  // We're in a code block if we're between opening and closing
+  return index > openingIndex && index < closingIndex;
 };
 
 // Check if a code block is SQL
 export const isSqlCodeBlock = (lines: string[], startIndex: number): boolean => {
-  if (startIndex + 1 < lines.length) {
-    const langLine = lines[startIndex + 1].trim().toLowerCase();
-    return langLine === 'sql';
-  }
-  return false;
+  // Check if this starts a code block
+  if (!lines[startIndex].trim().startsWith('```')) return false;
+  
+  // Extract language
+  const langLine = lines[startIndex].trim().substring(3).toLowerCase();
+  return langLine === 'sql' || langLine === 'sql\n';
 };
 
 // Extract code block content
 export const extractCodeBlock = (lines: string[], startIndex: number): { content: string, endIndex: number } => {
-  let endIndex = startIndex;
   const codeLines = [];
+  let i = startIndex + 1;  // Skip opening ```
   
-  // Find the end of the code block
-  for (let i = startIndex + 2; i < lines.length; i++) {
-    if (lines[i].trim().startsWith('```')) {
-      endIndex = i;
-      break;
-    }
+  // Skip language indicator line if present
+  if (['sql', 'javascript', 'typescript', 'json', 'bash', 'python', 'css', 'html'].some(
+    lang => lines[i]?.trim() === lang)) {
+    i++;
+  }
+  
+  // Collect all lines until closing ```
+  while (i < lines.length && !lines[i].trim().startsWith('```')) {
     codeLines.push(lines[i]);
+    i++;
   }
   
   return {
     content: codeLines.join('\n'),
-    endIndex
+    endIndex: i  // Return the index of the closing ```
+  };
+};
+
+// New function to extract SQL multi-line queries
+export const extractSqlQueries = (allLines: string[], startIndex: number): { content: string, endIndex: number } => {
+  const queryLines = [allLines[startIndex]];
+  let i = startIndex + 1;
+  
+  // Continue collecting lines that look like part of the same SQL query
+  while (i < allLines.length && 
+         allLines[i].trim() !== '' && 
+         !allLines[i].startsWith('#') && 
+         !allLines[i].startsWith('-') && 
+         !allLines[i].startsWith('>') && 
+         !allLines[i].startsWith('|') && 
+         !allLines[i].startsWith('```')) {
+    queryLines.push(allLines[i]);
+    i++;
+  }
+  
+  return {
+    content: queryLines.join('\n'),
+    endIndex: i - 1  // Return the last index that was part of the query
   };
 };
 

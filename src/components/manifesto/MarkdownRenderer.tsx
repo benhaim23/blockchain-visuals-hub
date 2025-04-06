@@ -9,8 +9,9 @@ import {
   isWithinCodeBlock, 
   isSqlCodeBlock, 
   extractCodeBlock, 
-  cleanHeaderText, 
-  isStandaloneQuery 
+  cleanHeaderText,
+  isStandaloneQuery,
+  extractSqlQueries
 } from './utils/markdownUtils';
 
 interface MarkdownRendererProps {
@@ -62,6 +63,24 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
         i = endIndex;
         continue;
       }
+      
+      // Handle regular code blocks (non-SQL)
+      const { content: codeContent, endIndex } = extractCodeBlock(allLines, i);
+      
+      // Determine the language from the opening line
+      let language = "sql"; // Default
+      const langMatch = line.trim().match(/^```(\w+)/);
+      if (langMatch && langMatch[1]) {
+        language = langMatch[1];
+      }
+      
+      renderedContent.push(
+        <CodeBlock key={`code-${i}`} content={codeContent} language={language} />
+      );
+      
+      // Skip to the end of the code block
+      i = endIndex;
+      continue;
     }
     
     // Headers
@@ -156,42 +175,10 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
       renderedContent.push(<div key={i} className="h-4"></div>);
     }
     
-    // Regular code blocks (non-SQL)
-    else if (line.startsWith('```')) {
-      // Skip the opening and closing code block markers
-      renderedContent.push(<div key={i} className="my-4"></div>);
-    }
-    
-    // Skip language indicators in code blocks
-    else if (['javascript', 'typescript', 'json', 'bash', 'python', 'css', 'html'].some(lang => line.trim() === lang)) {
-      continue;
-    }
-    
-    // Handle code content - detect if this line is within a code block
-    else if (isWithinCodeBlock(allLines, i)) {
-      renderedContent.push(<CodeBlock key={i} content={line} />);
-    }
-    
     // Check for standalone SQL queries and render them as SQL blocks
     else if (isStandaloneQuery(line) && line.includes(' ')) {
       // Collect all following lines that look like they're part of the same query
-      let queryLines = [line];
-      let j = i + 1;
-      
-      // Continue collecting lines until we hit a blank line or a new block
-      while (j < allLines.length && 
-             allLines[j].trim() !== '' && 
-             !allLines[j].startsWith('#') && 
-             !allLines[j].startsWith('-') && 
-             !allLines[j].startsWith('>') && 
-             !allLines[j].startsWith('|') && 
-             !allLines[j].startsWith('```')) {
-        queryLines.push(allLines[j]);
-        j++;
-      }
-      
-      // Create the SQL code block
-      const queryContent = queryLines.join('\n');
+      const { content: queryContent, endIndex } = extractSqlQueries(allLines, i);
       const blockIndex = renderedContent.length;
       
       renderedContent.push(
@@ -201,7 +188,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
       );
       
       // Skip to after the query
-      i = j - 1;
+      i = endIndex;
       continue;
     }
     
