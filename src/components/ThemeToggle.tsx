@@ -21,8 +21,8 @@ const ThemeToggle: React.FC<ThemeToggleProps> = ({ className }) => {
         'w-10 h-10 rounded-full transition-all duration-500 relative overflow-hidden',
         className,
         theme === 'dark' 
-          ? 'bg-primary/10 border-primary/20 text-blue-300 hover:text-blue-200 hover:bg-primary/20' 
-          : 'bg-amber-100/80 border-amber-200 text-amber-500 hover:text-amber-600 hover:bg-amber-100'
+          ? 'bg-primary/10 border-primary/20 text-primary hover:text-accent hover:bg-primary/20' 
+          : 'bg-sky-100/80 border-sky-200 text-primary hover:text-accent hover:bg-sky-100'
       )}
       aria-label="Toggle theme"
     >
