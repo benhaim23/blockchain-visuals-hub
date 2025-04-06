@@ -9,7 +9,7 @@ export interface ManifestoChapter {
 }
 
 // Basic chapters (0-10)
-const basicChapters: ManifestoChapter[] = [
+export const basicChapters: ManifestoChapter[] = [
   { 
     number: 0, 
     title: "The Onchain Analyst Decoding the Transparent Economy", 
@@ -1899,4 +1899,3 @@ For onchain analysts, MEV represents one of the most technically fascinating are
     pdfPath: "/Onchain Manifesto/18. Why the Future Belongs to Onchain Analysts.pdf",
     mdPath: "/Onchain Manifesto/The Onchain Analyst Decoding the Transparent Economy.md" 
   }
-]
