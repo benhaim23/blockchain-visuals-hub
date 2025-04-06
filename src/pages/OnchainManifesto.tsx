@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { BookOpen, FileText } from "lucide-react";
@@ -77,42 +78,48 @@ const OnchainManifesto: React.FC = () => {
   return (
     <>
       <Header />
-      <div className="min-h-screen pt-24 pb-16 relative">
-        <div className="absolute inset-0 z-0 overflow-hidden">
+      <div className="min-h-screen pt-24 pb-16 relative bg-gradient-to-b from-sky-50 to-white dark:from-gray-900 dark:to-gray-950">
+        <div className="absolute inset-0 z-0 overflow-hidden opacity-30 dark:opacity-50">
           <Squares 
             direction="diagonal"
             speed={0.5}
             squareSize={40}
-            borderColor="rgba(51, 51, 51, 0.3)" 
-            hoverFillColor="rgba(34, 34, 34, 0.5)"
+            borderColor="rgba(59, 130, 246, 0.3)" 
+            hoverFillColor="rgba(59, 130, 246, 0.1)"
             glowing={true}
           />
         </div>
         
         <div className="container mx-auto px-4 max-w-5xl relative z-10">
-          <div className="mb-8">
+          <div className="mb-8 text-center">
             <MatrixText 
               text="The Onchain Manifesto" 
-              className="h-auto" 
+              className="h-auto text-indigo-800 dark:text-indigo-300" 
               initialDelay={800}
               letterAnimationDuration={900}
               letterInterval={180}
             />
           </div>
-          <p className="text-muted-foreground mb-8 text-lg">
+          <p className="text-slate-700 dark:text-muted-foreground mb-8 text-lg text-center leading-relaxed">
             A comprehensive guide to blockchain analytics, exploring the transparent world of on-chain data 
             and how to derive meaningful insights from blockchain networks.
           </p>
 
           <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-            <TabsList className="w-full mb-6 border-2 border-border dark:border-slate-700 transition-all duration-300 hover:border-primary/30 dark:hover:border-primary/40 shadow-sm hover:shadow-md">
-              <TabsTrigger value="toc" className="flex-1 transition-all duration-300 hover:bg-primary/5">
-                <FileText className="mr-2 h-4 w-4" />
-                Table of Contents
+            <TabsList className="w-full mb-6 border-2 border-blue-300 dark:border-slate-700 shadow-md bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm rounded-xl">
+              <TabsTrigger 
+                value="toc" 
+                className="flex-1 transition-all duration-300 hover:bg-blue-50 dark:hover:bg-primary/5 data-[state=active]:bg-blue-100 dark:data-[state=active]:bg-slate-800"
+              >
+                <FileText className="mr-2 h-4 w-4 text-blue-600 dark:text-blue-400" />
+                <span className="text-blue-800 dark:text-blue-300">Table of Contents</span>
               </TabsTrigger>
-              <TabsTrigger value="reader" className="flex-1 transition-all duration-300 hover:bg-primary/5">
-                <BookOpen className="mr-2 h-4 w-4" />
-                Reader
+              <TabsTrigger 
+                value="reader" 
+                className="flex-1 transition-all duration-300 hover:bg-blue-50 dark:hover:bg-primary/5 data-[state=active]:bg-blue-100 dark:data-[state=active]:bg-slate-800"
+              >
+                <BookOpen className="mr-2 h-4 w-4 text-blue-600 dark:text-blue-400" />
+                <span className="text-blue-800 dark:text-blue-300">Reader</span>
               </TabsTrigger>
             </TabsList>
 
@@ -125,8 +132,8 @@ const OnchainManifesto: React.FC = () => {
 
             <TabsContent value="reader" className="mt-0">
               {isLoading ? (
-                <div className="bg-card/80 backdrop-blur-sm rounded-lg border-2 border-border dark:border-slate-700 min-h-[600px] flex items-center justify-center shadow-sm">
-                  <p>Loading chapter content...</p>
+                <div className="bg-white/90 dark:bg-card/80 backdrop-blur-sm rounded-lg border-2 border-blue-200 dark:border-slate-700 min-h-[600px] flex items-center justify-center shadow-lg">
+                  <p className="text-blue-600 dark:text-blue-400 animate-pulse">Loading chapter content...</p>
                 </div>
               ) : (
                 <ChapterReader 

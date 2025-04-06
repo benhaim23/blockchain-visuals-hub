@@ -8,25 +8,25 @@ interface MarkdownRendererProps {
 const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
   // Convert markdown content to HTML
   return (
-    <div className="prose dark:prose-invert max-w-none">
+    <div className="prose dark:prose-invert max-w-none prose-slate prose-headings:text-indigo-900 dark:prose-headings:text-indigo-300 prose-a:text-blue-600 dark:prose-a:text-blue-400">
       {content.split('\n').map((line, index) => {
         // Clean up asterisks from headers
         const cleanLine = (str: string) => str.replace(/\*\*(.*?)\*\*/g, '$1');
         
         // Headers
         if (line.startsWith('# ')) {
-          return <h1 key={index} className="text-3xl font-bold mt-6 mb-4">{cleanLine(line.substring(2))}</h1>;
+          return <h1 key={index} className="text-3xl font-bold mt-6 mb-4 text-indigo-900 dark:text-indigo-300">{cleanLine(line.substring(2))}</h1>;
         } else if (line.startsWith('## ')) {
-          return <h2 key={index} className="text-2xl font-bold mt-5 mb-3">{cleanLine(line.substring(3))}</h2>;
+          return <h2 key={index} className="text-2xl font-bold mt-5 mb-3 text-indigo-800 dark:text-indigo-400">{cleanLine(line.substring(3))}</h2>;
         } else if (line.startsWith('### ')) {
-          return <h3 key={index} className="text-xl font-bold mt-4 mb-2">{cleanLine(line.substring(4))}</h3>;
+          return <h3 key={index} className="text-xl font-bold mt-4 mb-2 text-indigo-700 dark:text-indigo-400">{cleanLine(line.substring(4))}</h3>;
         } else if (line.startsWith('#### ')) {
-          return <h4 key={index} className="text-lg font-bold mt-3 mb-2">{cleanLine(line.substring(5))}</h4>;
+          return <h4 key={index} className="text-lg font-bold mt-3 mb-2 text-indigo-700 dark:text-indigo-400">{cleanLine(line.substring(5))}</h4>;
         }
         
         // Lists
         else if (line.startsWith('- ')) {
-          return <li key={index} className="ml-6 mb-1">{cleanLine(line.substring(2))}</li>;
+          return <li key={index} className="ml-6 mb-1 text-slate-700 dark:text-slate-300">{cleanLine(line.substring(2))}</li>;
         } 
         
         // Bold text - we'll handle the ** markers properly
@@ -36,23 +36,23 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
           
           if (parts.length > 1) {
             return (
-              <p key={index} className="mb-4">
+              <p key={index} className="mb-4 text-slate-700 dark:text-slate-300">
                 {parts.map((part, i) => {
                   // Every even index (0, 2, 4...) is regular text
                   // Every odd index (1, 3, 5...) is bold text
                   return i % 2 === 0 ? 
                     <React.Fragment key={i}>{part}</React.Fragment> : 
-                    <strong key={i}>{part}</strong>;
+                    <strong key={i} className="text-blue-700 dark:text-blue-400">{part}</strong>;
                 })}
               </p>
             );
           }
-          return <p key={index} className="mb-4">{line}</p>;
+          return <p key={index} className="mb-4 text-slate-700 dark:text-slate-300">{line}</p>;
         }
         
         // Blockquotes
         else if (line.startsWith('> ')) {
-          return <blockquote key={index} className="border-l-4 border-primary pl-4 italic my-4 text-muted-foreground">{cleanLine(line.substring(2))}</blockquote>;
+          return <blockquote key={index} className="border-l-4 border-blue-400 dark:border-blue-500 bg-blue-50 dark:bg-blue-900/20 pl-4 py-2 italic my-4 text-slate-600 dark:text-slate-300 rounded-r">{cleanLine(line.substring(2))}</blockquote>;
         }
         
         // Tables
@@ -66,7 +66,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
           return (
             <div key={index} className="flex w-full my-1">
               {cells.map((cell, cellIndex) => (
-                <div key={cellIndex} className="flex-1 px-2 py-1 border">
+                <div key={cellIndex} className="flex-1 px-2 py-1 border border-blue-200 dark:border-slate-700 text-slate-700 dark:text-slate-300">
                   {cleanLine(cell.trim())}
                 </div>
               ))}
@@ -76,7 +76,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
         
         // Horizontal rule
         else if (line === '---') {
-          return <hr key={index} className="my-6 border-t border-muted" />;
+          return <hr key={index} className="my-6 border-t-2 border-blue-100 dark:border-slate-700" />;
         }
         
         // Empty line
@@ -90,25 +90,25 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
           let formattedText = line;
           
           // Bold text
-          formattedText = formattedText.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+          formattedText = formattedText.replace(/\*\*(.*?)\*\*/g, '<strong class="text-blue-700 dark:text-blue-400">$1</strong>');
           
           // Italic text
-          formattedText = formattedText.replace(/\*(.*?)\*/g, '<em>$1</em>');
+          formattedText = formattedText.replace(/\*(.*?)\*/g, '<em class="text-slate-600 dark:text-slate-400">$1</em>');
           
           // Code
-          formattedText = formattedText.replace(/`(.*?)`/g, '<code>$1</code>');
+          formattedText = formattedText.replace(/`(.*?)`/g, '<code class="bg-slate-100 dark:bg-slate-800 px-1 py-0.5 rounded text-indigo-600 dark:text-indigo-400 font-mono text-sm">$1</code>');
           
           if (formattedText.includes('<')) {
             return (
               <p 
                 key={index} 
-                className="mb-4" 
+                className="mb-4 text-slate-700 dark:text-slate-300" 
                 dangerouslySetInnerHTML={{ __html: formattedText }}
               />
             );
           }
           
-          return <p key={index} className="mb-4">{formattedText}</p>;
+          return <p key={index} className="mb-4 text-slate-700 dark:text-slate-300">{formattedText}</p>;
         }
       })}
     </div>

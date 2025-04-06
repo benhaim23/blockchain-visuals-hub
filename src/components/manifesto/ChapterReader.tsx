@@ -25,19 +25,19 @@ const ChapterReader: React.FC<ChapterReaderProps> = ({
   const showMarkdown = chapter && mdContent; // Always prefer markdown if available
   
   return (
-    <div className="bg-card/80 backdrop-blur-sm rounded-lg border-2 border-border dark:border-slate-700 min-h-[600px] flex flex-col shadow-sm transition-all duration-300 hover:shadow-md dark:hover:border-primary/40 hover:border-primary/30">
-      <div className="p-4 border-b-2 border-border dark:border-slate-700 flex items-center justify-between">
+    <div className="bg-white/90 dark:bg-card/80 backdrop-blur-sm rounded-lg border-2 border-blue-200 dark:border-slate-700 min-h-[600px] flex flex-col shadow-lg transition-all duration-300 hover:shadow-xl dark:hover:border-primary/40 hover:border-blue-300">
+      <div className="p-4 border-b-2 border-blue-100 dark:border-slate-700 flex items-center justify-between bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-slate-800 dark:to-slate-800 rounded-t-lg">
         <Button 
           variant="ghost" 
           onClick={onPreviousChapter}
           disabled={currentChapter <= 0}
-          className="gap-2 text-purple-500 hover:text-purple-600 hover:bg-purple-100/10 transition-all duration-300 hover:scale-105"
+          className="gap-2 text-blue-600 hover:text-blue-700 hover:bg-blue-100/50 transition-all duration-300 hover:scale-105 dark:text-blue-400 dark:hover:text-blue-300 dark:hover:bg-blue-900/20"
         >
           <ChevronLeft className="h-4 w-4" />
           Previous
         </Button>
 
-        <span className="font-medium text-purple-500">
+        <span className="font-medium text-indigo-700 dark:text-indigo-300">
           {currentChapter === 0 ? 'Executive Summary' : `Chapter ${currentChapter}`}: {chapter?.title}
         </span>
 
@@ -45,7 +45,7 @@ const ChapterReader: React.FC<ChapterReaderProps> = ({
           variant="ghost" 
           onClick={onNextChapter}
           disabled={currentChapter >= chapters.length - 1}
-          className="gap-2 text-purple-500 hover:text-purple-600 hover:bg-purple-100/10 transition-all duration-300 hover:scale-105"
+          className="gap-2 text-blue-600 hover:text-blue-700 hover:bg-blue-100/50 transition-all duration-300 hover:scale-105 dark:text-blue-400 dark:hover:text-blue-300 dark:hover:bg-blue-900/20"
         >
           Next
           <ChevronRight className="h-4 w-4" />
@@ -59,13 +59,13 @@ const ChapterReader: React.FC<ChapterReaderProps> = ({
           </ScrollArea>
         ) : (
           <div className="h-[600px] w-full flex items-center justify-center">
-            <p className="text-muted-foreground">
+            <p className="text-slate-600 dark:text-muted-foreground">
               This chapter is only available as a PDF. 
               <a 
                 href={chapter?.pdfPath} 
                 target="_blank" 
                 rel="noopener noreferrer"
-                className="ml-2 text-primary hover:underline transition-all duration-300 hover:text-primary/80"
+                className="ml-2 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:underline transition-all duration-300"
               >
                 Open PDF
               </a>
