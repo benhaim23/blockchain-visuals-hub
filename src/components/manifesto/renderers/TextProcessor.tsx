@@ -60,7 +60,11 @@ const TextProcessor: React.FC<TextProcessorProps> = ({ text }) => {
       return textNode;
     }
     
-    const segments = textNode.split(/(\*\*[^*]+\*\*)/g);
+    // Remove standalone ** characters that don't properly form bold text
+    const cleanedText = textNode.replace(/\*\*(?!\s)(?!.*\*\*)/g, '').replace(/(?<!\*\*.*)\*\*/g, '');
+    
+    // Process actual bold text (text between ** markers)
+    const segments = cleanedText.split(/(\*\*[^*]+\*\*)/g);
     
     return segments.map((segment, idx) => {
       // Check if this segment is bold (surrounded by **)
