@@ -31,7 +31,7 @@ Think of Dune as the **SQL-powered Google for blockchain activity**. It sits on 
 
 When you open [dune.com](https://dune.com), you’ll find:
 
-### 🧾 **Queries**
+### 🧾 Queries
 
 This is where the magic happens. Every query is a SQL script that pulls from decoded blockchain tables.
 
@@ -39,7 +39,7 @@ This is where the magic happens. Every query is a SQL script that pulls from dec
 - Visualize results with tables, charts, or graphs
 - Save your queries, fork others, or share links publicly
 
-### 📊 **Dashboards**
+### 📊 Dashboards
 
 Dashboards are collections of queries with visualizations. They let you tell a story with data.
 
@@ -47,7 +47,7 @@ Dashboards are collections of queries with visualizations. They let you tell a s
 - Combine multiple chains or protocols in one place
 - Embed charts in blog posts, docs, or Notion pages
 
-### 📚 **Table Explorer**
+### 📚 Table Explorer
 
 Explore the underlying schema.
 
@@ -55,7 +55,7 @@ Explore the underlying schema.
 - Browse by category: `transactions`, `token_transfers`, `logs`, etc.
 - View column definitions and data samples
 
-### 🧙‍♀️ **Spellbook**
+### 🧙‍♀️ Spellbook
 
 A collection of curated, reusable models written by the Dune community and maintained in the open-source Spellbook repo.
 
