@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useAnimatedText } from '@/hooks/useAnimatedText';
 import { Copy, Check } from 'lucide-react';
@@ -75,6 +76,27 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
       return headerText.substring(2, headerText.length - 2);
     }
     return headerText;
+  };
+
+  // Function to process text and remove markdown formatting
+  const processText = (text: string): JSX.Element => {
+    // Split text by ** markers
+    const segments = text.split(/(\*\*[^*]+\*\*)/g);
+    
+    return (
+      <>
+        {segments.map((segment, idx) => {
+          // Check if this segment is bold (surrounded by **)
+          if (segment.startsWith('**') && segment.endsWith('**')) {
+            // Remove the ** and render as bold
+            const cleanText = segment.substring(2, segment.length - 2);
+            return <strong key={idx} className="text-blue-700 dark:text-blue-400">{cleanText}</strong>;
+          }
+          // Regular text
+          return <React.Fragment key={idx}>{segment}</React.Fragment>;
+        })}
+      </>
+    );
   };
 
   // Convert markdown content to HTML
@@ -160,34 +182,29 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
     
     // Lists
     else if (line.startsWith('- ')) {
-      renderedContent.push(<li key={i} className="ml-6 mb-1 text-slate-700 dark:text-slate-300">{line.substring(2)}</li>);
+      renderedContent.push(
+        <li key={i} className="ml-6 mb-1 text-slate-700 dark:text-slate-300">
+          {processText(line.substring(2))}
+        </li>
+      );
     } 
     
-    // Bold text - we'll handle the ** markers properly
+    // Bold text - using our new text processor
     else if (line.includes('**')) {
-      // Replace ** with span for bold text
-      const parts = line.split('**');
-      
-      if (parts.length > 1) {
-        renderedContent.push(
-          <p key={i} className="mb-4 text-slate-700 dark:text-slate-300">
-            {parts.map((part, i) => {
-              // Every even index (0, 2, 4...) is regular text
-              // Every odd index (1, 3, 5...) is bold text
-              return i % 2 === 0 ? 
-                <React.Fragment key={i}>{part}</React.Fragment> : 
-                <strong key={i} className="text-blue-700 dark:text-blue-400">{part}</strong>;
-            })}
-          </p>
-        );
-      } else {
-        renderedContent.push(<p key={i} className="mb-4 text-slate-700 dark:text-slate-300">{line}</p>);
-      }
+      renderedContent.push(
+        <p key={i} className="mb-4 text-slate-700 dark:text-slate-300">
+          {processText(line)}
+        </p>
+      );
     }
     
     // Blockquotes
     else if (line.startsWith('> ')) {
-      renderedContent.push(<blockquote key={i} className="border-l-4 border-blue-400 dark:border-blue-500 bg-blue-50 dark:bg-blue-900/20 pl-4 py-2 italic my-4 text-slate-600 dark:text-slate-300 rounded-r">{line.substring(2)}</blockquote>);
+      renderedContent.push(
+        <blockquote key={i} className="border-l-4 border-blue-400 dark:border-blue-500 bg-blue-50 dark:bg-blue-900/20 pl-4 py-2 italic my-4 text-slate-600 dark:text-slate-300 rounded-r">
+          {processText(line.substring(2))}
+        </blockquote>
+      );
     }
     
     // Tables
@@ -212,7 +229,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
               key={cellIndex} 
               className={`flex-1 px-3 py-2 ${cellIndex === 0 ? 'border-l' : ''} border-r border-t border-b border-blue-200 dark:border-slate-600 text-slate-700 dark:text-slate-300 ${isHeaderRow ? 'font-semibold text-indigo-900 dark:text-indigo-300' : ''}`}
             >
-              {cell.trim()}
+              {processText(cell.trim())}
             </div>
           ))}
         </div>
@@ -251,32 +268,12 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
     
     // Regular paragraph
     else {
-      // Process inline formatting
-      let formattedText = line;
-      
-      // Bold text
-      formattedText = formattedText.replace(/\*\*(.*?)\*\*/g, '<strong class="text-blue-700 dark:text-blue-400">$1</strong>');
-      
-      // Italic text
-      formattedText = formattedText.replace(/\*(.*?)\*/g, '<em class="text-slate-600 dark:text-slate-400">$1</em>');
-      
-      // Code
-      formattedText = formattedText.replace(/`(.*?)`/g, '<code class="bg-slate-100 dark:bg-slate-800 px-1 py-0.5 rounded text-indigo-600 dark:text-indigo-400 font-mono text-sm">$1</code>');
-      
-      // Handle links
-      formattedText = formattedText.replace(/\[(.*?)\]\((.*?)\)/g, '<a href="$2" class="text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 underline" target="_blank" rel="noopener noreferrer">$1</a>');
-      
-      if (formattedText.includes('<')) {
-        renderedContent.push(
-          <p 
-            key={i} 
-            className="mb-4 text-slate-700 dark:text-slate-300" 
-            dangerouslySetInnerHTML={{ __html: formattedText }}
-          />
-        );
-      } else {
-        renderedContent.push(<p key={i} className="mb-4 text-slate-700 dark:text-slate-300">{formattedText}</p>);
-      }
+      // Process inline formatting 
+      renderedContent.push(
+        <p key={i} className="mb-4 text-slate-700 dark:text-slate-300">
+          {processText(line)}
+        </p>
+      );
     }
   }
 
