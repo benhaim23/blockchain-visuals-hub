@@ -12,7 +12,8 @@ const TextProcessor: React.FC<TextProcessorProps> = ({ text }) => {
   if (text.startsWith("Next:") || text.startsWith("**Next:")) {
     // Extract the chapter number from the text using a regex
     const chapterMatch = text.match(/Next:? (\d+)\./i) || 
-                         text.match(/\*\*Next:\*\* (\d+)\./i);
+                         text.match(/\*\*Next:\*\* (\d+)\./i) ||
+                         text.match(/Next: (\d+)\./i);
     
     if (chapterMatch && chapterMatch[1]) {
       const nextChapterNum = parseInt(chapterMatch[1], 10);
