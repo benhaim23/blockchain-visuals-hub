@@ -51,29 +51,45 @@ export function CustomCursor({ className }: CustomCursorProps) {
   }, [])
 
   return (
-    <motion.div
-      className={cn(
-        "fixed top-0 left-0 w-6 h-6 pointer-events-none z-50",
-        "text-primary",
-        isClicking ? "scale-90" : "scale-100",
-        isHovering ? "scale-125" : "scale-100",
-        className
-      )}
-      animate={{
-        x: mousePosition.x - 12,
-        y: mousePosition.y - 12,
-        transition: {
-          type: "spring",
-          damping: 25,
-          stiffness: 350,
-          mass: 0.5
-        }
-      }}
-      style={{
-        clipPath: "polygon(50% 0%, 0% 100%, 100% 100%)",
-        transform: "rotate(135deg)",
-        backgroundColor: "hsl(var(--primary))"
-      }}
-    />
+    <>
+      {/* Main cursor dot */}
+      <motion.div
+        className={cn(
+          "fixed top-0 left-0 w-5 h-5 rounded-full pointer-events-none z-50 mix-blend-difference",
+          "bg-primary",
+          isClicking ? "scale-75" : "scale-100",
+          isHovering ? "scale-150" : "scale-100",
+          className
+        )}
+        animate={{
+          x: mousePosition.x - 10,
+          y: mousePosition.y - 10,
+          transition: {
+            type: "spring",
+            damping: 25,
+            stiffness: 350,
+            mass: 0.5
+          }
+        }}
+      />
+
+      {/* Cursor trailing ring */}
+      <motion.div
+        className="fixed top-0 left-0 w-8 h-8 rounded-full border-2 border-primary/50 pointer-events-none z-50 mix-blend-difference"
+        animate={{
+          x: mousePosition.x - 16,
+          y: mousePosition.y - 16,
+          scale: isHovering ? 1.5 : 1,
+          opacity: isHovering ? 0.5 : 0.8,
+          transition: {
+            type: "spring",
+            damping: 20,
+            stiffness: 250,
+            mass: 0.8,
+            delay: 0.03
+          }
+        }}
+      />
+    </>
   )
 }
