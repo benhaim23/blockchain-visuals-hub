@@ -1,6 +1,7 @@
 
 import React, { useEffect, useState } from 'react';
 import { useAnimatedText } from '@/hooks/useAnimatedText';
+import { CodeBlock, CodeBlockCode, CodeBlockGroup, CopyButton } from '@/components/ui/code-block';
 
 interface MarkdownRendererProps {
   content: string;
@@ -29,10 +30,69 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
     return previousFences.length % 2 !== 0;
   };
 
+  // Function to extract code blocks from markdown
+  const extractCodeBlock = (lines: string[], startIndex: number): { code: string, endIndex: number, language: string } => {
+    const code = [];
+    let i = startIndex + 1; // Skip the opening ```
+    let language = lines[startIndex].trim().replace('```', '').trim();
+    
+    // Continue until we find a closing code fence or reach the end
+    while (i < lines.length && !lines[i].trim().startsWith('```')) {
+      code.push(lines[i]);
+      i++;
+    }
+    
+    return {
+      code: code.join('\n'),
+      endIndex: i,
+      language
+    };
+  };
+
   // Convert markdown content to HTML
   return (
     <div className={`prose dark:prose-invert max-w-none prose-slate prose-headings:text-indigo-900 dark:prose-headings:text-indigo-300 prose-a:text-blue-600 dark:prose-a:text-blue-400 transition-opacity duration-500 ${isVisible ? 'opacity-100' : 'opacity-0'}`}>
       {animatedContent.split('\n').map((line, index, allLines) => {
+        // Skip horizontal rule lines (------)
+        if (line.trim() === '---') {
+          return null;
+        }
+        
+        // Process code blocks
+        if (line.trim().startsWith('```')) {
+          const { code, endIndex, language } = extractCodeBlock(allLines, index);
+          
+          // Skip this line and all lines until the end of the code block
+          if (index === endIndex) return null; // This is the closing fence
+          if (index > endIndex || index < allLines.findIndex(l => l.trim().startsWith('```'))) return null;
+          
+          // Only render the code block at the opening fence line
+          if (line.trim().startsWith('```')) {
+            return (
+              <CodeBlock key={index}>
+                <CodeBlockGroup className="border-border border-b px-4 py-2">
+                  <div className="flex items-center gap-2">
+                    <div className="bg-slate-700 text-slate-200 rounded px-2 py-1 text-xs font-medium">
+                      {language || 'SQL'}
+                    </div>
+                    <span className="text-slate-400 text-sm">
+                      Code Sample
+                    </span>
+                  </div>
+                  <CopyButton code={code} />
+                </CodeBlockGroup>
+                <CodeBlockCode code={code} language={language || 'sql'} />
+              </CodeBlock>
+            );
+          }
+          return null;
+        }
+        
+        // Skip language indicators in code blocks
+        else if (['sql', 'javascript', 'typescript', 'json', 'bash', 'python', 'css', 'html'].some(lang => line.trim() === lang)) {
+          return null;
+        }
+        
         // Clean up formatting markers
         const cleanLine = (str: string) => str.replace(/\*\*(.*?)\*\*/g, '$1').replace(/\*(.*?)\*/g, '$1');
         
@@ -106,34 +166,14 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
           );
         }
         
-        // Horizontal rule
-        else if (line === '---') {
-          return <hr key={index} className="my-6 border-t-2 border-blue-100 dark:border-slate-700" />;
-        }
-        
         // Empty line
         else if (line.trim() === '') {
           return <div key={index} className="h-4"></div>;
         }
         
-        // Code blocks
-        else if (line.startsWith('```')) {
-          // Skip the opening and closing code block markers
-          return <div key={index} className="my-4"></div>;
-        }
-        
-        // Skip language indicators in code blocks
-        else if (['sql', 'javascript', 'typescript', 'json', 'bash', 'python', 'css', 'html'].some(lang => line.trim() === lang)) {
-          return null;
-        }
-        
-        // Handle code content - detect if this line is within a code block
+        // Skip code content within code blocks (already handled above)
         else if (isWithinCodeBlock(allLines, index)) {
-          return (
-            <div key={index} className="font-mono text-sm bg-slate-100 dark:bg-slate-800 p-1.5 rounded-none first:rounded-t last:rounded-b text-indigo-600 dark:text-indigo-400 border-l-4 border-indigo-300 dark:border-indigo-700 whitespace-pre-wrap">
-              {line}
-            </div>
-          );
+          return null;
         }
         
         // Regular paragraph
