@@ -58,9 +58,9 @@ export function Squares({
 
       // For glowing effect
       if (glowing) {
-        ctx.lineWidth = 1
-        ctx.shadowBlur = 8
-        ctx.shadowColor = "#32CD32" // Lime green glow
+        ctx.lineWidth = 1.5
+        ctx.shadowBlur = 15
+        ctx.shadowColor = "#00ff00" // More vibrant neon green glow
       } else {
         ctx.lineWidth = 0.5
         ctx.shadowBlur = 0
@@ -80,8 +80,8 @@ export function Squares({
             ctx.fillRect(squareX, squareY, squareSize, squareSize)
           }
 
-          // Use lime green color if glowing is enabled
-          ctx.strokeStyle = glowing ? "#32CD32" : borderColor
+          // Use bright neon green color if glowing is enabled
+          ctx.strokeStyle = glowing ? "#00ff00" : borderColor
           ctx.strokeRect(squareX, squareY, squareSize, squareSize)
         }
       }
