@@ -15,6 +15,7 @@ interface ChapterReaderProps {
   onNextChapter: () => void;
 }
 
+// Separated into a standalone component for better memoization
 const NavigationHeader = memo(({ 
   currentChapter, 
   chapterTitle, 
@@ -57,6 +58,7 @@ const NavigationHeader = memo(({
 
 NavigationHeader.displayName = 'NavigationHeader';
 
+// Separated call-to-action into its own component
 const ChapterCallToAction = memo(({ 
   isMobile, 
   nextChapterTitle, 
@@ -84,6 +86,50 @@ const ChapterCallToAction = memo(({
 
 ChapterCallToAction.displayName = 'ChapterCallToAction';
 
+// Main chapter content component
+const ChapterContent = memo(({ mdContent, isLastChapter, isMobile, nextChapterTitle, onNextChapter }: { 
+  mdContent: string; 
+  isLastChapter: boolean;
+  isMobile: boolean;
+  nextChapterTitle: string;
+  onNextChapter: () => void;
+}) => (
+  <ScrollArea className="h-[550px] pr-4">
+    <MarkdownRenderer content={mdContent} />
+    
+    {!isLastChapter && (
+      <ChapterCallToAction 
+        isMobile={isMobile}
+        nextChapterTitle={nextChapterTitle}
+        onNextChapter={onNextChapter}
+      />
+    )}
+  </ScrollArea>
+));
+
+ChapterContent.displayName = 'ChapterContent';
+
+// PDF fallback component
+const PdfFallback = memo(({ pdfPath }: { pdfPath?: string }) => (
+  <div className="h-[550px] w-full flex items-center justify-center">
+    <p className="text-slate-600 dark:text-muted-foreground">
+      This chapter is only available as a PDF. 
+      {pdfPath && (
+        <a 
+          href={pdfPath} 
+          target="_blank" 
+          rel="noopener noreferrer"
+          className="ml-2 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:underline"
+        >
+          Open PDF
+        </a>
+      )}
+    </p>
+  </div>
+));
+
+PdfFallback.displayName = 'PdfFallback';
+
 const ChapterReader: React.FC<ChapterReaderProps> = ({ 
   currentChapter, 
   chapters, 
@@ -91,7 +137,7 @@ const ChapterReader: React.FC<ChapterReaderProps> = ({
   onPreviousChapter, 
   onNextChapter 
 }) => {
-  // Memoize values to prevent unnecessary recalculations
+  // Memoized values to prevent unnecessary recalculations
   const chapter = useMemo(() => chapters[currentChapter], [chapters, currentChapter]);
   const isLastChapter = useMemo(() => currentChapter >= chapters.length - 1, [currentChapter, chapters.length]);
   const isMobile = useIsMobile();
@@ -118,31 +164,15 @@ const ChapterReader: React.FC<ChapterReaderProps> = ({
 
       <div className="flex-1 p-6">
         {showMarkdown ? (
-          <ScrollArea className="h-[600px] pr-4">
-            <MarkdownRenderer content={mdContent} />
-            
-            {!isLastChapter && (
-              <ChapterCallToAction 
-                isMobile={isMobile}
-                nextChapterTitle={nextChapterTitle}
-                onNextChapter={onNextChapter}
-              />
-            )}
-          </ScrollArea>
+          <ChapterContent 
+            mdContent={mdContent}
+            isLastChapter={isLastChapter}
+            isMobile={isMobile}
+            nextChapterTitle={nextChapterTitle}
+            onNextChapter={onNextChapter}
+          />
         ) : (
-          <div className="h-[600px] w-full flex items-center justify-center">
-            <p className="text-slate-600 dark:text-muted-foreground">
-              This chapter is only available as a PDF. 
-              <a 
-                href={chapter?.pdfPath} 
-                target="_blank" 
-                rel="noopener noreferrer"
-                className="ml-2 text-blue-600 hover:text-blue-800 dark:text-blue-400 dark:hover:text-blue-300 hover:underline"
-              >
-                Open PDF
-              </a>
-            </p>
-          </div>
+          <PdfFallback pdfPath={chapter?.pdfPath} />
         )}
       </div>
     </div>

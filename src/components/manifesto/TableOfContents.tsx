@@ -88,7 +88,7 @@ const ChapterItem = memo(({ chapter, index, onSelectChapter }: ChapterItemProps)
                 {chapter.title}
               </span>
               
-              {'description' in chapter && chapter.description && (
+              {chapter.description && (
                 <span className="text-xs text-slate-500 dark:text-slate-400 max-w-md line-clamp-1 md:line-clamp-2">
                   {chapter.description}
                 </span>

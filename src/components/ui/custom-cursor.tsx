@@ -15,7 +15,10 @@ export const CustomCursor = memo(({ className }: CustomCursorProps) => {
 
   useEffect(() => {
     const updateMousePosition = (e: MouseEvent) => {
-      setMousePosition({ x: e.clientX, y: e.clientY })
+      // Use requestAnimationFrame for smoother performance
+      requestAnimationFrame(() => {
+        setMousePosition({ x: e.clientX, y: e.clientY })
+      })
     }
 
     const handleMouseOver = (e: MouseEvent) => {
@@ -33,8 +36,9 @@ export const CustomCursor = memo(({ className }: CustomCursorProps) => {
       }
     }
 
-    window.addEventListener("mousemove", updateMousePosition)
-    window.addEventListener("mouseover", handleMouseOver)
+    // Use passive event listeners for better performance
+    window.addEventListener("mousemove", updateMousePosition, { passive: true })
+    window.addEventListener("mouseover", handleMouseOver, { passive: true })
 
     return () => {
       window.removeEventListener("mousemove", updateMousePosition)
@@ -53,18 +57,19 @@ export const CustomCursor = memo(({ className }: CustomCursorProps) => {
         y: mousePosition.y,
         transition: {
           type: "spring",
-          damping: 40,
-          stiffness: 500,
-          mass: 0.3
+          damping: 50,  // Increased damping for less oscillation
+          stiffness: 800, // Increased stiffness for faster response
+          mass: 0.2,     // Reduced mass for faster movement
+          restDelta: 0.01 // Smaller values create more precise movements
         }
       }}
     >
       <div
         className={cn(
           "w-6 h-6 -ml-3 -mt-3",
-          "bg-primary opacity-70 rounded-full",
+          "bg-primary opacity-60 rounded-full", // Reduced opacity
           isHovering ? "scale-125" : "scale-100",
-          "transition-transform duration-150"
+          "will-change-transform transition-transform duration-100" // Shorter duration, added will-change for GPU acceleration
         )}
       />
     </motion.div>
