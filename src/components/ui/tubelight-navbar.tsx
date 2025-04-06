@@ -9,6 +9,7 @@ import { cn } from "@/lib/utils"
 interface NavItem {
   name: string
   url: string
+  value?: string | null
   icon?: LucideIcon
 }
 
@@ -70,7 +71,10 @@ export function NavBar({ items, activeItem, onItemClick, className }: NavBarProp
             >
               <span className="flex items-center justify-center gap-2">
                 {Icon && <Icon className="h-4 w-4" />}
-                {item.name}
+                <span className="hidden md:inline">{item.name}</span>
+                <span className="md:hidden">
+                  {Icon && <Icon size={18} strokeWidth={2.5} />}
+                </span>
               </span>
               {isActive && (
                 <motion.div

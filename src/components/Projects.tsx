@@ -1,6 +1,6 @@
 
 import React, { useState } from 'react';
-import { Filter, Code } from 'lucide-react';
+import { Filter, Code, Home, Briefcase, FileText, BarChartBig } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import ProjectCard from '@/components/ProjectCard';
 import { NavBar } from '@/components/ui/tubelight-navbar';
@@ -14,10 +14,10 @@ const Projects: React.FC = () => {
     : projects;
 
   const filterItems = [
-    { name: 'All Projects', url: '#', value: null },
-    { name: 'Analytics', url: '#', value: 'analytics' },
-    { name: 'Development', url: '#', value: 'development' },
-    { name: 'Trading', url: '#', value: 'trading' },
+    { name: 'All Projects', url: '#', icon: Home, value: null },
+    { name: 'Analytics', url: '#', icon: BarChartBig, value: 'analytics' },
+    { name: 'Development', url: '#', icon: Code, value: 'development' },
+    { name: 'Trading', url: '#', icon: Briefcase, value: 'trading' },
   ];
 
   const activeItem = filter === null ? 'All Projects' : 
