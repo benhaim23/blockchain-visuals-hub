@@ -60,17 +60,20 @@ const TextProcessor: React.FC<TextProcessorProps> = ({ text }) => {
       return textNode;
     }
     
-    // Properly handle bold text (text between ** markers)
-    // This regex finds proper pairs of ** that surround text
-    const boldRegex = /\*\*([^*]+)\*\*/g;
-    const segments = textNode.split(boldRegex);
+    // Remove standalone ** characters that don't properly form bold text
+    const cleanedText = textNode.replace(/\*\*(?!\s)(?!.*\*\*)/g, '').replace(/(?<!\*\*.*)\*\*/g, '');
+    
+    // Process actual bold text (text between ** markers)
+    const segments = cleanedText.split(/(\*\*[^*]+\*\*)/g);
     
     return segments.map((segment, idx) => {
-      // For odd indices, these are the captures from the regex (the content between **)
-      if (idx % 2 === 1) {
-        return <strong key={idx} className="text-blue-700 dark:text-blue-400">{segment}</strong>;
+      // Check if this segment is bold (surrounded by **)
+      if (segment.startsWith('**') && segment.endsWith('**')) {
+        // Remove the ** and render as bold
+        const cleanText = segment.substring(2, segment.length - 2);
+        return <strong key={idx} className="text-blue-700 dark:text-blue-400">{cleanText}</strong>;
       }
-      // For even indices, these are the regular text segments
+      // Regular text
       return <React.Fragment key={idx}>{segment}</React.Fragment>;
     });
   };
