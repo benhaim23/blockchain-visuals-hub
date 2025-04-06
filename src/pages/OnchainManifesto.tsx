@@ -4,7 +4,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { BookOpen, FileText, Sparkles } from "lucide-react";
 import Header from '@/components/Header';
 import { Squares } from "@/components/ui/squares-background";
-import { manifestoChapters } from '@/data/manifestoChapters';
+import { manifestoChapters } from '@/data/manifestoChapters_updated';
 import TableOfContents from '@/components/manifesto/TableOfContents';
 import ChapterReader from '@/components/manifesto/ChapterReader';
 import { toast } from '@/components/ui/use-toast';
