@@ -55,7 +55,7 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
       {animatedContent.split('\n').map((line, index, allLines) => {
         // Skip horizontal rule lines (------)
         if (line.trim() === '---') {
-          return null;
+          return <div key={index} className="my-6 border-t border-slate-200 dark:border-slate-700"></div>;
         }
         
         // Process code blocks

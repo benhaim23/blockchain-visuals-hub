@@ -46,7 +46,10 @@ function CodeBlockCode({
   const formatCode = (code: string) => {
     if (language !== "sql") return <pre className="px-4 py-4 overflow-x-auto text-sm font-mono">{code}</pre>;
     
-    const lines = code.split('\n');
+    // Clean up code by removing any "400">" prefixes
+    const cleanedCode = code.replace(/400">|^\s*>\s*/gm, '');
+    
+    const lines = cleanedCode.split('\n');
     return (
       <pre className="px-4 py-4 overflow-x-auto text-sm font-mono">
         {lines.map((line, lineIndex) => {
@@ -122,10 +125,10 @@ export function CopyButton({ code }: { code: string }) {
   const [copied, setCopied] = useState(false);
 
   const handleCopy = () => {
-    // Remove "sql" from the beginning if it exists
-    const cleanCode = code.startsWith('sql\n\n') 
-      ? code.substring(5) 
-      : code;
+    // Clean up code by removing "400">" prefixes
+    const cleanCode = code
+      .replace(/400">|^\s*>\s*/gm, '')
+      .replace(/^sql\n+/, ''); // Also remove sql marker at the beginning if it exists
     
     navigator.clipboard.writeText(cleanCode);
     setCopied(true);
