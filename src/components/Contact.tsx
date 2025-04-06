@@ -6,7 +6,7 @@ import {
   Twitter, 
   Linkedin, 
   MessageSquare,
-  GitHub, 
+  Github, 
   Instagram, 
   ExternalLink
 } from 'lucide-react';
@@ -65,7 +65,7 @@ const Contact = () => {
                 type="social"
               />
               <ContactMethod 
-                icon={GitHub} 
+                icon={Github} 
                 label="GitHub" 
                 value="markbenhaim" 
                 link="https://github.com/markbenhaim" 
@@ -87,7 +87,7 @@ const Contact = () => {
 };
 
 interface ContactMethodProps {
-  icon: React.FC<{ size?: number, className?: string }>;
+  icon: React.FC<{ size?: number | string, className?: string }>;
   label: string;
   value: string;
   link: string;

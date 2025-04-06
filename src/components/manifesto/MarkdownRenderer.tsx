@@ -6,6 +6,14 @@ import TextProcessor from './renderers/TextProcessor';
 import CodeBlock from './renderers/CodeBlock';
 import TableRow from './renderers/TableRow';
 import { 
+  Table, 
+  TableBody, 
+  TableCell, 
+  TableHead, 
+  TableHeader, 
+  TableRow as ShadcnTableRow 
+} from "@/components/ui/table";
+import { 
   isWithinCodeBlock, 
   isSqlCodeBlock, 
   extractCodeBlock, 
@@ -140,30 +148,88 @@ const MarkdownRenderer: React.FC<MarkdownRendererProps> = ({ content }) => {
       
       // Tables
       else if (line.startsWith('| ')) {
-        // This is a table separator row, skip rendering but don't return null
+        // Check if this is the start of a table
+        const isTableStart = i === allLines.findIndex(l => l.startsWith('| '));
+        
+        // Skip table separator rows
         if (line.includes('---')) {
           renderedLines.push(<div key={i} className="hidden"></div>);
           continue;
         }
         
-        const cells = line.split('|').filter(cell => cell.trim() !== '');
+        // Collect all table rows until we hit a non-table line
+        const tableRows = [];
+        let currentLine = i;
+        let headerRow = null;
+        let separatorRowIndex = -1;
         
-        // Detect if this is a header row (typically the first row in a table)
-        const isHeaderRow = i < allLines.length - 1 && 
-                         allLines[i + 1]?.includes('---') &&
-                         allLines[i + 1]?.startsWith('|');
+        // First, find the separator row (if any)
+        for (let j = i; j < allLines.length; j++) {
+          if (allLines[j].startsWith('| ') && allLines[j].includes('---')) {
+            separatorRowIndex = j;
+            break;
+          }
+        }
         
-        const isFirstRow = i === allLines.findIndex(l => l.startsWith('| '));
+        // Collect all rows until we hit a non-table line
+        while (currentLine < allLines.length && allLines[currentLine].startsWith('| ')) {
+          const rowLine = allLines[currentLine];
+          
+          // Skip separator rows
+          if (rowLine.includes('---')) {
+            currentLine++;
+            continue;
+          }
+          
+          const cells = rowLine.split('|').filter(cell => cell.trim() !== '');
+          
+          // If this row is before the separator, it's a header row
+          const isHeaderRow = separatorRowIndex > -1 && currentLine < separatorRowIndex;
+          
+          if (isHeaderRow) {
+            headerRow = cells;
+          } else {
+            tableRows.push(cells);
+          }
+          
+          currentLine++;
+        }
         
-        renderedLines.push(
-          <TableRow 
-            key={i} 
-            cells={cells} 
-            isHeaderRow={isHeaderRow} 
-            isFirstRow={isFirstRow}
-            rowIndex={i}
-          />
-        );
+        // Now, render the table with Shadcn UI components
+        if (headerRow || tableRows.length > 0) {
+          renderedLines.push(
+            <div key={`table-${i}`} className="my-6 overflow-x-auto rounded-lg border border-blue-200 dark:border-slate-700">
+              <Table>
+                {headerRow && (
+                  <TableHeader>
+                    <ShadcnTableRow className="bg-blue-100 dark:bg-slate-700">
+                      {headerRow.map((cell, cellIndex) => (
+                        <TableHead key={cellIndex} className="text-indigo-900 dark:text-indigo-300 font-medium">
+                          <TextProcessor text={cell.trim()} />
+                        </TableHead>
+                      ))}
+                    </ShadcnTableRow>
+                  </TableHeader>
+                )}
+                <TableBody>
+                  {tableRows.map((row, rowIndex) => (
+                    <ShadcnTableRow key={rowIndex} className="hover:bg-blue-50 dark:hover:bg-slate-700/80">
+                      {row.map((cell, cellIndex) => (
+                        <TableCell key={cellIndex} className="text-slate-700 dark:text-slate-300">
+                          <TextProcessor text={cell.trim()} />
+                        </TableCell>
+                      ))}
+                    </ShadcnTableRow>
+                  ))}
+                </TableBody>
+              </Table>
+            </div>
+          );
+          
+          // Skip to after the entire table
+          i = currentLine - 1;
+          continue;
+        }
       }
       
       // Horizontal rule
