@@ -9,9 +9,12 @@ import Contact from '@/components/Contact';
 import Footer from '@/components/Footer';
 import ParticleBackground from '@/components/ParticleBackground';
 import { useIsMobile } from '@/hooks/use-mobile';
+import { useTheme } from '@/context/ThemeContext';
+import { cn } from '@/lib/utils';
 
 const Index: React.FC = () => {
   const isMobile = useIsMobile();
+  const { theme } = useTheme();
   
   // Smooth scroll function for anchor links
   useEffect(() => {
@@ -46,7 +49,15 @@ const Index: React.FC = () => {
   return (
     <>
       <div className="relative min-h-screen overflow-x-hidden">
+        <div className={cn(
+          "fixed inset-0 z-[-2]",
+          theme === 'dark' 
+            ? 'bg-gradient-to-b from-background to-background/90' 
+            : 'bg-gradient-to-b from-background to-background/95'
+        )}/>
+        
         <ParticleBackground />
+        
         <Header />
         <main className="flex flex-col items-center justify-center">
           <Hero />

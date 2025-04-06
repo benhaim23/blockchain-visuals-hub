@@ -6,6 +6,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { Link } from 'react-router-dom';
+import { useTheme } from '@/context/ThemeContext';
 
 const navigation = [
   { name: 'About', href: '#about', icon: <User className="h-4 w-4 mr-2" /> },
@@ -19,6 +20,7 @@ const Header: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [scrolled, setScrolled] = useState(false);
   const isMobile = useIsMobile();
+  const { theme } = useTheme();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -36,7 +38,9 @@ const Header: React.FC = () => {
     <header
       className={cn(
         'fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out',
-        scrolled ? 'glass py-3' : 'bg-transparent py-5'
+        scrolled 
+          ? 'backdrop-blur-lg bg-background/80 border-b border-border/30 py-3' 
+          : 'bg-transparent py-5'
       )}
     >
       <div className="container mx-auto px-4 sm:px-6 lg:px-8 max-w-7xl">
@@ -44,9 +48,12 @@ const Header: React.FC = () => {
           <div className="flex-shrink-0">
             <Link 
               to="/" 
-              className="text-xl md:text-2xl font-bold crypto-gradient"
+              className={cn(
+                "text-xl md:text-2xl font-bold transition-all duration-300", 
+                scrolled ? "crypto-gradient" : "text-foreground hover:crypto-gradient"
+              )}
             >
-              My<span className="font-mono">Portfolio</span>
+              Mark<span className="font-mono">Benhaim</span>
             </Link>
           </div>
           
@@ -57,7 +64,12 @@ const Header: React.FC = () => {
                 <Link
                   key={item.name}
                   to={item.href}
-                  className="text-foreground/80 hover:text-foreground transition-colors px-3 py-2 text-sm font-medium rounded-md hover:bg-foreground/5"
+                  className={cn(
+                    "px-3 py-2 text-sm font-medium rounded-md transition-all duration-200",
+                    theme === 'dark' 
+                      ? "text-foreground/80 hover:text-foreground hover:bg-white/5" 
+                      : "text-foreground/70 hover:text-foreground hover:bg-black/5"
+                  )}
                 >
                   {item.name}
                 </Link>
@@ -65,7 +77,12 @@ const Header: React.FC = () => {
                 <a
                   key={item.name}
                   href={item.href}
-                  className="text-foreground/80 hover:text-foreground transition-colors px-3 py-2 text-sm font-medium rounded-md hover:bg-foreground/5"
+                  className={cn(
+                    "px-3 py-2 text-sm font-medium rounded-md transition-all duration-200",
+                    theme === 'dark' 
+                      ? "text-foreground/80 hover:text-foreground hover:bg-white/5" 
+                      : "text-foreground/70 hover:text-foreground hover:bg-black/5"
+                  )}
                 >
                   {item.name}
                 </a>
@@ -93,17 +110,18 @@ const Header: React.FC = () => {
       {/* Mobile menu - updated for better UX */}
       <div
         className={cn(
-          'fixed inset-0 z-50 md:hidden glass',
+          "fixed inset-0 z-50 md:hidden backdrop-blur-xl",
+          theme === 'dark' ? 'bg-background/95' : 'bg-background/95',
           mobileMenuOpen ? 'block' : 'hidden'
         )}
       >
-        <div className="flex items-center justify-between p-4">
+        <div className="flex items-center justify-between p-4 border-b border-border/20">
           <Link 
             to="/" 
             className="text-xl font-bold crypto-gradient"
             onClick={() => setMobileMenuOpen(false)}
           >
-            My<span className="font-mono">Portfolio</span>
+            Mark<span className="font-mono">Benhaim</span>
           </Link>
           <Button
             variant="ghost"
@@ -118,7 +136,12 @@ const Header: React.FC = () => {
         <div className="flex flex-col px-4 py-6 space-y-2">
           <Link
             to="/"
-            className="flex items-center px-4 py-3 rounded-lg bg-primary/10 text-primary"
+            className={cn(
+              "flex items-center px-4 py-3 rounded-lg",
+              theme === 'dark' 
+                ? "bg-primary/20 text-primary hover:bg-primary/30" 
+                : "bg-primary/10 text-primary hover:bg-primary/20"
+            )}
             onClick={() => setMobileMenuOpen(false)}
           >
             <Home className="h-5 w-5 mr-3" />
@@ -130,7 +153,12 @@ const Header: React.FC = () => {
               <Link
                 key={item.name}
                 to={item.href}
-                className="flex items-center px-4 py-3 rounded-lg hover:bg-foreground/5 transition-colors"
+                className={cn(
+                  "flex items-center px-4 py-3 rounded-lg transition-colors",
+                  theme === 'dark' 
+                    ? "hover:bg-white/5" 
+                    : "hover:bg-black/5"
+                )}
                 onClick={() => setMobileMenuOpen(false)}
               >
                 {item.icon}
@@ -140,7 +168,12 @@ const Header: React.FC = () => {
               <a
                 key={item.name}
                 href={item.href}
-                className="flex items-center px-4 py-3 rounded-lg hover:bg-foreground/5 transition-colors"
+                className={cn(
+                  "flex items-center px-4 py-3 rounded-lg transition-colors",
+                  theme === 'dark' 
+                    ? "hover:bg-white/5" 
+                    : "hover:bg-black/5"
+                )}
                 onClick={() => setMobileMenuOpen(false)}
               >
                 {item.icon}
