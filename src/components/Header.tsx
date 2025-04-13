@@ -34,6 +34,21 @@ const Header: React.FC = () => {
     return () => window.removeEventListener('scroll', handleScroll);
   }, [scrolled]);
 
+  // Add effect to control body overflow when mobile menu is open
+  useEffect(() => {
+    if (isMobile) {
+      if (mobileMenuOpen) {
+        document.body.style.overflow = 'hidden';
+      } else {
+        document.body.style.overflow = '';
+      }
+    }
+    
+    return () => {
+      document.body.style.overflow = '';
+    };
+  }, [mobileMenuOpen, isMobile]);
+
   return (
     <header
       className={cn(
@@ -107,11 +122,11 @@ const Header: React.FC = () => {
         </div>
       </div>
 
-      {/* Mobile menu - updated for better UX */}
+      {/* Mobile menu - updated with backdrop blur and improved visibility */}
       <div
         className={cn(
           "fixed inset-0 z-50 md:hidden backdrop-blur-xl",
-          theme === 'dark' ? 'bg-background/95' : 'bg-background/95',
+          theme === 'dark' ? 'bg-background/90' : 'bg-background/90',
           mobileMenuOpen ? 'block' : 'hidden'
         )}
       >
