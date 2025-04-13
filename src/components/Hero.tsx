@@ -87,19 +87,6 @@ const Hero: React.FC = () => {
             </Button>
           </div>
         </div>
-        
-        <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce">
-          <button
-            onClick={scrollToNextSection}
-            className={cn(
-              "text-foreground/60 hover:text-foreground transition-colors p-2 rounded-full text-sm",
-              theme === 'dark' ? 'hover:bg-white/5' : 'hover:bg-black/5'
-            )}
-            aria-label="Scroll down"
-          >
-            Scroll Down
-          </button>
-        </div>
       </div>
       
       <div className={cn(
