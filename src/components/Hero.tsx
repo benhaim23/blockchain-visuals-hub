@@ -9,7 +9,7 @@ const Hero: React.FC = () => {
   const { theme } = useTheme();
   const [scrollY, setScrollY] = useState(0);
   
-  // Track scroll position for parallax effect
+  // Track scroll position for parallax effect - using a reduced intensity
   useEffect(() => {
     const handleScroll = () => {
       setScrollY(window.scrollY);
@@ -33,62 +33,66 @@ const Hero: React.FC = () => {
         {/* Base layer */}
         <div className={cn(
           "absolute inset-0 transition-opacity duration-700",
-          theme === 'dark' ? 'bg-gradient-to-b from-background/90 to-background/70' : 'bg-gradient-to-b from-background/95 to-background/80'
+          theme === 'dark' ? 'bg-gradient-to-b from-background/90 to-background/70' : 'bg-gradient-to-b from-background/90 to-background/80'
         )} />
         
         {/* Blockchain nodes - larger circles */}
-        {Array.from({ length: 12 }).map((_, index) => (
+        {Array.from({ length: 8 }).map((_, index) => (
           <div 
             key={`node-${index}`}
             className={cn(
-              "absolute rounded-full mix-blend-screen opacity-20 animate-pulse",
-              theme === 'dark' ? 'bg-primary/40' : 'bg-primary/30'
+              "absolute rounded-full mix-blend-screen animate-pulse",
+              theme === 'dark' 
+                ? 'bg-primary/40 opacity-20' 
+                : 'bg-primary/60 opacity-30'
             )}
             style={{
-              width: `${20 + Math.random() * 40}px`,
-              height: `${20 + Math.random() * 40}px`,
+              width: `${15 + Math.random() * 30}px`,
+              height: `${15 + Math.random() * 30}px`,
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
-              transform: `translateY(${scrollY * (0.1 + Math.random() * 0.1) * (index % 2 === 0 ? 1 : -1)}px)`,
-              animationDuration: `${3 + Math.random() * 7}s`,
+              transform: `translateY(${scrollY * (0.05 + Math.random() * 0.05) * (index % 2 === 0 ? 1 : -1)}px)`,
+              animationDuration: `${4 + Math.random() * 6}s`,
               animationDelay: `${Math.random() * 5}s`
             }}
           />
         ))}
         
         {/* Blockchain connections - lines */}
-        {Array.from({ length: 20 }).map((_, index) => (
+        {Array.from({ length: 15 }).map((_, index) => (
           <div 
             key={`connection-${index}`}
             className={cn(
-              "absolute h-px transform rotate-45 mix-blend-screen",
-              theme === 'dark' ? 'bg-gradient-to-r from-primary/0 via-primary/30 to-primary/0' 
-                              : 'bg-gradient-to-r from-primary/0 via-primary/20 to-primary/0'
+              "absolute h-px transform",
+              theme === 'dark' 
+                ? 'bg-gradient-to-r from-primary/0 via-primary/30 to-primary/0 opacity-20' 
+                : 'bg-gradient-to-r from-primary/0 via-primary/50 to-primary/0 opacity-30'
             )}
             style={{
-              width: `${100 + Math.random() * 200}px`,
+              width: `${80 + Math.random() * 150}px`,
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
-              transform: `rotate(${Math.random() * 360}deg) translateY(${scrollY * 0.05 * (index % 2 === 0 ? 1 : -1)}px)`,
-              opacity: 0.1 + Math.random() * 0.3
+              transform: `rotate(${Math.random() * 360}deg) translateY(${scrollY * 0.03 * (index % 2 === 0 ? 1 : -1)}px)`,
             }}
           />
         ))}
         
         {/* Floating data cubes */}
-        {Array.from({ length: 8 }).map((_, index) => (
+        {Array.from({ length: 6 }).map((_, index) => (
           <div 
             key={`cube-${index}`}
             className={cn(
-              "absolute opacity-10 mix-blend-screen border border-primary/30",
-              theme === 'dark' ? 'bg-primary/5' : 'bg-primary/5'
+              "absolute border",
+              theme === 'dark' 
+                ? 'bg-primary/5 border-primary/30 opacity-10' 
+                : 'bg-primary/10 border-primary/50 opacity-25'
             )}
             style={{
-              width: `${10 + Math.random() * 15}px`,
-              height: `${10 + Math.random() * 15}px`,
+              width: `${8 + Math.random() * 12}px`,
+              height: `${8 + Math.random() * 12}px`,
               left: `${Math.random() * 100}%`,
               top: `${Math.random() * 100}%`,
-              transform: `translateY(${scrollY * (0.2 + Math.random() * 0.1) * (index % 2 === 0 ? -1 : 1)}px) rotate(${Math.random() * 45}deg)`,
+              transform: `translateY(${scrollY * (0.1 + Math.random() * 0.05) * (index % 2 === 0 ? -1 : 1)}px) rotate(${Math.random() * 45}deg)`,
             }}
           />
         ))}
