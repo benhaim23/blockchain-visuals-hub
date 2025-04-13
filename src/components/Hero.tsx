@@ -1,5 +1,4 @@
-
-import React, { useEffect, useState } from 'react';
+import React from 'react';
 import { CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -7,17 +6,6 @@ import { useTheme } from '@/context/ThemeContext';
 
 const Hero: React.FC = () => {
   const { theme } = useTheme();
-  const [scrollY, setScrollY] = useState(0);
-  
-  // Track scroll position for parallax effect - using a reduced intensity
-  useEffect(() => {
-    const handleScroll = () => {
-      setScrollY(window.scrollY);
-    };
-    
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
   
   const scrollToNextSection = () => {
     const aboutSection = document.getElementById('about');
@@ -28,76 +16,6 @@ const Hero: React.FC = () => {
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16 px-4">
-      {/* Blockchain Parallax Background */}
-      <div className="absolute inset-0 z-0">
-        {/* Base layer */}
-        <div className={cn(
-          "absolute inset-0 transition-opacity duration-700",
-          theme === 'dark' ? 'bg-gradient-to-b from-background/90 to-background/70' : 'bg-gradient-to-b from-background/90 to-background/80'
-        )} />
-        
-        {/* Blockchain nodes - larger circles */}
-        {Array.from({ length: 8 }).map((_, index) => (
-          <div 
-            key={`node-${index}`}
-            className={cn(
-              "absolute rounded-full mix-blend-screen animate-pulse",
-              theme === 'dark' 
-                ? 'bg-primary/40 opacity-20' 
-                : 'bg-primary/60 opacity-30'
-            )}
-            style={{
-              width: `${15 + Math.random() * 30}px`,
-              height: `${15 + Math.random() * 30}px`,
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              transform: `translateY(${scrollY * (0.05 + Math.random() * 0.05) * (index % 2 === 0 ? 1 : -1)}px)`,
-              animationDuration: `${4 + Math.random() * 6}s`,
-              animationDelay: `${Math.random() * 5}s`
-            }}
-          />
-        ))}
-        
-        {/* Blockchain connections - lines */}
-        {Array.from({ length: 15 }).map((_, index) => (
-          <div 
-            key={`connection-${index}`}
-            className={cn(
-              "absolute h-px transform",
-              theme === 'dark' 
-                ? 'bg-gradient-to-r from-primary/0 via-primary/30 to-primary/0 opacity-20' 
-                : 'bg-gradient-to-r from-primary/0 via-primary/50 to-primary/0 opacity-30'
-            )}
-            style={{
-              width: `${80 + Math.random() * 150}px`,
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              transform: `rotate(${Math.random() * 360}deg) translateY(${scrollY * 0.03 * (index % 2 === 0 ? 1 : -1)}px)`,
-            }}
-          />
-        ))}
-        
-        {/* Floating data cubes */}
-        {Array.from({ length: 6 }).map((_, index) => (
-          <div 
-            key={`cube-${index}`}
-            className={cn(
-              "absolute border",
-              theme === 'dark' 
-                ? 'bg-primary/5 border-primary/30 opacity-10' 
-                : 'bg-primary/10 border-primary/50 opacity-25'
-            )}
-            style={{
-              width: `${8 + Math.random() * 12}px`,
-              height: `${8 + Math.random() * 12}px`,
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-              transform: `translateY(${scrollY * (0.1 + Math.random() * 0.05) * (index % 2 === 0 ? -1 : 1)}px) rotate(${Math.random() * 45}deg)`,
-            }}
-          />
-        ))}
-      </div>
-    
       <div className="container mx-auto max-w-5xl px-4 sm:px-6 text-center z-10">
         <div className="space-y-8 mx-auto">
           <div className="space-y-4 animate-fade-in-down">
