@@ -122,11 +122,13 @@ const Header: React.FC = () => {
         </div>
       </div>
 
-      {/* Mobile menu - updated with backdrop blur and improved visibility */}
+      {/* Mobile menu - updated with enhanced backdrop blur and improved visibility */}
       <div
         className={cn(
-          "fixed inset-0 z-50 md:hidden backdrop-blur-xl",
-          theme === 'dark' ? 'bg-background/90' : 'bg-background/90',
+          "fixed inset-0 z-50 md:hidden",
+          theme === 'dark' 
+            ? 'bg-background/80 backdrop-blur-2xl' 
+            : 'bg-background/80 backdrop-blur-2xl',
           mobileMenuOpen ? 'block' : 'hidden'
         )}
       >
