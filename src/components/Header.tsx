@@ -122,18 +122,10 @@ const Header: React.FC = () => {
         </div>
       </div>
 
-      {/* Backdrop overlay with blur for mobile menu */}
-      {mobileMenuOpen && (
-        <div
-          className="fixed inset-0 z-40 bg-background/40 backdrop-blur-md md:hidden"
-          onClick={() => setMobileMenuOpen(false)}
-        />
-      )}
-
-      {/* Mobile menu - with improved visibility */}
+      {/* Mobile menu - updated with backdrop blur and improved visibility */}
       <div
         className={cn(
-          "fixed inset-0 z-50 md:hidden",
+          "fixed inset-0 z-50 md:hidden backdrop-blur-xl",
           theme === 'dark' ? 'bg-background/90' : 'bg-background/90',
           mobileMenuOpen ? 'block' : 'hidden'
         )}
