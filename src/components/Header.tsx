@@ -51,15 +51,22 @@ const Header: React.FC = () => {
 
   return (
     <>
-      {/* Backdrop blur overlay for mobile menu */}
-      {mobileMenuOpen && (
-        <div 
-          className="fixed inset-0 z-40 md:hidden backdrop-blur-xl bg-background/50"
-          aria-hidden="true"
-          onClick={() => setMobileMenuOpen(false)}
-        />
-      )}
-      
+      {/* Overlay backdrop for mobile menu - separated from the menu for better blur effect */}
+      <div
+        className={cn(
+          "fixed inset-0 z-40 md:hidden transition-all duration-300",
+          mobileMenuOpen 
+            ? "opacity-100 pointer-events-auto" 
+            : "opacity-0 pointer-events-none"
+        )}
+        style={{
+          backdropFilter: mobileMenuOpen ? 'blur(8px)' : 'none',
+          WebkitBackdropFilter: mobileMenuOpen ? 'blur(8px)' : 'none', // For Safari support
+          backgroundColor: theme === 'dark' ? 'rgba(0, 0, 0, 0.5)' : 'rgba(255, 255, 255, 0.5)'
+        }}
+        onClick={() => setMobileMenuOpen(false)}
+      />
+
       <header
         className={cn(
           'fixed top-0 left-0 right-0 z-50 transition-all duration-300 ease-in-out',
@@ -132,15 +139,15 @@ const Header: React.FC = () => {
           </div>
         </div>
 
-        {/* Mobile menu - updated with improved visibility and z-index */}
+        {/* Mobile menu with content */}
         <div
           className={cn(
-            "fixed inset-0 z-50 md:hidden",
-            mobileMenuOpen ? 'block' : 'hidden'
+            "fixed inset-0 z-50 md:hidden transition-all duration-300",
+            mobileMenuOpen ? 'opacity-100' : 'opacity-0 pointer-events-none'
           )}
         >
-          <div className="relative h-full w-full">
-            <div className="flex items-center justify-between p-4 border-b border-border/20 bg-background">
+          <div className="relative h-full flex flex-col bg-background/90">
+            <div className="flex items-center justify-between p-4 border-b border-border/20">
               <Link 
                 to="/" 
                 className="text-xl font-bold crypto-gradient"
@@ -158,7 +165,7 @@ const Header: React.FC = () => {
                 <span className="sr-only">Close menu</span>
               </Button>
             </div>
-            <div className="flex flex-col px-4 py-6 space-y-2 bg-background h-full overflow-y-auto">
+            <div className="flex flex-col px-4 py-6 space-y-2">
               <Link
                 to="/"
                 className={cn(
