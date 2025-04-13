@@ -1,19 +1,12 @@
 
 import React from 'react';
-import { ChevronDown, CheckCircle2 } from 'lucide-react';
+import { CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/context/ThemeContext';
 
 const Hero: React.FC = () => {
   const { theme } = useTheme();
-  
-  const scrollToNextSection = () => {
-    const aboutSection = document.getElementById('about');
-    if (aboutSection) {
-      aboutSection.scrollIntoView({ behavior: 'smooth' });
-    }
-  };
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16 px-4">
@@ -88,20 +81,9 @@ const Hero: React.FC = () => {
             </Button>
           </div>
         </div>
-        
-        <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce">
-          <button
-            onClick={scrollToNextSection}
-            className={cn(
-              "text-foreground/60 hover:text-foreground transition-colors p-2 rounded-full",
-              theme === 'dark' ? 'hover:bg-white/5' : 'hover:bg-black/5'
-            )}
-            aria-label="Scroll down"
-          >
-            <ChevronDown className="h-8 w-8" />
-          </button>
-        </div>
       </div>
+      
+      {/* Removed the down arrow button */}
       
       {/* Enhanced decorative elements */}
       <div className={cn(
