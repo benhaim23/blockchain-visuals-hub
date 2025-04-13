@@ -1,4 +1,5 @@
-import React from 'react';
+
+import React, { useEffect, useState } from 'react';
 import { CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
@@ -6,6 +7,17 @@ import { useTheme } from '@/context/ThemeContext';
 
 const Hero: React.FC = () => {
   const { theme } = useTheme();
+  const [scrollY, setScrollY] = useState(0);
+  
+  // Track scroll position for parallax effect
+  useEffect(() => {
+    const handleScroll = () => {
+      setScrollY(window.scrollY);
+    };
+    
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
   
   const scrollToNextSection = () => {
     const aboutSection = document.getElementById('about');
@@ -16,6 +28,72 @@ const Hero: React.FC = () => {
 
   return (
     <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-16 px-4">
+      {/* Blockchain Parallax Background */}
+      <div className="absolute inset-0 z-0">
+        {/* Base layer */}
+        <div className={cn(
+          "absolute inset-0 transition-opacity duration-700",
+          theme === 'dark' ? 'bg-gradient-to-b from-background/90 to-background/70' : 'bg-gradient-to-b from-background/95 to-background/80'
+        )} />
+        
+        {/* Blockchain nodes - larger circles */}
+        {Array.from({ length: 12 }).map((_, index) => (
+          <div 
+            key={`node-${index}`}
+            className={cn(
+              "absolute rounded-full mix-blend-screen opacity-20 animate-pulse",
+              theme === 'dark' ? 'bg-primary/40' : 'bg-primary/30'
+            )}
+            style={{
+              width: `${20 + Math.random() * 40}px`,
+              height: `${20 + Math.random() * 40}px`,
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              transform: `translateY(${scrollY * (0.1 + Math.random() * 0.1) * (index % 2 === 0 ? 1 : -1)}px)`,
+              animationDuration: `${3 + Math.random() * 7}s`,
+              animationDelay: `${Math.random() * 5}s`
+            }}
+          />
+        ))}
+        
+        {/* Blockchain connections - lines */}
+        {Array.from({ length: 20 }).map((_, index) => (
+          <div 
+            key={`connection-${index}`}
+            className={cn(
+              "absolute h-px transform rotate-45 mix-blend-screen",
+              theme === 'dark' ? 'bg-gradient-to-r from-primary/0 via-primary/30 to-primary/0' 
+                              : 'bg-gradient-to-r from-primary/0 via-primary/20 to-primary/0'
+            )}
+            style={{
+              width: `${100 + Math.random() * 200}px`,
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              transform: `rotate(${Math.random() * 360}deg) translateY(${scrollY * 0.05 * (index % 2 === 0 ? 1 : -1)}px)`,
+              opacity: 0.1 + Math.random() * 0.3
+            }}
+          />
+        ))}
+        
+        {/* Floating data cubes */}
+        {Array.from({ length: 8 }).map((_, index) => (
+          <div 
+            key={`cube-${index}`}
+            className={cn(
+              "absolute opacity-10 mix-blend-screen border border-primary/30",
+              theme === 'dark' ? 'bg-primary/5' : 'bg-primary/5'
+            )}
+            style={{
+              width: `${10 + Math.random() * 15}px`,
+              height: `${10 + Math.random() * 15}px`,
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              transform: `translateY(${scrollY * (0.2 + Math.random() * 0.1) * (index % 2 === 0 ? -1 : 1)}px) rotate(${Math.random() * 45}deg)`,
+            }}
+          />
+        ))}
+      </div>
+    
       <div className="container mx-auto max-w-5xl px-4 sm:px-6 text-center z-10">
         <div className="space-y-8 mx-auto">
           <div className="space-y-4 animate-fade-in-down">
