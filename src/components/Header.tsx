@@ -122,92 +122,101 @@ const Header: React.FC = () => {
         </div>
       </div>
 
-      {/* Mobile menu - updated with backdrop blur and improved visibility */}
+      {/* Backdrop overlay - added for the blur effect */}
+      {mobileMenuOpen && (
+        <div 
+          className="fixed inset-0 z-40 md:hidden bg-background/50 backdrop-blur-xl"
+          onClick={() => setMobileMenuOpen(false)}
+        />
+      )}
+
+      {/* Mobile menu - positioned on top of the backdrop */}
       <div
         className={cn(
-          "fixed inset-0 z-50 md:hidden backdrop-blur-xl",
-          theme === 'dark' ? 'bg-background/90' : 'bg-background/90',
+          "fixed inset-0 z-50 md:hidden",
           mobileMenuOpen ? 'block' : 'hidden'
         )}
       >
-        <div className="flex items-center justify-between p-4 border-b border-border/20">
-          <Link 
-            to="/" 
-            className="text-xl font-bold crypto-gradient"
-            onClick={() => setMobileMenuOpen(false)}
-          >
-            Mark<span className="font-mono">Benhaim</span>
-          </Link>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="text-foreground"
-            onClick={() => setMobileMenuOpen(false)}
-          >
-            <X className="h-6 w-6" />
-            <span className="sr-only">Close menu</span>
-          </Button>
-        </div>
-        <div className="flex flex-col px-4 py-6 space-y-2">
-          <Link
-            to="/"
-            className={cn(
-              "flex items-center px-4 py-3 rounded-lg",
-              theme === 'dark' 
-                ? "bg-primary/20 text-primary hover:bg-primary/30" 
-                : "bg-primary/10 text-primary hover:bg-primary/20"
-            )}
-            onClick={() => setMobileMenuOpen(false)}
-          >
-            <Home className="h-5 w-5 mr-3" />
-            <span className="font-medium">Home</span>
-          </Link>
-          
-          {navigation.map((item) => (
-            item.isPage ? (
-              <Link
-                key={item.name}
-                to={item.href}
-                className={cn(
-                  "flex items-center px-4 py-3 rounded-lg transition-colors",
-                  theme === 'dark' 
-                    ? "hover:bg-white/5" 
-                    : "hover:bg-black/5"
-                )}
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                {item.icon}
-                <span>{item.name}</span>
-              </Link>
-            ) : (
-              <a
-                key={item.name}
-                href={item.href}
-                className={cn(
-                  "flex items-center px-4 py-3 rounded-lg transition-colors",
-                  theme === 'dark' 
-                    ? "hover:bg-white/5" 
-                    : "hover:bg-black/5"
-                )}
-                onClick={() => setMobileMenuOpen(false)}
-              >
-                {item.icon}
-                <span>{item.name}</span>
-              </a>
-            )
-          ))}
+        <div className="fixed inset-y-0 left-0 w-full max-w-xs bg-background shadow-lg">
+          <div className="flex items-center justify-between p-4 border-b border-border/20">
+            <Link 
+              to="/" 
+              className="text-xl font-bold crypto-gradient"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              Mark<span className="font-mono">Benhaim</span>
+            </Link>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-foreground"
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              <X className="h-6 w-6" />
+              <span className="sr-only">Close menu</span>
+            </Button>
+          </div>
+          <div className="flex flex-col px-4 py-6 space-y-2">
+            <Link
+              to="/"
+              className={cn(
+                "flex items-center px-4 py-3 rounded-lg",
+                theme === 'dark' 
+                  ? "bg-primary/20 text-primary hover:bg-primary/30" 
+                  : "bg-primary/10 text-primary hover:bg-primary/20"
+              )}
+              onClick={() => setMobileMenuOpen(false)}
+            >
+              <Home className="h-5 w-5 mr-3" />
+              <span className="font-medium">Home</span>
+            </Link>
+            
+            {navigation.map((item) => (
+              item.isPage ? (
+                <Link
+                  key={item.name}
+                  to={item.href}
+                  className={cn(
+                    "flex items-center px-4 py-3 rounded-lg transition-colors",
+                    theme === 'dark' 
+                      ? "hover:bg-white/5" 
+                      : "hover:bg-black/5"
+                  )}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  {item.icon}
+                  <span>{item.name}</span>
+                </Link>
+              ) : (
+                <a
+                  key={item.name}
+                  href={item.href}
+                  className={cn(
+                    "flex items-center px-4 py-3 rounded-lg transition-colors",
+                    theme === 'dark' 
+                      ? "hover:bg-white/5" 
+                      : "hover:bg-black/5"
+                  )}
+                  onClick={() => setMobileMenuOpen(false)}
+                >
+                  {item.icon}
+                  <span>{item.name}</span>
+                </a>
+              )
+            ))}
 
-          {isMobile && (
-            <div className="mt-8 pt-6 border-t border-border/30">
-              <a
-                href="mailto:markbenhaim0@gmail.com"
-                className="flex items-center justify-center w-full px-4 py-3 rounded-lg bg-primary text-primary-foreground"
-              >
-                <Mail className="h-5 w-5 mr-2" />
-                <span className="font-medium">Contact Me</span>
-              </a>
-            </div>
-          )}
+            {isMobile && (
+              <div className="mt-8 pt-6 border-t border-border/30">
+                <a
+                  href="mailto:markbenhaim0@gmail.com"
+                  className="flex items-center justify-center w-full px-4 py-3 rounded-lg bg-primary text-primary-foreground"
+                >
+                  <Mail className="h-5 w-5 mr-2" />
+                  <span className="font-medium">Contact Me</span>
+                </a>
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </header>
