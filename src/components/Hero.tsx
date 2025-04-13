@@ -1,5 +1,6 @@
+
 import React from 'react';
-import { CheckCircle2 } from 'lucide-react';
+import { ChevronDown, CheckCircle2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { useTheme } from '@/context/ThemeContext';
@@ -87,8 +88,22 @@ const Hero: React.FC = () => {
             </Button>
           </div>
         </div>
+        
+        <div className="absolute bottom-10 left-1/2 transform -translate-x-1/2 animate-bounce">
+          <button
+            onClick={scrollToNextSection}
+            className={cn(
+              "text-foreground/60 hover:text-foreground transition-colors p-2 rounded-full",
+              theme === 'dark' ? 'hover:bg-white/5' : 'hover:bg-black/5'
+            )}
+            aria-label="Scroll down"
+          >
+            <ChevronDown className="h-8 w-8" />
+          </button>
+        </div>
       </div>
       
+      {/* Enhanced decorative elements */}
       <div className={cn(
         "absolute -top-40 -right-40 w-96 h-96 rounded-full blur-3xl opacity-50",
         theme === 'dark' ? 'bg-primary/10' : 'bg-primary/5'
